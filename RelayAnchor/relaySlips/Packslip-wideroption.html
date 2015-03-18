@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="">
+<meta name="author" content="">
+
+<title>Relay Slips</title>
+
+<!-- Css Start -->
+<link rel="stylesheet" href="bootstrap.min.css" />
+<link rel="stylesheet" href="bootstrap-theme.min.css" />
+<link rel="stylesheet" href="relaySlips.css" />
+<!-- Css End -->
+
+<!-- Script Start -->
+<script type="text/javascript" src="jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="bootstrap.min.js"></script>
+<!-- Script End -->
+
+
+</head>
+
+<body>
+
+<!-- Relay Slip Wrapper Start -->
+<div class="relaySlipWrapper">
+	<!-- Relay Header Section Start -->
+    <div class="headerSection">
+    	<div class="text-center mb10">
+        	<img src="printerReceiptHeader.png" border="0" />
+        </div>
+        <div class="text-center">
+        	<img src="this_is_how_i_mall.png" border="0" />
+        </div>
+    </div><!-- Relay Header Section End -->
+    <!-- Body Section Start -->
+    <div class="bodySection pt0">
+    	<!-- Order Number Start -->
+        <div class="orderNumber clearfix p0">
+        	
+            <div class="col-md-6 col-xs-12 col-sm-6 fs20 pt10 pb10 brRGrayColor brRGrayColor-xs">
+            	
+                <div id="orderId">
+                	Order <span>#167345</span>
+                </div>
+                
+                <div>
+                	<span id="purchaseDate" class="lightGray fs14 fwn">03/13/2015</span>
+                    <span class="lightGray fwn fs14"> | </span>
+                    <span id="mallName" class="lightGray fs14 fwn">Oakbrook Mall</span>
+                </div>
+                
+            </div>
+            
+            <div class="col-md-6 col-xs-12 col-sm-6 pt10 pb10">
+            	<span id="fulfillment" class="fs17 fwb text-uppercase"> DELIVERY </span>
+                <img id="fulfillmentImage" src="" />
+                <!-- Change Classes as per Order   ** delivery / stationPickUp / officePickUp **  -->
+                <span class="delivery"></span>
+            </div>
+            
+        </div><!-- Order Number End -->
+        <!-- Address Outer Start -->
+        <div class="addressOuter">
+        	<div class="row mb10">
+            	<div class="col-md-2 col-sm-2 col-xs-3 fs14 lightGray pt2">Name:</div>
+                <div id="name" class="col-md-9 col-xs-9 fs17 fwb blackColor p0">David Fincher</div>
+            </div>
+            <div class="row mb10">
+            	<div class="col-md-2 col-sm-2 col-xs-3 fs14 lightGray pt2">Address:</div>
+                <div id="address" class="col-md-9 col-xs-9 fs17 fwb blackColor p0">1917 Nightsong CT, Schaumburg, 60194</div>
+            </div>
+            <div class="row mb10">
+            	<div class="col-md-2 col-sm-2 col-xs-3 fs14 lightGray pt2">Phone:</div>
+                <div id="phone" class="col-md-9 col-xs-9 fs17 fwb blackColors p0">6302347890</div>
+            </div>
+        </div><!-- Address Outer End -->
+        <!-- Items Header Start -->
+        <div class="itemsHeader mt10">
+            <div class="text-center m-top-10  lightGray">ITEMS</div>
+            <hr class="w40p m-top-10  pull-left m0 brBGrayColor">
+            <hr class="w40p m-top-10  pull-right m0 brBGrayColor">
+        </div><!-- Items Header End -->
+        <!-- Items Outer Start -->
+        <div id="itemList" class="itemsOuter">
+            
+            <div id="totals" class="row">
+            	<div class="col-md-9 col-xs-9 fs14 lightGray-3 text-right">Tax</div>
+                <div id="tax" class="col-md-3 col-xs-3 fs14 lightGray-3 p0 text-right">$15.39</div>
+            </div>
+            <div class="row">
+            	<div class="col-md-9 col-xs-9 fs14 lightGray-3 text-right">Shipping</div>
+                <div id="shipping" class="col-md-3 col-xs-3 fs14 lightGray-3 p0 text-right">$5.00</div>
+            </div>
+            <div class="row">
+            	<div class="col-md-9 col-xs-9 fs14 blackColors text-right">Total</div>
+                <div id="total" class="col-md-3 col-xs-3 fs14 fwb blackColors p0 text-right">$186.39</div>
+            </div>
+            
+        </div><!-- Items Outer End -->
+        
+        
+        
+        
+        <!-- Thank You Message Outer Start -->
+        <div id="thankYouMessage" class="thankYouMessageOuter fs14">
+        	Hi David, <br /><br />
+
+            Thank you for your business.  It is a pleasure to serve you!<br /><br />
+            
+            Thanks,<br />
+            Michael Cameron<br />
+            SYW Relay Runner<br />
+        </div><!-- Thank You Message Outer End -->
+        
+    </div><!-- Relay Slip Wrapper End -->
+</div><!-- Body Section End -->
+
+</body>
+</html>

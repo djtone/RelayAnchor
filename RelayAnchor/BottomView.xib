@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.iPad.XIB" version="3.0" toolsVersion="5056" systemVersion="13E28" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="BottomView">
+            <rect key="frame" x="0.0" y="0.0" width="1024" height="80"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="BottomView_ViewSeparator.png" id="oU8-61-48V">
+                    <rect key="frame" x="0.0" y="0.0" width="1024" height="4"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                </imageView>
+                <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="BottomView_SelectionTriangle.png" id="blK-Nb-CVN">
+                    <rect key="frame" x="102" y="-8" width="21" height="13"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                </imageView>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="okc-jd-Qif">
+                    <rect key="frame" x="70" y="19" width="35" height="44"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <state key="normal" image="BottomView_Open.png">
+                        <color key="titleColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                    <connections>
+                        <action selector="openButtonAction:" destination="iN0-l3-epB" eventType="touchUpInside" id="HDa-hH-9qm"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="Hax-d2-9JU">
+                    <rect key="frame" x="295" y="13" width="40" height="52"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <state key="normal" image="BottomView_Ready.png">
+                        <color key="titleColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                    <connections>
+                        <action selector="readyButtonAction:" destination="iN0-l3-epB" eventType="touchUpInside" id="tMQ-UD-46X"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="RNn-vs-RNr">
+                    <rect key="frame" x="543" y="17" width="59" height="45"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <state key="normal" image="BottomView_Delivered.png">
+                        <color key="titleColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                    <connections>
+                        <action selector="deliveredButtonAction:" destination="iN0-l3-epB" eventType="touchUpInside" id="9Hm-PD-xuF"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="wxW-xM-3Ty">
+                    <rect key="frame" x="798" y="14" width="129" height="46"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <state key="normal" image="BottomView_CancelledReturned.png">
+                        <color key="titleColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                    <connections>
+                        <action selector="cancelledReturnedButtonAction:" destination="iN0-l3-epB" eventType="touchUpInside" id="Lgo-JH-1Lb"/>
+                    </connections>
+                </button>
+            </subviews>
+            <color key="backgroundColor" red="0.90980392160000001" green="0.90588235289999997" blue="0.90588235289999997" alpha="1" colorSpace="calibratedRGB"/>
+            <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
+            <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="cancelledReturnedButton" destination="wxW-xM-3Ty" id="AEQ-fp-1l9"/>
+                <outlet property="deliveredButton" destination="RNn-vs-RNr" id="TeX-be-iu3"/>
+                <outlet property="openButton" destination="okc-jd-Qif" id="hdc-nJ-aSV"/>
+                <outlet property="readyButton" destination="Hax-d2-9JU" id="bci-sJ-wJd"/>
+                <outlet property="triangleSelectionIcon" destination="blK-Nb-CVN" id="AbR-oO-1pc"/>
+            </connections>
+        </view>
+    </objects>
+    <resources>
+        <image name="BottomView_CancelledReturned.png" width="258" height="93"/>
+        <image name="BottomView_Delivered.png" width="118" height="89"/>
+        <image name="BottomView_Open.png" width="69" height="88"/>
+        <image name="BottomView_Ready.png" width="81" height="104"/>
+        <image name="BottomView_SelectionTriangle.png" width="21" height="13"/>
+        <image name="BottomView_ViewSeparator.png" width="1072" height="4"/>
+    </resources>
+</document>
