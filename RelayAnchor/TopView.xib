@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.iPad.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.iPad.XIB" version="3.0" toolsVersion="6751" systemVersion="14C109" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6736"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
@@ -58,8 +58,8 @@
                                 <action selector="searchButtonAction:" destination="Mbz-9X-HUD" eventType="touchUpInside" id="svJ-Gs-3kV"/>
                             </connections>
                         </button>
-                        <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Find the Orders Here..." minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="VX0-Y6-eyp">
-                            <rect key="frame" x="13" y="1" width="204" height="23"/>
+                        <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Find the Orders Here..." minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="VX0-Y6-eyp">
+                            <rect key="frame" x="13" y="1" width="217" height="23"/>
                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <fontDescription key="fontDescription" type="system" pointSize="13"/>
                             <textInputTraits key="textInputTraits" autocorrectionType="no"/>
@@ -67,6 +67,9 @@
                                 <outlet property="delegate" destination="Mbz-9X-HUD" id="Ec0-Vr-VoG"/>
                             </connections>
                         </textField>
+                        <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" style="white" translatesAutoresizingMaskIntoConstraints="NO" id="YWJ-HH-TVv">
+                            <rect key="frame" x="205" y="2" width="20" height="20"/>
+                        </activityIndicatorView>
                     </subviews>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                 </view>
@@ -82,7 +85,7 @@
                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="Banner_SelectMallIcon.png" translatesAutoresizingMaskIntoConstraints="NO" id="khf-tz-teW">
                             <rect key="frame" x="0.0" y="7" width="15" height="20"/>
                         </imageView>
-                        <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Zs5-XH-WeC">
+                        <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Zs5-XH-WeC">
                             <rect key="frame" x="18" y="1" width="97" height="30"/>
                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                             <state key="normal" title="Oakbrook Mall">
@@ -96,36 +99,10 @@
                     </subviews>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                 </view>
-                <view hidden="YES" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wXh-PG-A9w">
-                    <rect key="frame" x="818" y="51" width="158" height="45"/>
-                    <subviews>
-                        <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vA2-uc-nZO">
-                            <rect key="frame" x="0.0" y="8" width="158" height="37"/>
-                            <color key="backgroundColor" red="0.88235294119999996" green="0.88235294119999996" blue="0.88235294119999996" alpha="1" colorSpace="calibratedRGB"/>
-                            <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                            <state key="normal" title="Logout">
-                                <color key="titleColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
-                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                            </state>
-                            <userDefinedRuntimeAttributes>
-                                <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
-                                    <integer key="value" value="2"/>
-                                </userDefinedRuntimeAttribute>
-                            </userDefinedRuntimeAttributes>
-                            <connections>
-                                <action selector="logoutAction:" destination="Mbz-9X-HUD" eventType="touchUpInside" id="NZP-Fq-8o3"/>
-                            </connections>
-                        </button>
-                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="BottomView_SelectionTriangle.png" translatesAutoresizingMaskIntoConstraints="NO" id="qQ9-ni-doe">
-                            <rect key="frame" x="66" y="-3" width="25" height="15"/>
-                        </imageView>
-                    </subviews>
-                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                </view>
-                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1s2-zZ-IV3">
-                    <rect key="frame" x="409" y="26" width="140" height="30"/>
+                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1s2-zZ-IV3">
+                    <rect key="frame" x="331" y="26" width="187" height="30"/>
                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                    <state key="normal" title="No Printer Selected">
+                    <state key="normal" title="  No Printer Selected" image="TopView_printerIconX.png">
                         <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
@@ -133,16 +110,41 @@
                         <action selector="printerAction:" destination="Mbz-9X-HUD" eventType="touchUpInside" id="7Mm-9i-cbn"/>
                     </connections>
                 </button>
+                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Tpz-ZJ-aZ1">
+                    <rect key="frame" x="453" y="27" width="51" height="31"/>
+                    <color key="onTintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <connections>
+                        <action selector="keynoteOrdersSwitchChanged:" destination="Mbz-9X-HUD" eventType="valueChanged" id="M1R-s9-t8S"/>
+                    </connections>
+                </switch>
+                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3wR-l5-J1z">
+                    <rect key="frame" x="331" y="26" width="123" height="30"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <state key="normal" title="Keynote Orders">
+                        <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                    <connections>
+                        <action selector="keynoteOrdersAction:" destination="Mbz-9X-HUD" eventType="touchUpInside" id="f7s-I9-NZr"/>
+                    </connections>
+                </button>
+                <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" style="white" translatesAutoresizingMaskIntoConstraints="NO" id="JGn-Ul-ewf">
+                    <rect key="frame" x="510" y="33" width="20" height="20"/>
+                </activityIndicatorView>
             </subviews>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             <nil key="simulatedStatusBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
                 <outlet property="backButton" destination="reO-Wf-gwL" id="3Bc-gl-rId"/>
+                <outlet property="keynoteActivityIndicator" destination="JGn-Ul-ewf" id="8B5-lq-aRL"/>
+                <outlet property="keynoteOrdersButton" destination="3wR-l5-J1z" id="ZnC-R0-nvr"/>
+                <outlet property="keynoteOrdersSwitch" destination="Tpz-ZJ-aZ1" id="jzA-Yy-fGM"/>
                 <outlet property="logo" destination="Nkj-1A-rrA" id="r8j-K9-z3C"/>
-                <outlet property="logoutView" destination="wXh-PG-A9w" id="8o4-WO-7Rg"/>
+                <outlet property="mallNameButton" destination="Zs5-XH-WeC" id="aSI-wa-Txl"/>
                 <outlet property="orderNumberLabel" destination="f3l-NE-d6M" id="RWx-ic-jL8"/>
                 <outlet property="printerButton" destination="1s2-zZ-IV3" id="3iu-lc-UPp"/>
+                <outlet property="searchActivityIndicator" destination="YWJ-HH-TVv" id="nbQ-MC-7UG"/>
                 <outlet property="searchBarTextField" destination="VX0-Y6-eyp" id="MIa-GO-6SQ"/>
                 <outlet property="searchSeparator" destination="KAy-LH-833" id="oDc-Ch-aO4"/>
                 <outlet property="searchView" destination="iv2-Kp-RVk" id="KPZ-s4-Las"/>
@@ -155,10 +157,10 @@
         <image name="Banner_SearchButton.png" width="16" height="15"/>
         <image name="Banner_SelectMallIcon.png" width="18" height="23"/>
         <image name="Banner_Separator.png" width="3" height="26"/>
-        <image name="BottomView_SelectionTriangle.png" width="21" height="13"/>
         <image name="TopView_Background.png" width="1024" height="70"/>
         <image name="TopView_Logo.png" width="222" height="27"/>
         <image name="TopView_SearchBar.png" width="248" height="23"/>
+        <image name="TopView_printerIconX.png" width="30" height="30"/>
     </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>

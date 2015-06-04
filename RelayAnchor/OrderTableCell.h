@@ -19,10 +19,12 @@
 @property (weak, nonatomic) IBOutlet UILabel *statusLabel;
 @property (weak, nonatomic) IBOutlet UIView *colorDot;
 @property (weak, nonatomic) IBOutlet UILabel *keynoteOrderLabel;
+@property (weak, nonatomic) IBOutlet UILabel *hasDeliveryItemsLabel;
 
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *loadingIndicator;
 @property (weak, nonatomic) IBOutlet UIButton *confirmDeliveryButton;
 
-@property (weak, nonatomic) IBOutlet UIView *setStatusButtons;
+@property (weak, nonatomic) IBOutlet UIView *swipeLeftMenu;
+@property (weak, nonatomic) IBOutlet UIButton *overrideReadyStatusButton;
 
 @end

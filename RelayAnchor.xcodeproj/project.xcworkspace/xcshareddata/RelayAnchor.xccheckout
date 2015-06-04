@@ -6,29 +6,33 @@
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>9C9CB13B-038A-4C62-9843-7A05044C13F0</string>
+	<key>IDESourceControlProjectName</key>
+	<string>RelayAnchor</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>DA401845F459A69E7D6D97BC57ECA2D3300E978B</key>
+		<key>A206C0EF0A3CDF6EBFF06174BCD1854FBC4F35ED</key>
 		<string>https://github.com/chuck21619/RelayAnchor.git</string>
 	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>RelayAnchor.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>DA401845F459A69E7D6D97BC57ECA2D3300E978B</key>
-		<string>RelayAnchor/</string>
+		<key>A206C0EF0A3CDF6EBFF06174BCD1854FBC4F35ED</key>
+		<string>../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/chuck21619/RelayAnchor.git</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>DA401845F459A69E7D6D97BC57ECA2D3300E978B</string>
+	<string>A206C0EF0A3CDF6EBFF06174BCD1854FBC4F35ED</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>DA401845F459A69E7D6D97BC57ECA2D3300E978B</string>
+			<string>A206C0EF0A3CDF6EBFF06174BCD1854FBC4F35ED</string>
 			<key>IDESourceControlWCCName</key>
 			<string>RelayAnchor</string>
 		</dict>

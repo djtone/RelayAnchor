@@ -9,6 +9,7 @@
 #import "Order.h"
 #import "Product.h"
 #import "DataMethods.h"
+#import "OrderManager.h"
 
 @implementation Order
 
@@ -18,62 +19,65 @@
     {
         self.hasLoadedDetails = NO;
         
-        self.orderId = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"wcsOrderId"] withAlternative:[NSNumber numberWithInt:0]];
+        self.wcsOrderId = [NSNumber numberWithInt:[[DataMethods checkForNull:[dictionaryResponse valueForKey:@"wcsOrderId"] withAlternative:@"0"] intValue]];
         self.mysqlOrderId = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"mysqlOrderId"] withAlternative:[NSNumber numberWithInt:0]];
-        self.totalPrice = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"totalOrderPrice"] withAlternative:[NSNumber numberWithInt:0]];
-        self.tax = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"tax"] withAlternative:[NSNumber numberWithInt:0]];
-        self.shippingCharges = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"shippingCharges"] withAlternative:[NSNumber numberWithInt:0]];
-        self.itemQuantity = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"noOfOrderItems"] withAlternative:[NSNumber numberWithInt:0]];
+        self.totalPrice = [NSNumber numberWithFloat:[[DataMethods checkForNull:[dictionaryResponse valueForKey:@"totalOrderPrice"] withAlternative:@"0"] floatValue]];
+        self.tax = [NSNumber numberWithFloat:[[DataMethods checkForNull:[dictionaryResponse valueForKey:@"tax"] withAlternative:@"0"] floatValue]];
+        self.shippingCharges = [NSNumber numberWithFloat:[[DataMethods checkForNull:[dictionaryResponse valueForKey:@"shippingCharges"] withAlternative:@"0"] floatValue]];
+        self.itemQuantity = [NSNumber numberWithInt:[[DataMethods checkForNull:[dictionaryResponse valueForKey:@"noOfOrderItems"] withAlternative:@"0"] intValue]];
         self.buyerFirstName = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"firstName"] withAlternative:@""];
         self.buyerLastName = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"lastName"] withAlternative:@""];
         self.runnerId = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"runnerId"] withAlternative:[NSNumber numberWithInt:0]];
         self.anchorId = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"anchorId"] withAlternative:[NSNumber numberWithInt:0]];
         self.buyerEmail = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"buyerEmail"] withAlternative:@""];
+        
         self.buyerPhoneNumber = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"buyerPhoneNumber"] withAlternative:[NSNumber numberWithDouble:0]];
         
         self.isKeynoteOrder = NO;
         if ( [[DataMethods checkForNull:[dictionaryResponse valueForKey:@"isKeynoteOrder"] withAlternative:nil] intValue] != 0 )
             self.isKeynoteOrder = YES;
         
-        //NSLog(@"hasDelivItems : %hhd", self.hasDeliveryItems);
+        self.hasDeliveryItems = NO;
+        if ( [[DataMethods checkForNull:[dictionaryResponse valueForKey:@"hasDelivItems"] withAlternative:nil] intValue] != 0 )
+            self.hasDeliveryItems = YES;
         
-        self.runnerStatus = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"runnerStatus"] withAlternative:@"Open"];
-        if ( [self.runnerStatus isEqualToString:@"RUNNING"] )
-            self.runnerStatus = @"Running";
-        else if ( [self.runnerStatus isEqualToString:@"PICKEDUPBYRUNNER"] )
-            self.runnerStatus = @"Picked Up";
-        else if ( [self.runnerStatus isEqualToString:@"DROPPEDATANCHOR"] || [self.runnerStatus isEqualToString:@"READY"] ) //READY means it was overridden
-            self.runnerStatus = @"At Station";
-        else if ( [self.runnerStatus isEqualToString:@"DELIVERED"] )
-            self.runnerStatus = @"Delivered";
+        NSString * apiRunnerStatus = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"runnerStatus"] withAlternative:@"Open"];
+        if ( [apiRunnerStatus isEqualToString:@"RUNNING"] )
+            self.runnerStatus = kRunnerStatusRunning;
+        else if ( [apiRunnerStatus isEqualToString:@"PICKEDUPBYRUNNER"] )
+            self.runnerStatus = kRunnerStatusPickedUp;
+        else if ( [apiRunnerStatus isEqualToString:@"DROPPEDATANCHOR"] || [apiRunnerStatus isEqualToString:@"READY"] ) //READY means it was overridden
+            self.runnerStatus = kRunnerStatusAtStation;
+        else if ( [apiRunnerStatus isEqualToString:@"DELIVERED"] )
+            self.runnerStatus = kRunnerStatusDelivered;
         
-        self.anchorStatus = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"anchorStatus"] withAlternative:@"Open"];
-        if ( [self.anchorStatus isEqualToString:@"RUNNING"] )
-            self.anchorStatus = @"Running";
-        else if ( [self.anchorStatus isEqualToString:@"PICKEDUPBYRUNNER"] )
-            self.anchorStatus = @"Picked Up";
-        else if ( [self.anchorStatus isEqualToString:@"DROPPEDATANCHOR"] || [self.anchorStatus isEqualToString:@"READY"] ) //READY means it was overridden
-            self.anchorStatus = @"At Station";
-        else if ( [self.anchorStatus isEqualToString:@"DELIVERED"] )
-            self.anchorStatus = @"Delivered";
-        else if ( [self.anchorStatus isEqualToString:@"WAITITEMRETURNCUST"] )
-            self.anchorStatus = @"Return Initiated";
+        NSString * apiAnchorStatus = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"anchorStatus"] withAlternative:@"Open"];
+        if ( [apiAnchorStatus isEqualToString:@"RUNNING"] )
+            self.anchorStatus = kAnchorStatusRunning;
+        else if ( [apiAnchorStatus isEqualToString:@"PICKEDUPBYRUNNER"] )
+            self.anchorStatus = kAnchorStatusPickedUp;
+        else if ( [apiAnchorStatus isEqualToString:@"DROPPEDATANCHOR"] || [apiAnchorStatus isEqualToString:@"READY"] ) //READY means it was overridden
+            self.anchorStatus = kAnchorStatusAtStation;
+        else if ( [apiAnchorStatus isEqualToString:@"DELIVERED"] )
+            self.anchorStatus = kAnchorStatusDelivered;
+        else if ( [apiAnchorStatus isEqualToString:@"WAITITEMRETURNCUST"] )
+            self.anchorStatus = kAnchorStatusReturnInitiated;
         
         self.placeTime = [NSDate dateWithTimeIntervalSince1970:[[NSNumber numberWithInt:[[DataMethods checkForNull:[dictionaryResponse valueForKey:@"orderPlaceTime"] withAlternative:[NSNumber numberWithInt:0]] floatValue] /1000] doubleValue]];
         
-        self.status = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"orderStatus"] withAlternative:@""];
-        if ( [self.status isEqualToString:@"SUBMITTED"] )
-            self.status = @"Open";
-        else if ( [self.status isEqualToString:@"READY"] )
-            self.status = @"At Station";
-        else if ( [self.status isEqualToString:@"DELIVERED"] )
-            self.status = @"Delivered";
-        else if ( [self.status isEqualToString:@"FULLORDERREFINIT"] )
-            self.status = @"Cancelled";
-        else if ( [self.status isEqualToString:@"REFUNDED"] )
-            self.status = @"Returned";
-        else if ( [self.status isEqualToString:@"REFREJECTED"] )
-            self.status = @"Rejected";
+        NSString * apiStatus = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"orderStatus"] withAlternative:@""];
+        if ( [apiStatus isEqualToString:@"SUBMITTED"] )
+            self.status = kStatusOpen;
+        else if ( [apiStatus isEqualToString:@"READY"] )
+            self.status = kStatusAtStation;
+        else if ( [apiStatus isEqualToString:@"DELIVERED"] )
+            self.status = kStatusDelivered;
+        else if ( [apiStatus isEqualToString:@"FULLORDERREFINIT"] )
+            self.status = kStatusCancelled;
+        else if ( [apiStatus isEqualToString:@"REFUNDED"] )
+            self.status = kStatusReturned;
+        else if ( [apiStatus isEqualToString:@"REFREJECTED"] )
+            self.status = kStatusReturnRejected;
         
         /*
         if ( [DataMethods checkForNull:[dictionaryResponse valueForKey:@"orderItemReturnsBean"] withAlternative:nil] )
@@ -90,6 +94,43 @@
         self.returnReceiptUrl = [NSURL URLWithString:urlString];
         self.returnReceiptImage = nil;
         
+        [self displayStatus]; //sets display color - ill change it eventually.. maybe
+        //for displaying in table views
+        /*
+        self.displayStatus = self.runnerStatus;
+        if ( [self.anchorStatus isEqualToString:@"Return Initiated"] )
+        {
+            self.displayStatus = @"Return\nInitiated";
+            self.displayColor = [UIColor colorWithRed:(float)82/255 green:(float)210/255 blue:(float)128/255 alpha:1];
+        }
+        else if ( self.status == kCancelled || self.status == kReturned || self.status == kReturnRejected )
+        {
+            self.displayStatus = self.status;
+            self.displayColor = [UIColor lightGrayColor];
+        }
+        else if ( [self.runnerStatus isEqualToString:@"Open"] )
+            self.displayColor = [UIColor colorWithRed:(float)241/255 green:(float)68/255 blue:(float)51/255 alpha:1];
+        else if ( [self.runnerStatus isEqualToString:@"Running"] )
+            self.displayColor = [UIColor colorWithRed:(float)254/255 green:(float)174/255 blue:(float)17/255 alpha:1];
+        else if ( [self.runnerStatus isEqualToString:@"Picked Up"] )
+            self.displayColor = [UIColor colorWithRed:(float)254/255 green:(float)174/255 blue:(float)17/255 alpha:1];
+        else if ( [self.runnerStatus isEqualToString:@"At Station"] )
+        {
+            self.displayStatus = @"Pending\nAt Station";
+            self.displayColor = [UIColor colorWithRed:(float)82/255 green:(float)210/255 blue:(float)128/255 alpha:1];
+            
+            if ( [self.anchorStatus isEqualToString:@"At Station"] )
+            {
+                self.displayStatus = @"At Station";
+                self.displayColor = [UIColor colorWithRed:(float)239/255 green:(float)118/255 blue:(float)37/255 alpha:1];
+            }
+            else if ( [self.anchorStatus isEqualToString:@"Delivered"] )
+            {
+                self.displayStatus = @"Delivered";
+                self.displayColor = [UIColor colorWithRed:(float)109/255 green:(float)202/255 blue:(float)72/255 alpha:1];
+            }
+        }*/
+
         self.isChangingStatus = NO;
     }
     return self;
@@ -97,20 +138,147 @@
 
 - (void) fillOrderDetails:(NSDictionary *)dictionaryResponse
 {
-    self.products = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"anchorStatus"] withAlternative:@""];
-    self.tax = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"tax"] withAlternative:0];
+    self.totalPrice = [NSNumber numberWithFloat:[[DataMethods checkForNull:[dictionaryResponse valueForKey:@"totalOrderPrice"] withAlternative:@"0"] floatValue]];
+    self.deliveryPhoneNumber = [NSNumber numberWithInt:[[DataMethods checkForNull:[dictionaryResponse valueForKey:@"fullfillmentPhoneNumber"] withAlternative:@"0"] intValue]];
+//    NSDateFormatter * tmpDateFormatter = [[OrderManager sharedInstance] myDateFormatter];
+//    [tmpDateFormatter setDateFormat:@""];
+//    NSString * tmpDateString = [dictionaryResponse valueForKey:@"deliverySlot"];
+//    if ( [tmpDateString class] != [NSNull class] )
+//        self.deliveryDate = [tmpDateFormatter dateFromString:tmpDateString];
     
-    NSArray * productDictionaries = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"orderItems"] withAlternative:[[NSArray alloc] init]];
-    if ( [productDictionaries class] == [NSNull class] )
-        productDictionaries = @[];
     NSMutableArray * tmpProducts = [[NSMutableArray alloc] init];
-    for ( int i = 0; i < [productDictionaries count]; i++ )
+    NSArray * productsArray = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"orderItems"] withAlternative:@[]];
+    
+    for ( int i = 0; i < [productsArray count]; i++ )
     {
-        Product * tmpProduct = [[Product alloc] initWithOrder:self andDictionary:[productDictionaries objectAtIndex:i]];
+        Product * tmpProduct = [[Product alloc] initWithOrder:self andDictionary:[productsArray objectAtIndex:i]];
+        tmpProduct.runnerFirstName = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"runnerFirstName"] withAlternative:@""];
+        tmpProduct.runnerLastName = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"runnerLastName"] withAlternative:@""];
+        tmpProduct.runnerPhoneNumber = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"runnerPhoneNumber"] withAlternative:0];
         [tmpProducts addObject:tmpProduct];
+        
+        [[OrderManager sharedInstance] loadImageType:@"product" forProduct:tmpProduct];
+        [[OrderManager sharedInstance] loadImageType:@"purchaseReceipt" forProduct:tmpProduct];
+        [[OrderManager sharedInstance] loadImageType:@"returnReceipt" forProduct:tmpProduct];
     }
-    self.products = [tmpProducts copy];
+    self.products = tmpProducts;
+    self.hasLoadedDetails = YES;
 }
 
+- (NSString *)displayStatus
+{
+    NSString * displayStatus = @"";
+    displayStatus = [self stringFromRunnerStatus]; // switch this to the [EnumTypes string] call
+    
+    if ( self.anchorStatus == kAnchorStatusReturnInitiated )
+    {
+        displayStatus = @"Return\nInitiated";
+        self.displayColor = [UIColor colorWithRed:(float)82/255 green:(float)210/255 blue:(float)128/255 alpha:1];
+    }
+    else if ( self.status == kStatusCancelled || self.status == kStatusReturned || self.status == kStatusReturnRejected )
+    {
+        displayStatus = [self stringFromStatus];
+        self.displayColor = [UIColor lightGrayColor];
+    }
+    else if ( self.runnerStatus == kRunnerStatusRunning )
+        self.displayColor = [UIColor colorWithRed:(float)254/255 green:(float)174/255 blue:(float)17/255 alpha:1];
+    else if ( self.runnerStatus == kRunnerStatusPickedUp )
+        self.displayColor = [UIColor colorWithRed:(float)254/255 green:(float)174/255 blue:(float)17/255 alpha:1];
+    else if ( self.runnerStatus == kRunnerStatusAtStation || self.runnerStatus == kRunnerStatusDelivered )
+    {
+        displayStatus = @"Pending\nAt Station";
+        self.displayColor = [UIColor colorWithRed:(float)82/255 green:(float)210/255 blue:(float)128/255 alpha:1];
+        
+        if ( self.anchorStatus == kAnchorStatusAtStation )
+        {
+            displayStatus = @"At Station";
+            self.displayColor = [UIColor colorWithRed:(float)239/255 green:(float)118/255 blue:(float)37/255 alpha:1];
+        }
+        else if ( self.anchorStatus == kAnchorStatusDelivered )
+        {
+            displayStatus = @"Delivered";
+            self.displayColor = [UIColor colorWithRed:(float)109/255 green:(float)202/255 blue:(float)72/255 alpha:1];
+        }
+    }
+    else
+    {
+        displayStatus = @"Open";
+        self.displayColor = [UIColor colorWithRed:(float)241/255 green:(float)68/255 blue:(float)51/255 alpha:1];
+    }
+
+    return displayStatus;
+}
+
+- (NSString *) stringFromStatus
+{
+    switch (self.status)
+    {
+        case kStatusOpen:
+            return @"Open";
+            
+        case kStatusAtStation:
+            return @"At Station";
+            
+        case kStatusDelivered:
+            return @"Delivered";
+            
+        case kStatusCancelled:
+            return @"Cancelled";
+            
+        case kStatusReturned:
+            return @"Returned";
+            
+        case kStatusReturnRejected:
+            return @"Return Rejected";
+            
+        default:
+            return @"";
+    }
+}
+
+- (NSString *) stringFromRunnerStatus
+{
+    switch (self.runnerStatus)
+    {
+        case kRunnerStatusRunning:
+            return @"Running";
+            
+        case kRunnerStatusPickedUp:
+            return @"Picked Up";
+            
+        case kRunnerStatusAtStation:
+            return @"At Station";
+            
+        case kRunnerStatusDelivered:
+            return @"Delivered";
+            
+        default:
+            return @"";
+    }
+}
+
+- (NSString *) stringFromAnchorStatus
+{
+    switch (self.anchorStatus)
+    {
+        case kAnchorStatusRunning:
+            return @"Running";
+            
+        case kAnchorStatusPickedUp:
+            return @"Picked Up";
+            
+        case kAnchorStatusAtStation:
+            return @"At Station";
+            
+        case kAnchorStatusDelivered:
+            return @"Delivered";
+            
+        case kAnchorStatusReturnInitiated:
+            return @"Return Initiated";
+            
+        default:
+            return @"";
+    }
+}
 
 @end

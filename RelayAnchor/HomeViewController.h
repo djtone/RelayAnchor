@@ -13,6 +13,8 @@
 
 @interface HomeViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, TopViewDelegate, BottomViewDelegate, OrderManagerDelegate>
 
+@property (weak, nonatomic) IBOutlet UIImageView *welcomeImageView;
+@property (weak, nonatomic) IBOutlet UILabel *mallNameLabel;
 @property OrderManager * myOrderManager;
 @property TopView * myTopView;
 @property BottomView * myBottomView;
@@ -23,8 +25,6 @@
 
 //this is to keep track of the last time a call was made to update the table
 @property NSDate * myDate;
-
-@property NSTimer * updateOrdersTimer;
 
 @property (weak, nonatomic) IBOutlet UILabel *noOrdersLabel;
 

@@ -10,6 +10,7 @@
 #import "OrderTableCell.h"
 #import "OrdersViewController.h"
 #import "OrderDetailViewController.h"
+#import "AccountManager.h"
 
 @implementation HomeViewController
 
@@ -18,10 +19,9 @@
     [super viewDidLoad];
     
     self.myOrderManager = [OrderManager sharedInstanceWithDelegate:self];
-    [self.myOrderManager loadAllOrders];
     self.myDate = [NSDate date];
     self.myDateFormatter = [[NSDateFormatter alloc] init];
-    self.updateOrdersTimer = [NSTimer scheduledTimerWithTimeInterval:10 target:self.myOrderManager selector:@selector(loadAllOrders) userInfo:nil repeats:YES];
+    [self.myOrderManager startAutoRefreshOrdersWithStatus:kLoadOrderStatusAll timeInterval:10];
     
     //ui stuff
     [self setNeedsStatusBarAppearanceUpdate];
@@ -32,6 +32,8 @@
     self.myTopView.searchSeparator.hidden = YES;
     self.myTopView.hideBackButton = YES;
     self.myTopView.printerButton.hidden = YES;
+    self.myTopView.keynoteOrdersButton.hidden = YES;
+    self.myTopView.keynoteOrdersSwitch.hidden = YES;
     [self.view addSubview:self.myTopView];
     
     self.myBottomView = [[[NSBundle mainBundle] loadNibNamed:@"BottomView" owner:self options:nil] firstObject];
@@ -39,10 +41,48 @@
     [self.view addSubview:self.myBottomView];
 }
 
+- (void) viewWillAppear:(BOOL)animated
+{
+    [self updateMallName];
+    [self updateTopBarMallName];
+    [self updateWelcomeImage];
+    [self.myBottomView resetButtons];
+}
+
+- (void) updateTopBarMallName
+{
+    [self.myTopView.mallNameButton setTitle:[[[AccountManager sharedInstance] selectedMall] name] forState:UIControlStateNormal];
+}
+
+- (void) updateMallName
+{
+    NSString * mallName = [[[AccountManager sharedInstance] selectedMall] name];
+    if ( !mallName || [mallName class] == [NSNull class] )
+        return;
+    
+    UIFont * bold = [UIFont fontWithName:@"Helvetica-Bold" size:58];
+    NSDictionary * arialDict = [NSDictionary dictionaryWithObject:bold forKey:NSFontAttributeName];
+    NSMutableAttributedString * aAttrString = [[NSMutableAttributedString alloc] initWithString:[mallName stringByReplacingOccurrencesOfString:@" Mall" withString:@""] attributes:arialDict];
+    
+    UIFont * normal = [UIFont systemFontOfSize:58];
+    NSDictionary * verdanaDict = [NSDictionary dictionaryWithObject:normal forKey:NSFontAttributeName];
+    [aAttrString appendAttributedString:[[NSMutableAttributedString alloc]initWithString:@" Mall" attributes:verdanaDict]];
+    
+    self.mallNameLabel.attributedText = aAttrString;
+}
+
+- (void) updateWelcomeImage
+{
+    if ( [[[[AccountManager sharedInstance] selectedMall] name] isEqualToString:@"Oakbrook Mall"] )
+        self.welcomeImageView.image = [UIImage imageNamed:@"Welcome_oakbrook.png"];
+    else if ( [[[[AccountManager sharedInstance] selectedMall] name] isEqualToString:@"Water Tower Mall"] )
+        self.welcomeImageView.image = [UIImage imageNamed:@"Welcome_waterTower.png"];
+}
+
 #pragma mark - top view delegate
 - (void) didPressLogout
 {
-    [self.updateOrdersTimer invalidate];
+    [self.myOrderManager stopAutoRefreshOrders:nil];
     UIViewController * modalToDismissFrom = self;
     while ( ! [[[modalToDismissFrom presentingViewController] restorationIdentifier] isEqualToString:@"loginPage"] )
         modalToDismissFrom = [modalToDismissFrom presentingViewController];
@@ -54,48 +94,62 @@
     [self.myBottomView openButtonAction:nil];
 }
 
+- (void) didChangeMall
+{
+    self.ordersForTableView = @[];
+    [self.myOrderManager stopAutoRefreshOrders:^
+    {
+        [self.myOrderManager startAutoRefreshOrdersWithStatus:kLoadOrderStatusAll timeInterval:10];
+        [self forceRefreshOrders];
+        [UIView animateWithDuration:.2 animations:^
+        {
+            self.mallNameLabel.alpha = 0;
+            self.welcomeImageView.alpha = 0;
+            self.myTopView.mallNameButton.alpha = 0;
+        }
+        completion:^(BOOL finished)
+        {
+            [self updateMallName];
+            [self updateWelcomeImage];
+            [self updateTopBarMallName];
+            [UIView animateWithDuration:.2 animations:^
+            {
+                self.mallNameLabel.alpha = 1;
+                self.welcomeImageView.alpha = 1;
+                self.myTopView.mallNameButton.alpha = 1;
+            }];
+        }];
+    }];
+}
+
 #pragma mark - bottom view delegate
-- (void) didPressOpen
+- (void) didChangeStatus:(enum BottomViewStatus)selectedStatus
 {
-    [self.updateOrdersTimer invalidate];
-    OrdersViewController * modalOrdersViewController = [[self storyboard] instantiateViewControllerWithIdentifier:@"orderPage"];
-    modalOrdersViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-    [self presentViewController:modalOrdersViewController animated:YES completion:nil];
-    [[(OrdersViewController *)modalOrdersViewController myBottomView] performSelector:@selector(openButtonAction:) withObject:self afterDelay:0];
-    modalOrdersViewController.myTopView.orderNumberLabel.text = self.myTopView.orderNumberLabel.text;
-}
-
-- (void) didPressReady
-{
-    [self.updateOrdersTimer invalidate];
-    OrdersViewController * modalOrdersViewController = [[self storyboard] instantiateViewControllerWithIdentifier:@"orderPage"];
-    modalOrdersViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-    [self presentViewController:modalOrdersViewController animated:YES completion:nil];
-    [[(OrdersViewController *)modalOrdersViewController myBottomView] performSelector:@selector(readyButtonAction:) withObject:self afterDelay:0];
-    modalOrdersViewController.myTopView.orderNumberLabel.text = self.myTopView.orderNumberLabel.text;
-}
-
-- (void) didPressDelivered
-{
-    [self.updateOrdersTimer invalidate];
-    OrdersViewController * modalOrdersViewController = [[self storyboard] instantiateViewControllerWithIdentifier:@"orderPage"];
-    modalOrdersViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-    [self presentViewController:modalOrdersViewController animated:YES completion:nil];
-    [[(OrdersViewController *)modalOrdersViewController myBottomView] performSelector:@selector(deliveredButtonAction:) withObject:self afterDelay:0];
-    modalOrdersViewController.myTopView.orderNumberLabel.text = self.myTopView.orderNumberLabel.text;
-}
-
-- (void) didPressCancelledReturned
-{
-    [self.updateOrdersTimer invalidate];
-    OrdersViewController * modalOrdersViewController = [[self storyboard] instantiateViewControllerWithIdentifier:@"orderPage"];
-    modalOrdersViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-    [self presentViewController:modalOrdersViewController animated:YES completion:nil];
-    [[(OrdersViewController *)modalOrdersViewController myBottomView] performSelector:@selector(cancelledReturnedButtonAction:) withObject:self afterDelay:0];
-    modalOrdersViewController.myTopView.orderNumberLabel.text = self.myTopView.orderNumberLabel.text;
+    [self.myOrderManager stopAutoRefreshOrders:^
+    {
+        OrdersViewController * modalOrdersViewController = [[self storyboard] instantiateViewControllerWithIdentifier:@"orderPage"];
+        modalOrdersViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+        [self presentViewController:modalOrdersViewController animated:YES completion:nil];
+        modalOrdersViewController.myTopView.orderNumberLabel.text = self.myTopView.orderNumberLabel.text;
+        
+        if ( selectedStatus == kBottomViewStatusOpen )
+            [[(OrdersViewController *)modalOrdersViewController myBottomView] performSelector:@selector(openButtonAction:) withObject:self afterDelay:0];
+        else if ( selectedStatus == kBottomViewStatusReady )
+            [[(OrdersViewController *)modalOrdersViewController myBottomView] performSelector:@selector(readyButtonAction:) withObject:self afterDelay:0];
+        else if ( selectedStatus == kBottomViewStatusDelivered )
+            [[(OrdersViewController *)modalOrdersViewController myBottomView] performSelector:@selector(deliveredButtonAction:) withObject:self afterDelay:0];
+        else if ( selectedStatus == kBottomViewStatusCancelledReturned )
+            [[(OrdersViewController *)modalOrdersViewController myBottomView] performSelector:@selector(cancelledReturnedButtonAction:) withObject:self afterDelay:0];
+    }];
 }
 
 #pragma mark - table view delegate/datasource
+- (void) forceRefreshOrders
+{
+    [self.myOrderManager loadOrdersWithStatus:kLoadOrderStatusAll completion:nil];
+    [self.orderTableView reloadData];
+}
+
 - (CGFloat) tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
     return 1;
@@ -115,6 +169,7 @@
     
     if ( self.myOrderManager.isLoadingOrders )
         return [self.ordersForTableView count]+1;
+    
     return [self.ordersForTableView count];
 }
 
@@ -179,7 +234,7 @@
             [self.myDateFormatter setDateFormat:@"M/d/yy"];
         
         cell.dateLabel.text = [self.myDateFormatter stringFromDate:tmpOrder.placeTime];
-        cell.idLabel.text = [NSString stringWithFormat:@"%@", tmpOrder.orderId];
+        cell.idLabel.text = [NSString stringWithFormat:@"%@", tmpOrder.wcsOrderId];
         cell.buyerNameLabel.text = [[NSString stringWithFormat:@"%@ %@", tmpOrder.buyerFirstName, tmpOrder.buyerLastName] capitalizedString];
         cell.buyerEmail.text = tmpOrder.buyerEmail;
         
@@ -197,35 +252,14 @@
         }
         
         cell.runnerNameLabel.text = [NSString stringWithFormat:@"%@", tmpOrder.runnerId];
-        cell.statusLabel.text = tmpOrder.runnerStatus;
+        cell.statusLabel.text = [tmpOrder stringFromRunnerStatus];
+        if ( tmpOrder.isKeynoteOrder )
+            cell.keynoteOrderLabel.hidden = NO;
+        else
+            cell.keynoteOrderLabel.hidden = YES;
         
-        if ( [tmpOrder.status isEqualToString:@"Cancelled"] || [tmpOrder.status isEqualToString:@"Returned"] || [tmpOrder.status isEqualToString:@"Rejected"] )
-        {
-            cell.statusLabel.text = tmpOrder.status;
-            cell.colorDot.backgroundColor = [UIColor lightGrayColor];
-        }
-        else if ( [tmpOrder.runnerStatus isEqualToString:@"Open"] )
-            cell.colorDot.backgroundColor = [UIColor colorWithRed:(float)241/255 green:(float)68/255 blue:(float)51/255 alpha:1];
-        else if ( [tmpOrder.runnerStatus isEqualToString:@"Running"] )
-            cell.colorDot.backgroundColor = [UIColor colorWithRed:(float)254/255 green:(float)174/255 blue:(float)17/255 alpha:1];
-        else if ( [tmpOrder.runnerStatus isEqualToString:@"Picked Up"] )
-            cell.colorDot.backgroundColor = [UIColor colorWithRed:(float)254/255 green:(float)174/255 blue:(float)17/255 alpha:1];
-        else if ( [tmpOrder.runnerStatus isEqualToString:@"At Station"] )
-        {
-            cell.statusLabel.text = @"Pending\nAt Station";
-            cell.colorDot.backgroundColor = [UIColor colorWithRed:(float)82/255 green:(float)210/255 blue:(float)128/255 alpha:1];
-            
-            if ( [tmpOrder.anchorStatus isEqualToString:@"At Station"] )
-            {
-                cell.statusLabel.text = @"At Station";
-                cell.colorDot.backgroundColor = [UIColor colorWithRed:(float)239/255 green:(float)118/255 blue:(float)37/255 alpha:1];
-            }
-            else if ( [tmpOrder.anchorStatus isEqualToString:@"Delivered"] )
-            {
-                cell.statusLabel.text = @"Delivered";
-                cell.colorDot.backgroundColor = [UIColor colorWithRed:(float)109/255 green:(float)202/255 blue:(float)72/255 alpha:1];
-            }
-        }
+        cell.statusLabel.text = tmpOrder.displayStatus;
+        cell.colorDot.backgroundColor = tmpOrder.displayColor;
     }
     
     return cell;
@@ -237,7 +271,7 @@
     
     if ( [(OrderTableCell *)[self.orderTableView cellForRowAtIndexPath:indexPath] loadingIndicator].hidden == YES ) //make sure its not a loading cell
     {
-        [self.updateOrdersTimer invalidate];
+        [self.myOrderManager stopAutoRefreshOrders:nil];
         OrdersViewController * modalOrdersViewController = [[self storyboard] instantiateViewControllerWithIdentifier:@"orderPage"];
         modalOrdersViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
         
@@ -247,10 +281,13 @@
         UIGraphicsEndImageContext();
         UIImageView * imageOverlay = [[UIImageView alloc] initWithImage:overlayImage];
         
-        if ( [[UIDevice currentDevice] orientation] == UIDeviceOrientationLandscapeRight || self.interfaceOrientation == 4 )
-            imageOverlay.transform = CGAffineTransformMakeRotation(M_PI_2);
-        else
-            imageOverlay.transform = CGAffineTransformMakeRotation(-M_PI_2);
+        if ( [[[UIDevice currentDevice] systemVersion] compare:@"8" options:NSNumericSearch] == NSOrderedAscending ) //iOS 7 and lesser
+        {
+            if ( [[UIDevice currentDevice] orientation] == UIDeviceOrientationLandscapeRight || self.interfaceOrientation == 4 )
+                imageOverlay.transform = CGAffineTransformMakeRotation(M_PI_2);
+            else
+                imageOverlay.transform = CGAffineTransformMakeRotation(-M_PI_2);
+        }
         
         imageOverlay.frame = CGRectMake(0, 0, 1024, 768);
         [self presentViewController:modalOrdersViewController animated:NO completion:nil];
@@ -279,8 +316,7 @@
             if ( [self.myDate timeIntervalSinceNow] + 3 < [[NSDate date] timeIntervalSinceNow] )
             {
                 self.myDate = [NSDate date];
-                [self.myOrderManager loadAllOrders];
-                [self.orderTableView reloadData];
+                [self forceRefreshOrders];
             }
         }
     }
@@ -289,9 +325,15 @@
 }
 
 #pragma mark - order manager delegate
-- (void) didFinishLoadingOrders:(NSArray *)orders withStatusOpen:(BOOL)open ready:(BOOL)ready delivered:(BOOL)delivered cancelledReturned:(BOOL)cancelledReturned
+- (void) didStartLoadingOrdersWithStatus:(LoadOrderStatus)loadOrderStatus
 {
-    if ( open && ready && delivered && cancelledReturned )
+    [self.orderTableView reloadData];
+}
+
+- (void) didFinishLoadingOrders:(NSArray *)orders status:(LoadOrderStatus)loadOrderStatus error:(NSString *)error
+{
+    //check if there is an error before doing the below stuff
+    if ( loadOrderStatus == kLoadOrderStatusAll )
     {
         if ( [self.myTopView.searchBarTextField.text length] != 0 )
             self.ordersForTableView = [self.myOrderManager searchOrders:orders withString:self.myTopView.searchBarTextField.text];
@@ -304,10 +346,35 @@
         int numberOfOpenOrders = 0;
         for ( int i = 0; i < [orders count]; i++ )
         {
-            if ( [[[orders objectAtIndex:i] status] isEqualToString:@"Open"] )
+            if ( [(Order *)[orders objectAtIndex:i] status] == kStatusOpen )
                 numberOfOpenOrders++;
         }
         self.myTopView.orderNumberLabel.text = [NSString stringWithFormat:@"%i", numberOfOpenOrders];
+    }
+}
+
+- (void) didFinishLoadingOrders:(NSArray *)orders withStatusOpen:(BOOL)open ready:(BOOL)ready delivered:(BOOL)delivered cancelledReturned:(BOOL)cancelledReturned success:(BOOL)success
+{
+    if ( success )
+    {
+        if ( open && ready && delivered && cancelledReturned )
+        {
+            if ( [self.myTopView.searchBarTextField.text length] != 0 )
+                self.ordersForTableView = [self.myOrderManager searchOrders:orders withString:self.myTopView.searchBarTextField.text];
+            else
+                self.ordersForTableView = orders;
+            
+            [self.orderTableView reloadData];
+            
+            // setting the top view bell thing number
+            int numberOfOpenOrders = 0;
+            for ( int i = 0; i < [orders count]; i++ )
+            {
+                if ( [(Order *)[orders objectAtIndex:i] status] == kStatusOpen )
+                    numberOfOpenOrders++;
+            }
+            self.myTopView.orderNumberLabel.text = [NSString stringWithFormat:@"%i", numberOfOpenOrders];
+        }
     }
 }
 

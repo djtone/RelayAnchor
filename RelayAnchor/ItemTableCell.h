@@ -27,7 +27,8 @@
 @property (weak, nonatomic) IBOutlet UILabel *itemPriceLabel;
 @property (weak, nonatomic) IBOutlet UILabel *priceLabel;
 
-@property (weak, nonatomic) IBOutlet UIView *setStatusButtonsView;
+@property (weak, nonatomic) IBOutlet UIView *swipeLeftMenu;
+@property (weak, nonatomic) IBOutlet UIButton *cancelItemButton;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *loadingIndicator;
 @property (weak, nonatomic) IBOutlet UIButton *atStationButton;
 @property (weak, nonatomic) IBOutlet UIButton *deliveredButton;

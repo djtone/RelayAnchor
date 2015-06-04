@@ -27,6 +27,10 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
     // Setup the preview view
     [[self myCameraSessionView] setSession:session];
     [(AVCaptureVideoPreviewLayer *)[self.myCameraSessionView layer] setVideoGravity:AVLayerVideoGravityResizeAspectFill];
+    
+    //gesture recognizers
+    self.dragCropViewGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(dragCropView:)];
+    [self.cropView addGestureRecognizer:self.dragCropViewGesture];
     self.cropAdjusterGestureTopLeft = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(adjustCropView:)];
     [self.cropAdjusterTopLeft addGestureRecognizer:self.cropAdjusterGestureTopLeft];
     self.cropAdjusterGestureBottomRight = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(adjustCropView:)];
@@ -331,6 +335,62 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 }
 
 #pragma mark - crop adjusting
+- (void) dragCropView:(id)sender
+{
+    CGPoint touchPoint = [(UIPanGestureRecognizer *)sender locationInView:self.myCameraSessionView];
+    
+    //set offset if its the first drag call
+    if ( [(UIGestureRecognizer *)sender state] == UIGestureRecognizerStateBegan )
+        self.dragPointOffset = [(UIPanGestureRecognizer *)sender locationInView:self.cropView];
+
+    //make sure the crop view doesn't drag off the screen
+    int xValue = touchPoint.x - self.dragPointOffset.x;
+    if ( xValue < 38 )
+        xValue = 38;
+    else if ( xValue + self.cropView.frame.size.width > self.myCameraSessionView.frame.size.width - 38 )
+        xValue = (self.myCameraSessionView.frame.size.width - self.cropView.frame.size.width) - 38;
+    
+    int yValue = touchPoint.y - self.dragPointOffset.y;
+    if ( yValue < 38 )
+        yValue = 38;
+    else if ( yValue + self.cropView.frame.size.height > self.myCameraSessionView.frame.size.height - 38 )
+        yValue = (self.myCameraSessionView.frame.size.height - self.cropView.frame.size.height) - 38;
+    
+    
+    self.cropView.frame = CGRectMake(xValue, yValue, self.cropView.frame.size.width, self.cropView.frame.size.height);
+    
+    //adjust the other views according to the new crop view frame
+    self.cropAdjusterTopLeft.frame = CGRectMake(self.cropView.frame.origin.x - self.cropAdjusterTopLeft.frame.size.width/2 - 8,
+                                                self.cropView.frame.origin.y - self.cropAdjusterTopLeft.frame.size.height/2 - 8,
+                                                self.cropAdjusterTopLeft.frame.size.width,
+                                                self.cropAdjusterTopLeft.frame.size.height);
+    
+    self.cropAdjusterBottomRight.frame = CGRectMake((self.cropView.frame.origin.x + self.cropView.frame.size.width) - self.cropAdjusterTopLeft.frame.size.width/2 + 8,
+                                                    (self.cropView.frame.origin.y + self.cropView.frame.size.height) - self.cropAdjusterTopLeft.frame.size.height/2 + 8,
+                                                    self.cropAdjusterTopLeft.frame.size.width,
+                                                    self.cropAdjusterTopLeft.frame.size.height);
+    
+    self.cropAlphaViewTop.frame = CGRectMake(self.myCameraSessionView.frame.origin.x,
+                                             self.cropAlphaViewTop.frame.origin.y,
+                                             self.myCameraSessionView.frame.size.width,
+                                             self.cropAdjusterTopLeft.frame.origin.y + self.cropAdjusterTopLeft.frame.size.height - 22);
+    
+    self.cropAlphaViewLeft.frame = CGRectMake(self.myCameraSessionView.frame.origin.x,
+                                              self.cropView.frame.origin.y,
+                                              self.cropView.frame.origin.x,
+                                              self.cropView.frame.size.height);
+    
+    self.cropAlphaViewRight.frame = CGRectMake(self.cropView.frame.origin.x + self.cropView.frame.size.width,
+                                               self.cropView.frame.origin.y,
+                                               self.myCameraSessionView.frame.size.width - self.cropAdjusterBottomRight.frame.origin.x,
+                                               self.cropView.frame.size.height);
+    
+    self.cropAlphaViewBottom.frame = CGRectMake(self.myCameraSessionView.frame.origin.x,
+                                                self.cropAdjusterBottomRight.frame.origin.y + 22,
+                                                self.myCameraSessionView.frame.size.width,
+                                                self.myCameraSessionView.frame.size.height - self.cropAdjusterBottomRight.frame.origin.y);
+}
+
 - (void) adjustCropView:(id)sender
 {
     CGPoint touchPoint = [(UIPanGestureRecognizer *)sender locationInView:self.myCameraSessionView];

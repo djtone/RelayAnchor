@@ -21,10 +21,13 @@ static OrderManager * sharedOrderManager = nil;
     if ( sharedOrderManager == nil )
     {
         sharedOrderManager = [[OrderManager alloc] init];
+        sharedOrderManager.myNSURLSession = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:sharedOrderManager delegateQueue:nil];
+        sharedOrderManager.responsesData = [[NSMutableDictionary alloc] init];
         sharedOrderManager.isUpdatingOrder = NO;
         sharedOrderManager.isLoadingOrders = NO;
         sharedOrderManager.isLoadingOrderDetails = NO;
         sharedOrderManager.isUploadingReceipt = NO;
+        sharedOrderManager.showKeynoteOrders = NO;
         sharedOrderManager.myDateFormatter = [[NSDateFormatter alloc] init];
         [sharedOrderManager.myDateFormatter setDateFormat:@"M/d/yy"];
     }
@@ -48,67 +51,52 @@ static OrderManager * sharedOrderManager = nil;
 }
 
 #pragma mark - viewing orders
-- (void) loadOrdersForOpen:(BOOL)open ready:(BOOL)ready delivered:(BOOL)delivered cancelledReturned:(BOOL)cancelledReturned startIndex:(int)startIndex count:(int)count completion:(void (^)(NSArray * newOrders))callBack
+- (void) loadOrdersWithStatus:(LoadOrderStatus)loadOrderStatus completion:(void (^)(NSArray *))callBack
 {
-    NSString * urlString = [CreateAPIStrings viewOrdersForOpen:open ready:ready closed:delivered cancelledReturned:cancelledReturned startIndex:startIndex count:count];
-    
+    self.isLoadingOrders = YES;
+    NSString * urlString = [CreateAPIStrings viewOrdersWithStatus:loadOrderStatus];
     [CreateAPIStrings splitUrl:urlString ForApis:^(NSString *baseUrl, NSString *paramString)
     {
-        NSURLSession * session = [NSURLSession sharedSession];
         NSURLRequest * request = [CreateAPIStrings createRequestWithBaseUrl:baseUrl paramString:paramString isPostRequest:NO];
-         
-        [[session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
-        {
-            if ( error )
-            {
-                NSLog(@"error : %@", error);
-                callBack(nil);
-            }
-            else
-            {
-                NSDictionary * dictionaryResponse = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-                NSMutableArray * tmpOrders = [[NSMutableArray alloc] init];
-                NSArray * ordersArray = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"orderBeanList"] withAlternative:@[]];
-                for ( int i = 0; i < [ordersArray count]; i++ )
-                {
-                    Order * tmpOrder = [[Order alloc] initWithDictionary:[ordersArray objectAtIndex:i]];
-                    [tmpOrders addObject:tmpOrder];
-                }
-                
-                tmpOrders = [OrderManager sortOrders:tmpOrders];
-                
-                callBack(tmpOrders);
-            }
-        }] resume];
+        NSURLSessionDataTask * loadOrdersDataTask = [self.myNSURLSession dataTaskWithRequest:request];
+        loadOrdersDataTask.taskDescription = [EnumTypes stringFromLoadOrderStatus:loadOrderStatus];
+        
+        if ( callBack )
+            self.completionBlocks[@(loadOrdersDataTask.taskIdentifier)] = callBack;
+        else if ( [self.delegate respondsToSelector:@selector(didStartLoadingOrdersWithStatus:)] )
+            [self.delegate didStartLoadingOrdersWithStatus:loadOrderStatus];
+        
+        [loadOrdersDataTask resume];
     }];
 }
 
-- (void) loadEveryOrderWithStatusOpen:(BOOL)open ready:(BOOL)ready delivered:(BOOL)delivered cancelledReturned:(BOOL)cancelledReturned startIndex:(int)startIndex orders:(NSMutableArray *)orders completion:(void(^)(NSArray * orders))callBack;
+- (void) startAutoRefreshOrdersWithStatus:(LoadOrderStatus)loadOrderStatus timeInterval:(float)timeInterval
 {
-    [self loadOrdersForOpen:open ready:ready delivered:delivered cancelledReturned:cancelledReturned startIndex:startIndex count:5000 completion:^(NSArray *newOrders)
+    NSDictionary * userInfo = @{@"loadOrderStatus": @(loadOrderStatus)};
+    [self loadOrdersWithStatus:loadOrderStatus completion:nil];
+    self.autoRefreshOrdersTimer = [NSTimer scheduledTimerWithTimeInterval:timeInterval target:self selector:@selector(loadOrdersFromTimer:) userInfo:userInfo repeats:YES];
+}
+
+- (void) loadOrdersFromTimer:(NSTimer *)timer
+{
+    if ( ! self.isLoadingOrders && ! self.isUpdatingOrder )
     {
-        [orders addObjectsFromArray:newOrders];
-         
-        if ( [newOrders count] == 5000 )
-            [self loadEveryOrderWithStatusOpen:open ready:ready delivered:delivered cancelledReturned:cancelledReturned startIndex:startIndex+5000 orders:orders completion:callBack];
-        else
-        {
-            self.isLoadingOrders = NO;
-            
-            if ( callBack != nil )
-                dispatch_sync(dispatch_get_main_queue(), ^
-            {
-                callBack(orders);
-            });
-            else if ([self.delegate respondsToSelector:@selector(didFinishLoadingOrders:withStatusOpen:ready:delivered:cancelledReturned:)])
-                 dispatch_sync(dispatch_get_main_queue(), ^
-            {
-                [self.delegate didFinishLoadingOrders:orders withStatusOpen:open ready:ready delivered:delivered cancelledReturned:cancelledReturned];
-            });
-        }
+        LoadOrderStatus loadOrderStatus = [[[timer userInfo] valueForKey:@"loadOrderStatus"] intValue];
+        [self loadOrdersWithStatus:loadOrderStatus completion:nil];
+    }
+}
+
+- (void) stopAutoRefreshOrders:(void(^)())completion
+{
+    [self.autoRefreshOrdersTimer invalidate];
+    [self cancelLoadOrders:^
+    {
+        if ( completion )
+            completion();
     }];
 }
 
+#pragma mark - misc
 + (NSMutableArray *) sortOrders:(NSMutableArray *)tmpOrders
 {
     NSMutableArray * sortDescriptors = [[NSMutableArray alloc] init];
@@ -122,7 +110,7 @@ static OrderManager * sharedOrderManager = nil;
         if ( [sortPreferenceString isEqualToString:@"Order Date"] )
             sortKey = @"placeTime";
         else if ( [sortPreferenceString isEqualToString:@"Order ID"] )
-            sortKey = @"orderId";
+            sortKey = @"wcsOrderId";
         else if ( [sortPreferenceString isEqualToString:@"Buyer Name"] )
             sortKey = @"buyerLastName";
         else if ( [sortPreferenceString isEqualToString:@"Buyer Email"] )
@@ -132,168 +120,98 @@ static OrderManager * sharedOrderManager = nil;
         else if ( [sortPreferenceString isEqualToString:@"Runner"] )
             sortKey = @"runnerId";
         else if ( [sortPreferenceString isEqualToString:@"Status"] )
-            sortKey = @"status";
+            sortKey = @"displayStatus";
         
         if ( [sortKey length] > 0 )
             [sortDescriptors addObject:[[NSSortDescriptor alloc] initWithKey:sortKey ascending:[[[sortPreferences objectAtIndex:i] lastObject] boolValue]]];
     }
     
-    return [[tmpOrders sortedArrayUsingDescriptors:sortDescriptors] mutableCopy];
-}
-
-- (void) loadAllOrders
-{
-    if ( ! self.isLoadingOrders )
-    {
-        self.isLoadingOrders = YES;
-        NSMutableArray * orders = [[NSMutableArray alloc] init];
-        [self loadEveryOrderWithStatusOpen:YES ready:YES delivered:YES cancelledReturned:YES startIndex:0 orders:orders completion:nil];
-    }
-}
-
-- (void) loadAllOrdersWithCompletion:(void (^)(NSArray *))callBack
-{
-    if ( ! self.isLoadingOrders )
-    {
-        self.isLoadingOrders = YES;
-        NSMutableArray * orders = [[NSMutableArray alloc] init];
-        [self loadEveryOrderWithStatusOpen:YES ready:YES delivered:YES cancelledReturned:YES startIndex:0 orders:orders completion:callBack];
-    }
-}
-
-- (void) loadOpenOrders
-{
-    if ( ! self.isLoadingOrders )
-    {
-        self.isLoadingOrders = YES;
-        NSMutableArray * orders = [[NSMutableArray alloc] init];
-        [self loadEveryOrderWithStatusOpen:YES ready:NO delivered:NO cancelledReturned:NO startIndex:0 orders:orders completion:nil];
-    }
-}
-
-- (void) loadOpenOrdersWithCompletion:(void (^)(NSArray *))callBack
-{
-    if ( ! self.isLoadingOrders )
-    {
-        self.isLoadingOrders = YES;
-        NSMutableArray * orders = [[NSMutableArray alloc] init];
-        [self loadEveryOrderWithStatusOpen:YES ready:NO delivered:NO cancelledReturned:NO startIndex:0 orders:orders completion:callBack];
-    }
-}
-
-- (void) loadReadyOrders
-{
-    if ( ! self.isLoadingOrders )
-    {
-        self.isLoadingOrders = YES;
-        NSMutableArray * orders = [[NSMutableArray alloc] init];
-        [self loadEveryOrderWithStatusOpen:NO ready:YES delivered:NO cancelledReturned:NO startIndex:0 orders:orders completion:nil];
-    }
-}
-
-- (void) loadReadyOrdersWithCompletion:(void (^)(NSArray *))callBack
-{
-    if ( ! self.isLoadingOrders )
-    {
-        self.isLoadingOrders = YES;
-        NSMutableArray * orders = [[NSMutableArray alloc] init];
-        [self loadEveryOrderWithStatusOpen:NO ready:YES delivered:NO cancelledReturned:NO startIndex:0 orders:orders completion:callBack];
-    }
-}
-
-- (void) loadDeliveredOrders
-{
-    if ( ! self.isLoadingOrders )
-    {
-        self.isLoadingOrders = YES;
-        NSMutableArray * orders = [[NSMutableArray alloc] init];
-        [self loadEveryOrderWithStatusOpen:NO ready:NO delivered:YES cancelledReturned:NO startIndex:0 orders:orders completion:nil];
-    }
-}
-
-- (void) loadDeliveredOrdersWithCompletion:(void (^)(NSArray *))callBack
-{
-    if ( ! self.isLoadingOrders )
-    {
-        self.isLoadingOrders = YES;
-        NSMutableArray * orders = [[NSMutableArray alloc] init];
-        [self loadEveryOrderWithStatusOpen:NO ready:NO delivered:YES cancelledReturned:NO startIndex:0 orders:orders completion:callBack];
-    }
-}
-
-- (void) loadCancelledReturnedOrders
-{
-    if ( ! self.isLoadingOrders )
-    {
-        self.isLoadingOrders = YES;
-        NSMutableArray * orders = [[NSMutableArray alloc] init];
-        [self loadEveryOrderWithStatusOpen:NO ready:NO delivered:NO cancelledReturned:YES startIndex:0 orders:orders completion:nil];
-    }
-}
-
-- (void) loadCancelledReturnedOrdersWithCompletion:(void (^)(NSArray *))callBack
-{
-    if ( ! self.isLoadingOrders )
-    {
-        self.isLoadingOrders = YES;
-        NSMutableArray * orders = [[NSMutableArray alloc] init];
-        [self loadEveryOrderWithStatusOpen:NO ready:NO delivered:NO cancelledReturned:YES startIndex:0 orders:orders completion:callBack];
-    }
+    return [[tmpOrders sortedArrayUsingDescriptors:sortDescriptors] mutableCopy];    
 }
 
 
-- (void) loadOrderDetailsForOrder:(Order *)order
+- (void) cancelLoadOrders:(void (^)())callBack
 {
-    self.isLoadingOrderDetails = YES;
-    NSString * urlString = [CreateAPIStrings viewOrderDetailsForOrder:order];
-    
-    [CreateAPIStrings splitUrl:urlString ForApis:^(NSString *baseUrl, NSString *paramString)
+    [self.myNSURLSession getTasksWithCompletionHandler:^(NSArray *dataTasks, NSArray *uploadTasks, NSArray *downloadTasks)
     {
-        NSURLSession * session = [NSURLSession sharedSession];
-        NSURLRequest * request = [CreateAPIStrings createRequestWithBaseUrl:baseUrl paramString:paramString isPostRequest:NO];
-         
-        [[session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
+        dispatch_async(dispatch_get_main_queue(), ^
         {
-            if ( error )
-                NSLog(@"error : %@", error);
-            else
+            for ( NSURLSessionDataTask * tmpDataTask in dataTasks )
             {
-                NSDictionary * dictionaryResponse = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-                order.buyerPhoneNumber = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"memberPhone"] withAlternative:0];
-                order.totalPrice = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"totalOrderPrice"] withAlternative:[NSNumber numberWithInt:0]];
-                NSMutableArray * tmpProducts = [[NSMutableArray alloc] init];
-                NSArray * productsArray = [dictionaryResponse valueForKey:@"orderItems"];
-                if ( [productsArray class] == [NSNull class] )
-                    productsArray = @[]; //prevents exception "no known selector [NSNull Count]"
-                                         //i have only seen this error in QA orders that are messed up (all the entries are null)
-                for ( int i = 0; i < [productsArray count]; i++ )
+                if ( [tmpDataTask.taskDescription containsString:@"LoadOrderStatus"] )
                 {
-                    Product * tmpProduct = [[Product alloc] initWithOrder:order andDictionary:[productsArray objectAtIndex:i]];
-                    //the following 3 fields will be moved into the product details dictionary eventually
-                    //because the runner assignments will be moved to item level instead of order level
-                    tmpProduct.runnerFirstName = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"runnerFirstName"] withAlternative:@""];
-                    tmpProduct.runnerLastName = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"runnerLastName"] withAlternative:@""];
-                    tmpProduct.runnerPhoneNumber = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"runnerPhoneNumber"] withAlternative:0];
-                    [tmpProducts addObject:tmpProduct];
-                    
-                    [self loadImageType:@"product" forProduct:tmpProduct];
-                    [self loadImageType:@"purchaseReceipt" forProduct:tmpProduct];
-                    [self loadImageType:@"returnReceipt" forProduct:tmpProduct];
-                }
-                order.products = tmpProducts;
-                order.hasLoadedDetails = YES;
-                
-                if ([self.delegate respondsToSelector:@selector(didFinishLoadingOrderDetails:)])
-                {
-                    dispatch_sync(dispatch_get_main_queue(), ^
-                    {
-                        self.isLoadingOrderDetails = NO;
-                        [self.delegate didFinishLoadingOrderDetails:order];
-                    });
+                    NSLog(@"cancelling request : %@", tmpDataTask.currentRequest);
+                    [tmpDataTask cancel];
                 }
             }
-        }] resume];
+            self.isLoadingOrders = NO;
+            if ( callBack )
+                callBack();
+        });
     }];
+}
+
+- (void) URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error
+{
+    if (error)
+    {
+        NSLog(@"%@ failed: %@", task.originalRequest.URL, error);
+        return;
+    }
+    
+    NSMutableData * responseData = self.responsesData[@(task.taskIdentifier)];
+    NSDictionary * dictionaryResponse = [NSJSONSerialization JSONObjectWithData:responseData options:kNilOptions error:nil];
+    
+    if ( dictionaryResponse )
+    {
+        //NSLog(@"dictionaryResponse = %@", dictionaryResponse);
+
+        if ( [task.taskDescription containsString:@"LoadOrderStatus"] ) //find a better way of checking this
+        {
+            self.isLoadingOrders = NO;
+            NSMutableArray * tmpOrders = [[NSMutableArray alloc] init];
+            NSArray * ordersArray = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"orderBeanList"] withAlternative:@[]];
+            for ( int i = 0; i < [ordersArray count]; i++ )
+            {
+                Order * tmpOrder = [[Order alloc] initWithDictionary:[ordersArray objectAtIndex:i]];
+                
+                if ( self.showKeynoteOrders )
+                {
+                    if ( tmpOrder.isKeynoteOrder )
+                        [tmpOrders addObject:tmpOrder];
+                }
+                else if ( ! tmpOrder.isKeynoteOrder )
+                    [tmpOrders addObject:tmpOrder];
+            }
+            
+            tmpOrders = [OrderManager sortOrders:tmpOrders];
+            
+            dispatch_async(dispatch_get_main_queue(), ^
+            {
+                void(^completionBlock)(NSArray *) = self.completionBlocks[@(task.taskIdentifier)];
+                if ( completionBlock )
+                    completionBlock(tmpOrders);
+                else if ( [self.delegate respondsToSelector:@selector(didFinishLoadingOrders:status:error:)] )
+                    [self.delegate didFinishLoadingOrders:tmpOrders status:[EnumTypes enumFromString:task.taskDescription] error:[error localizedDescription]];
+                
+                [self.completionBlocks removeObjectForKey:@(task.taskIdentifier)];
+            });
+        }
+    }
+    
+    [self.responsesData removeObjectForKey:@(task.taskIdentifier)];
+}
+
+- (void) URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data
+{
+    NSMutableData * responseData = self.responsesData[@(dataTask.taskIdentifier)];
+    if ( ! responseData )
+    {
+        responseData = [NSMutableData dataWithData:data];
+        self.responsesData[@(dataTask.taskIdentifier)] = responseData;
+    }
+    else
+        [responseData appendData:data];
 }
 
 - (void) loadOrderDetailsForOrder:(Order *)order completion:(void (^)(Order *))callBack
@@ -313,33 +231,15 @@ static OrderManager * sharedOrderManager = nil;
             else
             {
                 NSDictionary * dictionaryResponse = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-                order.buyerPhoneNumber = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"memberPhone"] withAlternative:0];
-                order.totalPrice = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"totalOrderPrice"] withAlternative:[NSNumber numberWithInt:0]];
-                NSMutableArray * tmpProducts = [[NSMutableArray alloc] init];
-                NSArray * productsArray = [dictionaryResponse valueForKey:@"orderItems"];
-                if ( [productsArray class] == [NSNull class] )
-                    productsArray = @[];
-                for ( int i = 0; i < [productsArray count]; i++ )
+                [order fillOrderDetails:dictionaryResponse];
+                self.isLoadingOrderDetails = NO;
+                
+                dispatch_async(dispatch_get_main_queue(), ^
                 {
-                    Product * tmpProduct = [[Product alloc] initWithOrder:order andDictionary:[productsArray objectAtIndex:i]];
-                    //the following 3 fields will be moved into the product details dictionary eventually
-                    //because the runner assignments will be moved to item level instead of order level
-                    tmpProduct.runnerFirstName = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"runnerFirstName"] withAlternative:@""];
-                    tmpProduct.runnerLastName = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"runnerLastName"] withAlternative:@""];
-                    tmpProduct.runnerPhoneNumber = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"runnerPhoneNumber"] withAlternative:0];
-                    [tmpProducts addObject:tmpProduct];
-                       
-                    [self loadImageType:@"product" forProduct:tmpProduct];
-                    [self loadImageType:@"purchaseReceipt" forProduct:tmpProduct];
-                    [self loadImageType:@"returnReceipt" forProduct:tmpProduct];
-                }
-                order.products = tmpProducts;
-                order.hasLoadedDetails = YES;
-                   
-                dispatch_sync(dispatch_get_main_queue(), ^
-                {
-                    self.isLoadingOrderDetails = NO;
-                    callBack(order);
+                    if ( callBack )
+                        callBack(order);
+                    else if ( [self.delegate respondsToSelector:@selector(didFinishLoadingOrderDetails:)] )
+                        [self.delegate didFinishLoadingOrderDetails:order];
                 });
             }
         }] resume];
@@ -363,47 +263,38 @@ static OrderManager * sharedOrderManager = nil;
     {
         [[session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
         {
-            NSLog(@"loadImageType url : %@", request.URL.absoluteString);
-            
-            if ( error )
-                NSLog(@"error : %@", error);
-            else
+            dispatch_async(dispatch_get_main_queue(), ^
             {
-                UIImage * tmpImage = [UIImage imageWithData:data];
+                NSLog(@"loadImageType url : %@", request.URL.absoluteString);
                 
-                if ( [type isEqualToString:@"product"] )
-                {
-                    product.productImage = tmpImage;
-                    if ([self.delegate respondsToSelector:@selector(didFinishLoadingImageType:forProduct:)])
-                        dispatch_sync(dispatch_get_main_queue(), ^
-                    {
-                        [self.delegate didFinishLoadingImageType:type forProduct:product];
-                    });
-                }
-                else if ( [type isEqualToString:@"purchaseReceipt"] )
-                {
-                    product.purchaseReceiptImage = tmpImage;
-                    if ([self.delegate respondsToSelector:@selector(didFinishLoadingImageType:forProduct:)])
-                        dispatch_sync(dispatch_get_main_queue(), ^
-                    {
-                        [self.delegate didFinishLoadingImageType:type forProduct:product];
-                    });
-                }
+                if ( error )
+                    NSLog(@"error : %@", error);
                 else
                 {
-                    product.returnReceiptImage = tmpImage;
-                    if ([self.delegate respondsToSelector:@selector(didFinishLoadingImageType:forProduct:)])
-                        dispatch_sync(dispatch_get_main_queue(), ^
+                    UIImage * tmpImage = [UIImage imageWithData:data];
+                    
+                    if ( [type isEqualToString:@"product"] )
                     {
-                        [self.delegate didFinishLoadingImageType:type forProduct:product];
-                    });
+                        product.productImage = tmpImage;
+                        if ([self.delegate respondsToSelector:@selector(didFinishLoadingImageType:forProduct:)])
+                                            [self.delegate didFinishLoadingImageType:type forProduct:product];
+                    }
+                    else if ( [type isEqualToString:@"purchaseReceipt"] )
+                    {
+                        product.purchaseReceiptImage = tmpImage;
+                        if ([self.delegate respondsToSelector:@selector(didFinishLoadingImageType:forProduct:)])                                               [self.delegate didFinishLoadingImageType:type forProduct:product];
+                    }
+                    else
+                    {
+                        product.returnReceiptImage = tmpImage;
+                        if ([self.delegate respondsToSelector:@selector(didFinishLoadingImageType:forProduct:)])                                               [self.delegate didFinishLoadingImageType:type forProduct:product];
+                    }
                 }
-            }
+            });
         }] resume];
     }
 }
 
-#pragma mark - misc
 - (void) confirmProductAtStation:(Product *)product completion:(void (^)(BOOL success))callBack
 {
     NSString * urlString = [CreateAPIStrings confirmProductAtAnchor:product];
@@ -415,40 +306,32 @@ static OrderManager * sharedOrderManager = nil;
         
         [[session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
         {
-            NSDictionary * dictionaryResponse;
-            if ( data )
+            dispatch_async(dispatch_get_main_queue(), ^
             {
-                dictionaryResponse = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-                NSLog(@"%@", dictionaryResponse);
-            }
-            
-            if ( error )
-            {
-                NSLog(@"error : %@", error);
-                dispatch_sync(dispatch_get_main_queue(), ^
+                NSDictionary * dictionaryResponse;
+                if ( data )
                 {
+                    dictionaryResponse = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+                    NSLog(@"%@", dictionaryResponse);
+                }
+                
+                if ( error )
+                {
+                    NSLog(@"error : %@", error);
                     callBack(NO);
-                });
-            }
-            else
-            {
-                if ( [[dictionaryResponse valueForKey:@"responseCode"] intValue] != 0 )
-                {
-                    dispatch_sync(dispatch_get_main_queue(), ^
-                    {
-                        callBack(NO);
-                    });
                 }
                 else
                 {
-                    product.anchorStatus = @"At Station";
-                    product.myOrder.anchorStatus = @"At Station";
-                    dispatch_sync(dispatch_get_main_queue(), ^
+                    if ( [[dictionaryResponse valueForKey:@"responseCode"] intValue] != 0 )
+                        callBack(NO);
+                    else
                     {
+                        product.anchorStatus = @"At Station";
+                        product.myOrder.anchorStatus = kAnchorStatusAtStation;
                         callBack(YES);
-                    });
+                    }
                 }
-            }
+            });
         }] resume];
     }];
 }
@@ -464,13 +347,14 @@ static OrderManager * sharedOrderManager = nil;
         Order * tmpOrder = [orders objectAtIndex:i];
         
         if ( [[[self.myDateFormatter stringFromDate:tmpOrder.placeTime] lowercaseString] rangeOfString:searchString].location != NSNotFound ||
-            [[[NSString stringWithFormat:@"%@", tmpOrder.orderId] lowercaseString] rangeOfString:searchString].location != NSNotFound ||
+            [[[NSString stringWithFormat:@"%@", tmpOrder.wcsOrderId] lowercaseString] rangeOfString:searchString].location != NSNotFound ||
             [[[NSString stringWithFormat:@"%@ %@", tmpOrder.buyerFirstName, tmpOrder.buyerLastName] lowercaseString] rangeOfString:searchString].location != NSNotFound ||
             [[[NSString stringWithFormat:@"%@", tmpOrder.buyerEmail] lowercaseString] rangeOfString:searchString].location != NSNotFound ||
             [[[NSString stringWithFormat:@"%@", tmpOrder.buyerPhoneNumber] lowercaseString] rangeOfString:searchString].location != NSNotFound ||
             [[[NSString stringWithFormat:@"%@", tmpOrder.runnerId] lowercaseString] rangeOfString:searchString].location != NSNotFound ||
-            [[[NSString stringWithFormat:@"%@", tmpOrder.runnerStatus] lowercaseString] rangeOfString:searchString].location != NSNotFound ||
-            [[tmpOrder.status lowercaseString] rangeOfString:searchString].location != NSNotFound )
+            [[[NSString stringWithFormat:@"%@", [tmpOrder stringFromRunnerStatus]] lowercaseString] rangeOfString:searchString].location != NSNotFound ||
+            [[[NSString stringWithFormat:@"%@", tmpOrder.displayStatus] lowercaseString] rangeOfString:searchString].location != NSNotFound ||
+            [[[tmpOrder stringFromStatus] lowercaseString] rangeOfString:searchString].location != NSNotFound )
         {
             [filteredOrders addObject:tmpOrder];
         }
@@ -493,7 +377,8 @@ static OrderManager * sharedOrderManager = nil;
             [[tmpProduct.color lowercaseString] rangeOfString:searchString].location != NSNotFound ||
             [[tmpProduct.size lowercaseString] rangeOfString:searchString].location != NSNotFound ||
             [[[NSString stringWithFormat:@"%@", tmpProduct.price] lowercaseString] rangeOfString:searchString].location != NSNotFound ||
-            [[tmpProduct.status lowercaseString] rangeOfString:searchString].location != NSNotFound )
+            [[tmpProduct.status lowercaseString] rangeOfString:searchString].location != NSNotFound ||
+            [[tmpProduct.name lowercaseString] rangeOfString:searchString].location != NSNotFound )
         {
             [filteredProducts addObject:tmpProduct];
         }
@@ -504,6 +389,7 @@ static OrderManager * sharedOrderManager = nil;
 
 - (void) confirmDeliveryForOrder:(Order *)order completion:(void (^)(BOOL success))callBack
 {
+    self.isUpdatingOrder = YES;
     NSString * urlString = [CreateAPIStrings confirmOrderDelivery:order];
     
     [CreateAPIStrings splitUrl:urlString ForApis:^(NSString *baseUrl, NSString *paramString)
@@ -513,61 +399,40 @@ static OrderManager * sharedOrderManager = nil;
          
         [[session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
         {
-            NSDictionary * dictionaryResponse = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-            NSString * responseStatus = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"status"] withAlternative:@""];
-               
-            if ( error || ! [responseStatus isEqualToString:@"SUCCESS"] )
+            dispatch_async(dispatch_get_main_queue(), ^
             {
-                if ( error )
-                    NSLog(@"error : %@", error);
-                else
-                    NSLog(@"response : %@", responseStatus);
+                NSDictionary * dictionaryResponse = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+                NSString * responseStatus = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"status"] withAlternative:@""];
+                self.isUpdatingOrder = NO;
                 
-                dispatch_sync(dispatch_get_main_queue(), ^
+                if ( error || ! [responseStatus isEqualToString:@"SUCCESS"] )
                 {
-                    callBack(NO);
-                });
-            }
-            else
-            {
-                dispatch_sync(dispatch_get_main_queue(), ^
-                {
-                    order.status = @"Delivered";
-                    order.anchorStatus = @"Delivered";
-                    for ( int i = 0; i < [order.products count]; i++ )
-                    {
-                        Product * tmpProduct = (Product *)[order.products objectAtIndex:i];
-                        tmpProduct.anchorStatus = @"Delivered";
-                    }
-                    callBack(YES);
+                    if ( error )
+                        NSLog(@"error : %@", error);
+                    else
+                        NSLog(@"response : %@", responseStatus);
                     
-                    //the below /*code*/ could be used for automatic printing
-                    //remember to comment out the above callBack(YES) if you are going to use automatic printing
-                    /*
-                    [self.myPrintManager printReceiptForOrder:order completion:^(BOOL success)
-                    {
-                        if ( success )
-                        {
-                            if ( [self.delegate respondsToSelector:@selector(didFinishPrintingReceiptForOrder:)] )
-                                [self.delegate didFinishPrintingReceiptForOrder:order];
-                        }
-                        else
-                        {
-                            if ( [self.delegate respondsToSelector:@selector(didFailPrintingReceiptForOrder:)] )
-                                [self.delegate didFailPrintingReceiptForOrder:order];
-                        }
-                        
-                        callBack(YES);
-                    }];
-                     */
-                });
-            }
+                    callBack(NO);
+                }
+                else
+                {
+                   order.status = kStatusDelivered;
+                   order.anchorStatus = kAnchorStatusDelivered;
+                   for ( int i = 0; i < [order.products count]; i++ )
+                   {
+                       Product * tmpProduct = (Product *)[order.products objectAtIndex:i];
+                       tmpProduct.anchorStatus = @"Delivered";
+                   }
+                   callBack(YES);
+                }
+            });
         }] resume];
     }];
 }
 
 - (void) overrideConfirmOrderAtStation:(Order *)order completion:(void (^)(NSString *))callBack
 {
+    self.isUpdatingOrder = YES;
     NSString * urlString = [CreateAPIStrings overrideConfirmOrderAtStation:order];
     
     [CreateAPIStrings splitUrl:urlString ForApis:^(NSString *baseUrl, NSString *paramString)
@@ -577,36 +442,39 @@ static OrderManager * sharedOrderManager = nil;
          
         [[session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
         {
-            if ( error )
+            dispatch_async(dispatch_get_main_queue(), ^
             {
-                NSLog(@"error : %@", error);
-                dispatch_sync(dispatch_get_main_queue(), ^
+                self.isUpdatingOrder = NO;
+                if ( error )
                 {
-                    callBack([NSString stringWithFormat:@"%@", error]);
-                });
-            }
-            else
-            {
-                NSDictionary * responseDictionary = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-                
-                NSLog(@"%@", responseDictionary);
-                
-                if ( [[responseDictionary valueForKey:@"status"] isEqualToString:@"SUCCESS"] )
-                {
-                    dispatch_sync(dispatch_get_main_queue(), ^
-                    {
-                        callBack(nil);
-                    });
+                    NSLog(@"error : %@", error);
+                    if ( callBack )
+                        callBack([NSString stringWithFormat:@"%@", error]);
                 }
                 else
                 {
-                    dispatch_sync(dispatch_get_main_queue(), ^
+                    NSDictionary * responseDictionary = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+                    
+                    NSLog(@"%@", responseDictionary);
+                    
+                    if ( callBack )
                     {
-                        callBack([responseDictionary valueForKey:@"status"]);
-                        //callBack([[responseDictionary valueForKey:@"messageBean"] valueForKey:@"message"]);
-                    });
+                        if ( [[responseDictionary valueForKey:@"status"] class] == [NSString class] &&
+                           ( [[responseDictionary valueForKey:@"status"] isEqualToString:@"Delivery successfully called"] ||
+                             [[responseDictionary valueForKey:@"status"] isEqualToString:@"SUCCESS"] ) )
+                        {
+                                 callBack(nil);
+                        }
+                        else
+                        {
+                            if ( [responseDictionary valueForKey:@"status"] )
+                                callBack([responseDictionary valueForKey:@"status"]);
+                            else
+                                callBack(@"No Reponse From Server");
+                        }
+                    }
                 }
-            }
+            });
         }] resume];
     }];
 }
@@ -622,33 +490,23 @@ static OrderManager * sharedOrderManager = nil;
         
         [[session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
         {
-            if ( error )
+            dispatch_async(dispatch_get_main_queue(), ^
             {
-                NSLog(@"error : %@", error);
-                dispatch_sync(dispatch_get_main_queue(), ^
+                if ( error )
                 {
+                    NSLog(@"error : %@", error);
                     callBack(NO);
-                });
-            }
-            else
-            {
-                NSDictionary * responseDictionary = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-                NSLog(@"%@", responseDictionary);
-                if ( [[responseDictionary valueForKey:@"status"] isEqualToString:@"SUCCESS"] )
-                {
-                    dispatch_sync(dispatch_get_main_queue(), ^
-                    {
-                        callBack(YES);
-                    });
                 }
                 else
                 {
-                    dispatch_sync(dispatch_get_main_queue(), ^
-                    {
+                    NSDictionary * responseDictionary = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+                    NSLog(@"%@", responseDictionary);
+                    if ( [[responseDictionary valueForKey:@"status"] isEqualToString:@"SUCCESS"] )
+                        callBack(YES);
+                    else
                         callBack(NO);
-                    });
                 }
-            }
+            });
         }] resume];
     }];
 }
@@ -664,33 +522,23 @@ static OrderManager * sharedOrderManager = nil;
          
         [[session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
         {
-            if ( error )
+            dispatch_async(dispatch_get_main_queue(), ^
             {
-                NSLog(@"error : %@", error);
-                dispatch_sync(dispatch_get_main_queue(), ^
+                if ( error )
                 {
+                    NSLog(@"error : %@", error);
                     callBack(NO);
-                });
-            }
-            else
-            {
-                NSDictionary * responseDictionary = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-                NSLog(@"%@", responseDictionary);
-                if ( [[responseDictionary valueForKey:@"status"] isEqualToString:@"SUCCESS"] )
-                {
-                    dispatch_sync(dispatch_get_main_queue(), ^
-                    {
-                        callBack(YES);
-                    });
                 }
                 else
                 {
-                    dispatch_sync(dispatch_get_main_queue(), ^
-                    {
+                    NSDictionary * responseDictionary = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+                    NSLog(@"%@", responseDictionary);
+                    if ( [[responseDictionary valueForKey:@"status"] isEqualToString:@"SUCCESS"] )
+                        callBack(YES);
+                    else
                         callBack(NO);
-                    });
                 }
-            }
+            });
         }] resume];
     }];
 }
@@ -706,33 +554,60 @@ static OrderManager * sharedOrderManager = nil;
          
         [[session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
         {
-            if ( error )
+            dispatch_async(dispatch_get_main_queue(), ^
             {
-                NSLog(@"error : %@", error);
-                dispatch_sync(dispatch_get_main_queue(), ^
+                if ( error )
                 {
+                    NSLog(@"error : %@", error);
                     callBack(NO);
-                });
-            }
-            else
-            {
-                NSDictionary * responseDictionary = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-                NSLog(@"%@", responseDictionary);
-                if ( [[responseDictionary valueForKey:@"status"] isEqualToString:@"SUCCESS"] )
-                {
-                    dispatch_sync(dispatch_get_main_queue(), ^
-                    {
-                        callBack(YES);
-                    });
                 }
                 else
                 {
-                    dispatch_sync(dispatch_get_main_queue(), ^
-                    {
+                    NSDictionary * responseDictionary = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+                    NSLog(@"%@", responseDictionary);
+                    
+                    if ( [[responseDictionary valueForKey:@"status"] isEqualToString:@"SUCCESS"] )
+                        callBack(YES);
+                    else
                         callBack(NO);
-                    });
                 }
-            }
+            });
+        }] resume];
+    }];
+}
+
+- (void) cancelProduct:(Product *)product completion:(void (^)(BOOL, NSString *))callBack
+{
+    NSString * urlString = [CreateAPIStrings cancelProduct:product];
+    
+    [CreateAPIStrings splitUrl:urlString ForApis:^(NSString *baseUrl, NSString *paramString)
+    {
+        NSURLSession * session = [NSURLSession sharedSession];
+        NSURLRequest * request = [CreateAPIStrings createRequestWithBaseUrl:baseUrl paramString:paramString isPostRequest:YES];
+         
+        [[session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
+        {
+            dispatch_async(dispatch_get_main_queue(), ^
+            {
+                if ( error )
+                {
+                    NSLog(@"error : %@", error);
+                    callBack(NO, [error localizedDescription]);
+                }
+                else
+                {
+                    NSDictionary * responseDictionary = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+                    NSLog(@"%@", responseDictionary);
+                    
+                    if ( [[responseDictionary valueForKey:@"message"] isEqualToString:@"SUCCESS"] )
+                    {
+                        product.status = @"Cancelled";
+                        callBack(YES, nil);
+                    }
+                    else
+                        callBack(NO, [DataMethods checkForNull:[responseDictionary valueForKey:@"message"] withAlternative:@"No Error Message"]);
+                }
+            });
         }] resume];
     }];
 }
@@ -741,7 +616,8 @@ static OrderManager * sharedOrderManager = nil;
 {
     for ( int i = 0; i < [order.products count]; i++ )
     {
-        if ( ! [[(Product *)[order.products objectAtIndex:i] anchorStatus] isEqualToString:@"At Station"] && ! [[(Product *)[order.products objectAtIndex:i] status] isEqualToString:@"Cancelled"])
+        if ( ! [[(Product *)[order.products objectAtIndex:i] anchorStatus] isEqualToString:@"At Station"] &&
+             ! [[(Product *)[order.products objectAtIndex:i] status] isEqualToString:@"Cancelled"] )
             return NO;
     }
     return YES;
@@ -855,7 +731,7 @@ static OrderManager * sharedOrderManager = nil;
     if (imageData)
     {
         [body appendData:[[NSString stringWithFormat:@"--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-        [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"%@\"; filename=\"PurchaseReceipt_%@.jpg\"\r\n", FileParamConstant, order.orderId] dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"%@\"; filename=\"PurchaseReceipt_%@.jpg\"\r\n", FileParamConstant, order.wcsOrderId] dataUsingEncoding:NSUTF8StringEncoding]];
         [body appendData:[@"Content-Type:image/jpeg\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
         [body appendData:imageData];
         [body appendData:[[NSString stringWithFormat:@"\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
@@ -888,6 +764,31 @@ static OrderManager * sharedOrderManager = nil;
         else if ( [self.delegate respondsToSelector:@selector(didFailUploadingReceipt:)] )
             [self.delegate didFailUploadingReceipt:@"Error Uploading Receipt"];
     }
+}
+
++ (void) currentTasks:(void (^)(BOOL isLoadingOrders, BOOL isLoadingOrderDetails, BOOL isUpdatingOrder, BOOL isUploadingReceipt))completion
+{
+    [[NSURLSession sharedSession] getTasksWithCompletionHandler:^(NSArray *dataTasks, NSArray *uploadTasks, NSArray *downloadTasks)
+    {
+        BOOL isUpdatingOrder = NO;
+        BOOL isLoadingOrders = NO;
+        BOOL isLoadingOrderDetails = NO;
+        BOOL isUploadingReceipt = NO;
+        
+        for ( NSURLSessionDataTask * dataTask in dataTasks )
+        {
+            if ( [dataTask.taskDescription isEqualToString:@"load orders"] )
+                isLoadingOrders = YES;
+            else if ( [dataTask.taskDescription isEqualToString:@"load order details"] )
+                isLoadingOrderDetails = YES;
+            else if ( [dataTask.taskDescription isEqualToString:@"updating order"] )
+                isUpdatingOrder = YES;
+            else if ( [dataTask.taskDescription isEqualToString:@"uploading receipt"] )
+                isUploadingReceipt = YES;
+        }
+        
+        completion(isLoadingOrders, isLoadingOrderDetails, isUpdatingOrder, isUploadingReceipt);
+    }];
 }
 
 @end

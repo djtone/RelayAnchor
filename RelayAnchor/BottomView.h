@@ -7,14 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "EnumTypes.h"
 
 @protocol BottomViewDelegate <NSObject>
-
-- (void) didPressOpen;
-- (void) didPressReady;
-- (void) didPressDelivered;
-- (void) didPressCancelledReturned;
-
+- (void) didChangeStatus:(BottomViewStatus)selectedStatus;
 @end
 
 @interface BottomView : UIView
@@ -25,7 +21,9 @@
 @property (weak, nonatomic) IBOutlet UIButton *readyButton;
 @property (weak, nonatomic) IBOutlet UIButton *deliveredButton;
 @property (weak, nonatomic) IBOutlet UIButton *cancelledReturnedButton;
-@property NSString * selectedStatus;
+@property BottomViewStatus selectedStatus;
+
+- (void) resetButtons;
 
 - (IBAction)openButtonAction:(id)sender;
 - (IBAction)readyButtonAction:(id)sender;

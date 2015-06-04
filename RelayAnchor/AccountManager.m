@@ -23,7 +23,10 @@ static AccountManager * sharedAccountManager = nil;
         sharedAccountManager = [[AccountManager alloc] init];
         sharedAccountManager.shouldAddPushToken = NO;
         sharedAccountManager.shouldUpdatePushToken = NO;
+        sharedAccountManager.authenticatedMalls = [[NSMutableArray alloc] init];
+        sharedAccountManager.rememberedEmail = [[NSUserDefaults standardUserDefaults] valueForKey:@"sellerEmail"];
         
+        //needed cause some devices saved old preferences which had different structure. too lazy to check for correct format
         [[NSUserDefaults standardUserDefaults] setValue:nil forKey:@"orderSortPreferences"];
         
         //if no sort preferences are found, create default sort preferences
@@ -45,7 +48,7 @@ static AccountManager * sharedAccountManager = nil;
     return sharedAccountManager;
 }
 
-+ (void) loginWithUser:(NSString *)user password:(NSString *)password andPushToken:(NSString *)pushToken completion:(void (^)(BOOL))callBack
++ (void) loginWithUser:(NSString *)user password:(NSString *)password rememberEmail:(BOOL)rememberEmail andPushToken:(NSString *)pushToken completion:(void (^)(BOOL))callBack
 {
     NSString * urlString = [CreateAPIStrings loginWithUser:user password:password andPushToken:pushToken];
     
@@ -63,16 +66,13 @@ static AccountManager * sharedAccountManager = nil;
             if ( error || [sessionKey length] == 0)
             {
                 NSLog(@"error : %@", error);
-                dispatch_sync(dispatch_get_main_queue(), ^
+                dispatch_async(dispatch_get_main_queue(), ^
                 {
                     callBack(NO);
                 });
             }
             else
             {
-                [[NSUserDefaults standardUserDefaults] setValue:[responseDictionary valueForKey:@"sellerId"] forKey:@"sellerId"];
-                [[NSUserDefaults standardUserDefaults] setValue:[responseDictionary valueForKey:@"sessionKey"] forKey:@"sessionKey"];
-                
                 if ( [[AccountManager sharedInstance] shouldAddPushToken] )
                 {
                     [AccountManager addPushToken:[[NSUserDefaults standardUserDefaults] valueForKey:@"pushTokenString"] completion:^(BOOL success)
@@ -127,7 +127,35 @@ static AccountManager * sharedAccountManager = nil;
                     }];
                 }
                 
-                dispatch_sync(dispatch_get_main_queue(), ^
+                if ( rememberEmail )
+                    [[AccountManager sharedInstance] setRememberedEmail:user];
+                else
+                    [[AccountManager sharedInstance] setRememberedEmail:nil];
+                
+                //convert the camelcased name from the reponse to include spaces
+                NSString * camelCaseName = [responseDictionary valueForKey:@"sellerName"];
+                if ( [camelCaseName isEqualToString:@"OakBrookMall"] )
+                    camelCaseName = @"OakbrookMall"; //backend should change their response. oakbrook is one word
+                NSMutableString * spacedName = [NSMutableString string];
+                
+                for ( int i = 0 ; i < camelCaseName.length; i++ )
+                {
+                    NSString * ch = [camelCaseName substringWithRange:NSMakeRange(i, 1)];
+                    if ( [ch rangeOfCharacterFromSet:[NSCharacterSet uppercaseLetterCharacterSet]].location != NSNotFound  && i != 0)
+                        [spacedName appendString:@" "];
+
+                    [spacedName appendString:ch];
+                }
+                
+                Mall * tmpMall = [[Mall alloc] init];
+                tmpMall.name = spacedName;
+                tmpMall.name = [tmpMall.name capitalizedString];
+                tmpMall.mallId = [responseDictionary valueForKey:@"sellerId"];
+                tmpMall.sessionKey = [responseDictionary valueForKey:@"sessionKey"];
+                [[AccountManager sharedInstance] setSelectedMall:tmpMall];
+                [[[AccountManager sharedInstance] authenticatedMalls] addObject:tmpMall];
+                
+                dispatch_async(dispatch_get_main_queue(), ^
                 {
                     callBack(YES);
                 });
@@ -297,6 +325,42 @@ static AccountManager * sharedAccountManager = nil;
                
         }] resume];
     }];
+}
+
++ (void) nearbyMalls:(void (^)(NSArray *))callBack
+{
+    if ( [[AccountManager sharedInstance] nearbyMalls] )
+    {
+        callBack([[AccountManager sharedInstance] nearbyMalls]);
+        return;
+    }
+        
+    NSURLSession * session = [NSURLSession sharedSession];
+    NSURLRequest * request = [[NSURLRequest alloc] initWithURL:[NSURL URLWithString:@"http://www.google.com"]];
+    
+    [[session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
+    {
+        [NSThread sleepForTimeInterval:1];
+        dispatch_async(dispatch_get_main_queue(), ^
+        {
+            NSArray * tmpMalls = @[@"Oakbrook Mall", @"Water Tower Mall"];
+            [[AccountManager sharedInstance] setNearbyMalls:tmpMalls];
+            callBack(tmpMalls);
+        });
+    }] resume];
+}
+
++ (void) logout:(void (^)())callBack
+{
+    [[AccountManager sharedInstance] setSelectedMall:nil];
+    [[[AccountManager sharedInstance] authenticatedMalls] removeAllObjects];
+    callBack();
+}
+
+- (void) setRememberedEmail:(NSString *)rememberedEmail
+{
+    [[NSUserDefaults standardUserDefaults] setValue:rememberedEmail forKey:@"sellerEmail"];
+    _rememberedEmail = rememberedEmail;
 }
 
 @end

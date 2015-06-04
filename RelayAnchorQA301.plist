@@ -17,7 +17,7 @@
 			<key>metadata</key>
 			<dict>
 				<key>bundle-identifier</key>
-				<string>com.searshc.RelayAnchor</string>
+				<string>com.searshc.RelayAnchor.ios8fix</string>
 				<key>bundle-version</key>
 				<string>0.9.1</string>
 				<key>kind</key>

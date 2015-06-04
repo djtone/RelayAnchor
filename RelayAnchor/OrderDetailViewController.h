@@ -29,7 +29,6 @@
 @property NSTimer * refreshTimer;
 - (void) refreshDetails;
 
-- (IBAction)setStatusReturnPendingAction:(id)sender;
 - (IBAction)setStatusReturnConfirmedAction:(id)sender;
 - (IBAction)setStatusReturnRejectedAction:(id)sender;
 

@@ -36,6 +36,8 @@
 @property (nonatomic) id runtimeErrorHandlingObserver;
 
 #pragma mark - crop adjusting
+@property CGPoint dragPointOffset;
+@property UIPanGestureRecognizer * dragCropViewGesture;
 @property UIPanGestureRecognizer * cropAdjusterGestureTopLeft;
 @property UIPanGestureRecognizer * cropAdjusterGestureBottomRight;
 

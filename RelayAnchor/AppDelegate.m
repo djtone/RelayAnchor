@@ -9,6 +9,7 @@
 #import "AppDelegate.h"
 #import "UIAlertView+Blocks.h"
 #import "AccountManager.h"
+#import <Crashlytics/Crashlytics.h>
 
 @implementation AppDelegate
 
@@ -18,6 +19,8 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    [Crashlytics startWithAPIKey:@"c6a2eda33ca408fedceef9fade959e30ee8ce437"];
+    
     NSDictionary * remoteNotif = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
     if ( remoteNotif )
     {

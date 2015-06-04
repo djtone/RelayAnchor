@@ -9,8 +9,9 @@
 #import "PrintManager.h"
 #import "OrderManager.h"
 #import "UIPrintPageRenderer+PDFdata.h"
+#import "SVProgressHUD.h"
 
-#define kPaperSizeA4 CGSizeMake(595.2,841.8)
+//#define kPaperSizeA4 CGSizeMake(595.2,841.8)
 
 @implementation PrintManager
 
@@ -22,7 +23,7 @@ static PrintManager * sharedPrintManager = nil;
     {
         sharedPrintManager = [[PrintManager alloc] init];
         sharedPrintManager.myPrinterPicker = [UIPrinterPickerController printerPickerControllerWithInitiallySelectedPrinter:nil];
-        sharedPrintManager.myPrinterPicker.delegate = (id<UIPrinterPickerControllerDelegate>)self;
+        //sharedPrintManager.myPrinterPicker.delegate = sharedPrintManager;
         sharedPrintManager.myPrintInteractionController = [UIPrintInteractionController sharedPrintController];
         sharedPrintManager.myDateFormatter = [[NSDateFormatter alloc] init];
         [sharedPrintManager.myDateFormatter setDateStyle:NSDateFormatterShortStyle];
@@ -35,18 +36,26 @@ static PrintManager * sharedPrintManager = nil;
 
 - (void) presentFromRect:(CGRect)rect inView:(UIView *)view animated:(BOOL)animated completionHandler:(UIPrinterPickerCompletionHandler)callBack
 {
-    [self.myPrinterPicker presentFromRect:rect inView:view animated:animated completionHandler:callBack];
+    [SVProgressHUD show];
+    //the printer picker takes a while to show
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^
+    {
+        [self.myPrinterPicker presentFromRect:rect inView:view animated:animated completionHandler:callBack];
+        dispatch_async(dispatch_get_main_queue(), ^
+        {
+            [SVProgressHUD dismiss];
+        });
+    });
 }
 
-- (void) printReceiptForOrder:(Order *)order fromView:(UIView *)view completion:(void (^)(BOOL))callBack
+- (void) printReceiptForOrder:(Order *)order fromView:(UIView *)view completion:(void (^)(BOOL, NSString *))callBack
 {
     if ( ( [[[UIDevice currentDevice] systemVersion] compare:@"8" options:NSNumericSearch] == NSOrderedAscending ) )
     {
         if ( ! view )
         {
-            NSLog(@"must provide view if iOS is not 8.0 or later" );
             if ( callBack )
-                callBack(NO);
+                callBack(NO, @"must provide view if iOS is not 8.0 or later");
             return;
         }
         
@@ -54,9 +63,8 @@ static PrintManager * sharedPrintManager = nil;
     }
     else if ( ! self.myPrinterPicker.selectedPrinter )
     {
-        NSLog(@"no printer selected - printer must be selected in iOS 8 and later");
         if ( callBack )
-            callBack(NO);
+            callBack(NO, @"no printer selected - printer must be selected in iOS 8 and later");
         return;
     }
     
@@ -95,8 +103,8 @@ static PrintManager * sharedPrintManager = nil;
     self.myPrintInteractionController.showsPageRange = NO;
      
     
-    NSString *html = [self.myWebView stringByEvaluatingJavaScriptFromString:@"document.documentElement.outerHTML"];
-    NSLog(@"html code: \n%@", html);
+    //NSString *html = [self.myWebView stringByEvaluatingJavaScriptFromString:@"document.documentElement.outerHTML"];
+    //NSLog(@"html code: \n%@", html);
     
     if ( view )
     {
@@ -105,9 +113,9 @@ static PrintManager * sharedPrintManager = nil;
             if ( callBack )
             {
                 if ( completed )
-                    callBack(YES);
+                    callBack(YES, nil);
                 else
-                    callBack(NO);
+                    callBack(NO, [error localizedDescription]);
             }
         }];
     }
@@ -119,9 +127,9 @@ static PrintManager * sharedPrintManager = nil;
             if ( callBack )
             {
                 if ( completed )
-                    callBack(YES);
+                    callBack(YES, nil);
                 else
-                    callBack(NO);
+                    callBack(NO, [error localizedDescription]);
             }
         }];
     }
@@ -170,7 +178,7 @@ static PrintManager * sharedPrintManager = nil;
         phoneString = @"N/A";
     
     javaScriptString = [NSString stringWithFormat:javaScriptString,
-                        [order.orderId intValue],
+                        [order.wcsOrderId intValue],
                         order.buyerFirstName, order.buyerLastName,
                         @"N/A",
                         phoneString,
@@ -304,9 +312,17 @@ static PrintManager * sharedPrintManager = nil;
     return self.myWebView;
 }
 
+/*
 - (void) printerPickerControllerDidSelectPrinter:(UIPrinterPickerController *)printerPickerController
 {
+    //im not sure if this works. not even sure if this method gets called
     self.defaultPrinterId = self.myPrintInteractionController.printInfo.printerID;
 }
+
+- (void) printerPickerControllerDidPresent:(UIPrinterPickerController *)printerPickerController
+{
+    [SVProgressHUD dismiss];
+}
+ */
 
 @end

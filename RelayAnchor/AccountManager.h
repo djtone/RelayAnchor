@@ -7,14 +7,22 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "Mall.h"
 
 @interface AccountManager : NSObject
 
 + (AccountManager *)sharedInstance;
 
-+ (void) loginWithUser:(NSString *)user password:(NSString *)password andPushToken:(NSString *)pushToken completion:(void (^)(BOOL success))callBack;
++ (void) loginWithUser:(NSString *)user password:(NSString *)password rememberEmail:(BOOL)rememberEmail andPushToken:(NSString *)pushToken completion:(void (^)(BOOL success))callBack;
 + (void) forgotPasswordForUser:(NSString *)user completion:(void (^)(BOOL success))callBack;
 + (void) synchronizePushToken:(NSData *)newPushToken;
++ (void) nearbyMalls:(void(^)(NSArray * malls))callBack;
++ (void) logout:(void(^)())callBack;
+
+@property (nonatomic) NSString * rememberedEmail; //this setter is overriden
+@property NSArray * nearbyMalls;
+@property Mall * selectedMall;
+@property NSMutableArray * authenticatedMalls;
 
 @property BOOL shouldAddPushToken;
 @property BOOL shouldUpdatePushToken;

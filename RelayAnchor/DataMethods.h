@@ -11,5 +11,6 @@
 @interface DataMethods : NSObject
 
 + (id) checkForNull:(id)dataObject withAlternative:(id)alternative;
++ (NSString *) formmatedPhoneNumber:(NSNumber *)phoneNumber;
 
 @end

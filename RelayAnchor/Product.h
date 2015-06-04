@@ -28,6 +28,12 @@
 @property UIImage * productImage;
 @property NSString * productDescription; //'description' is a key word
 @property NSString * fulfillment;
+@property NSString * buyerComments;
+//this buyer info should be moved to order level
+@property NSString * buyerAddress;
+@property NSString * buyerCity;
+@property NSString * buyerState;
+@property NSString * buyerZip;
 @property NSString * size;
 @property NSString * color;
 @property NSString * status;

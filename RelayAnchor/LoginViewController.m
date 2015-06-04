@@ -34,31 +34,21 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide) name:UIKeyboardWillHideNotification object:self.view.window];
     
     //ui stuff
-    NSUserDefaults * preferences = [NSUserDefaults standardUserDefaults];
-    if ( [preferences valueForKey:@"sellerEmail"] == nil )
-        [self.rememberEmailSwitch setOn:NO];
-    else
-    {
+    self.emailTextField.text = [[AccountManager sharedInstance] rememberedEmail];
+    if ( [[AccountManager sharedInstance] rememberedEmail] != nil )
         [self.rememberEmailSwitch setOn:YES];
-        self.emailTextField.text = [preferences valueForKey:@"sellerEmail"];
-    }
+    else
+        [self.rememberEmailSwitch setOn:NO];
 }
 
 - (IBAction)loginAction:(id)sender
 {
-    NSUserDefaults * preferences = [NSUserDefaults standardUserDefaults];
-    if ( [self.rememberEmailSwitch isOn] )
-        [preferences setValue:self.emailTextField.text forKey:@"sellerEmail"];
-    else
-        [preferences setValue:nil forKey:@"sellerEmail"];
-    [preferences synchronize];
-    
     if ( [self.emailTextField.text length] == 0 )
         [SVProgressHUD showErrorWithStatus:@"No Login Provided"];
     else
     {
         [SVProgressHUD show];
-        [AccountManager loginWithUser:self.emailTextField.text password:self.passwordTextField.text andPushToken:@"" completion:^(BOOL success)
+        [AccountManager loginWithUser:self.emailTextField.text password:self.passwordTextField.text rememberEmail:self.rememberEmailSwitch.on andPushToken:@"" completion:^(BOOL success)
         {
             if ( success )
             {
@@ -104,7 +94,7 @@
     if ( [[[UIDevice currentDevice] systemVersion] compare:@"8" options:NSNumericSearch] != NSOrderedAscending ) //iOS 8 and greater
     {
         offsetRectOrientationRight = CGRectMake(0, -100, 768, 1024);
-        offsetRectOrientationLeft = CGRectMake(0, 100, 768, 1024);
+        offsetRectOrientationLeft = CGRectMake(0, -100, 768, 1024);
     }
     else
     {

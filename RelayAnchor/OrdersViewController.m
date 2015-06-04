@@ -24,21 +24,24 @@
     self.myOrderManager = [OrderManager sharedInstanceWithDelegate:self];
     self.myDateFormatter = [[NSDateFormatter alloc] init];
     self.myDate = [NSDate date];
-    self.updateOrdersTimer = [NSTimer scheduledTimerWithTimeInterval:10 target:self selector:@selector(refreshOrders) userInfo:nil repeats:YES];
+    self.statusesFirstLoad = YES;
+    self.searchesFirstLoad = NO;
     
     // register for keyboard notifications
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow) name:UIKeyboardWillShowNotification object:self.view.window];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide) name:UIKeyboardWillHideNotification object:self.view.window];
     
-    //printing
-    self.myPrintManager = [PrintManager sharedPrintManager];
-    
     //ui stuff
     [self setNeedsStatusBarAppearanceUpdate];
-    self.swipedOrders = [[NSMutableArray alloc] init];
+    self.swipedOrderIds = [[NSMutableArray alloc] init];
     
     self.myTopView = [[[NSBundle mainBundle] loadNibNamed:@"TopView" owner:self options:nil] firstObject];
     self.myTopView.delegate = self;
+    self.myTopView.printerButton.hidden = YES;
+    if ( self.myOrderManager.showKeynoteOrders )
+        [self.myTopView.keynoteOrdersSwitch setOn:YES];
+    else
+        [self.myTopView.keynoteOrdersSwitch setOn:NO];
     [self.view addSubview:self.myTopView];
     
     self.myBottomView = [[[NSBundle mainBundle] loadNibNamed:@"BottomView" owner:self options:nil] firstObject];
@@ -75,12 +78,23 @@
 - (void) viewWillAppear:(BOOL)animated
 {
     [self.orderTableView reloadData];
+    [self.myTopView.mallNameButton setTitle:[[[AccountManager sharedInstance] selectedMall] name] forState:UIControlStateNormal];
 }
 
 #pragma mark - top view delegate
 - (void) searchBarTextDidChange:(NSString *)searchString
 {
-    [self refreshOrders];
+    if ( ! [self.searchedText isEqualToString:searchString] )
+    {//this is required becuase the clear button calls textFieldDidChange twice (im guessing its an iOS bug)
+        self.searchedText = searchString;
+        
+        self.noOrdersLabel.hidden = YES;
+        self.searchesFirstLoad = YES;
+        [self.myTopView.searchBarTextField setClearButtonMode:UITextFieldViewModeNever];
+        
+        if ( ! [self refreshOrders ] )
+            [self.orderTableView reloadData];
+    }
 }
 
 - (void) didPressAlertButton
@@ -88,140 +102,105 @@
     [self.myBottomView openButtonAction:nil];
 }
 
-- (void) didChangeKeynoteSwitch
-{
-    [self refreshOrders];
-    
-    //the below /*code*/ works
-
-    /*
-    UIPrintInteractionController * printInteractionController = [UIPrintInteractionController sharedPrintController];
-    printInteractionController.showsNumberOfCopies = NO;
-    printInteractionController.showsPageRange = NO;
-    printInteractionController.printingItem = [NSURL URLWithString:@"https://www.google.com/images/nav_logo195.png"];
-    
-    [printInteractionController presentFromRect:CGRectMake(100, 100, 300, 300) inView:self.view animated:YES completionHandler:^(UIPrintInteractionController *printInteractionController, BOOL completed, NSError *error)
-    {
-        //
-    }];
-     */
-    
-    /*
-    if ( ! self.myPrinter )
-    {
-        //getting the printer
-        UIPrinterPickerController * myPrinterPicker = [UIPrinterPickerController printerPickerControllerWithInitiallySelectedPrinter:nil];
-        myPrinterPicker.delegate = self;
-        
-        [myPrinterPicker presentFromRect:CGRectMake(100, 100, 300, 300) inView:self.view animated:YES completionHandler:^(UIPrinterPickerController *printerPickerController, BOOL userDidSelect, NSError *error)
-        {
-            if ( userDidSelect )
-            {
-                self.myPrinter = printerPickerController.selectedPrinter;
-            }
-        }];
-    }
-    else
-    {
-        UIPrintInteractionController * printInteractionController = [UIPrintInteractionController sharedPrintController];
-        printInteractionController.printingItem = [NSURL URLWithString:@"https://www.google.com/images/nav_logo195.png"];
-        
-        [printInteractionController printToPrinter:self.myPrinter completionHandler:^(UIPrintInteractionController *printInteractionController, BOOL completed, NSError *error)
-        {
-            //
-        }];
-    }
-     */
-}
-
 - (void) didPressLogout
 {
-    [self.updateOrdersTimer invalidate];
-    UIViewController * modalToDismissFrom = self;
-    while ( ! [[[modalToDismissFrom presentingViewController] restorationIdentifier] isEqualToString:@"loginPage"] )
-        modalToDismissFrom = [modalToDismissFrom presentingViewController];
-    modalToDismissFrom = [modalToDismissFrom presentingViewController];
-    [modalToDismissFrom dismissViewControllerAnimated:YES completion:nil];
+    //[self] specific stuff
+    [self.myOrderManager stopAutoRefreshOrders:nil];
+    
+    //handling the UI
+    UIViewController * homePage = self;
+    while ( ! [[[homePage presentingViewController] restorationIdentifier] isEqualToString:@"loginPage"] )
+        homePage = [homePage presentingViewController];
+    UIViewController * loginPage = [homePage presentingViewController];
+    
+    UIGraphicsBeginImageContext(self.view.window.bounds.size);
+    [self.view.window.layer renderInContext:UIGraphicsGetCurrentContext()];
+    UIImage * overlayImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    UIImageView * imageOverlay = [[UIImageView alloc] initWithImage:overlayImage];
+    
+    if ( [[[UIDevice currentDevice] systemVersion] compare:@"8" options:NSNumericSearch] == NSOrderedAscending ) //iOS 7 and lesser
+    {
+        if ( [[UIDevice currentDevice] orientation] == UIDeviceOrientationLandscapeRight || self.interfaceOrientation == 4 )
+            imageOverlay.transform = CGAffineTransformMakeRotation(M_PI_2);
+        else
+            imageOverlay.transform = CGAffineTransformMakeRotation(-M_PI_2);
+    }
+    
+    imageOverlay.frame = CGRectMake(0, 0, 1024, 768);
+    [homePage.view addSubview:imageOverlay];
+    [loginPage dismissViewControllerAnimated:YES completion:^
+    {
+        [loginPage dismissViewControllerAnimated:NO completion:nil];
+    }];
 }
 
 - (void) didPressBackButton
 {
-    [self.updateOrdersTimer invalidate];
+    [self.myOrderManager stopAutoRefreshOrders:nil];
     
     HomeViewController * homeViewController = (HomeViewController *)self.presentingViewController;
     [homeViewController myTopView].orderNumberLabel.text = self.myTopView.orderNumberLabel.text;
     self.myOrderManager.delegate = (HomeViewController *)self.presentingViewController;
-    homeViewController.updateOrdersTimer = [NSTimer scheduledTimerWithTimeInterval:10 target:self.myOrderManager selector:@selector(loadAllOrders) userInfo:nil repeats:YES];
+    [homeViewController.myOrderManager stopAutoRefreshOrders:^
+    {
+        [homeViewController.myOrderManager startAutoRefreshOrdersWithStatus:kLoadOrderStatusAll timeInterval:10];
+    }];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
+- (void) didChangeMall
+{
+    self.statusesFirstLoad = YES;
+    self.ordersForTableView = @[];
+    
+    if ( ! [self refreshOrders] )
+        [self.orderTableView reloadData];
+}
+
+- (void) didChangeKeynoteBoolean
+{
+    self.statusesFirstLoad = YES;
+    self.ordersForTableView = @[];
+    
+    if ( ! [self refreshOrders] )
+        [self.orderTableView reloadData];
+}
+
 #pragma mark - bottom view delegate
-- (void) didPressOpen
+- (void) didChangeStatus:(BottomViewStatus)selectedStatus
 {
-    self.ordersForTableView = [[NSArray alloc] init];
+    self.statusesFirstLoad = YES;
+    self.ordersForTableView = @[];
+    [self.myOrderManager stopAutoRefreshOrders:^
+    {
+        [self.myOrderManager startAutoRefreshOrdersWithStatus:[EnumTypes LoadOrderStatusFromBottomViewStatus:selectedStatus] timeInterval:10];
+    }];
     
-    if ( [self.myTopView.searchBarTextField.text length] == 0 )
-        [self.myOrderManager loadOpenOrders];
-    else
-        [self.myOrderManager loadOpenOrdersWithCompletion:^(NSArray *orders)
-        {
-            self.noOrdersLabel.text = @"No Open Orders"; // in case there are zero orders
-            self.ordersForTableView = [self.myOrderManager searchOrders:orders withString:self.myTopView.searchBarTextField.text];
-            [self.orderTableView reloadData];
-        }];
+    switch (selectedStatus)
+    {
+        case kBottomViewStatusOpen:
+            self.noOrdersLabel.text = @"No Open Orders";
+            break;
+            
+        case kBottomViewStatusReady:
+            self.noOrdersLabel.text = @"No Ready Orders";
+            break;
+            
+        case kBottomViewStatusDelivered:
+            self.noOrdersLabel.text = @"No Delivered Orders";
+            break;
+            
+        case kBottomViewStatusCancelledReturned:
+            self.noOrdersLabel.text = @"No Cancelled\nOr Returned Orders";
+            break;
+            
+        default:
+            self.noOrdersLabel.text = @"No Orders";
+            NSLog(@"invalid selectedStatus");
+    }
     
-    [self.orderTableView reloadData];
-}
-
-- (void) didPressReady
-{
-    self.ordersForTableView = [[NSArray alloc] init];
-    
-    if ( [self.myTopView.searchBarTextField.text length] == 0 )
-        [self.myOrderManager loadReadyOrders];
-    else
-        [self.myOrderManager loadReadyOrdersWithCompletion:^(NSArray *orders)
-        {
-            self.noOrdersLabel.text = @"No Ready Orders"; // in case there are zero orders
-            self.ordersForTableView = [self.myOrderManager searchOrders:orders withString:self.myTopView.searchBarTextField.text];
-            [self.orderTableView reloadData];
-        }];
-    
-    [self.orderTableView reloadData];
-}
-
-- (void) didPressDelivered
-{
-    self.ordersForTableView = [[NSArray alloc] init];
-    
-    if ( [self.myTopView.searchBarTextField.text length] == 0 )
-        [self.myOrderManager loadDeliveredOrders];
-    else
-        [self.myOrderManager loadDeliveredOrdersWithCompletion:^(NSArray *orders)
-        {
-            self.noOrdersLabel.text = @"No Delivered Orders"; // in case there are zero orders
-            self.ordersForTableView = [self.myOrderManager searchOrders:orders withString:self.myTopView.searchBarTextField.text];
-            [self.orderTableView reloadData];
-        }];
-    
-    [self.orderTableView reloadData];
-}
-
-- (void) didPressCancelledReturned
-{
-    self.ordersForTableView = [[NSArray alloc] init];
-    
-    if ( [self.myTopView.searchBarTextField.text length] == 0 )
-        [self.myOrderManager loadCancelledReturnedOrders];
-    else
-        [self.myOrderManager loadCancelledReturnedOrdersWithCompletion:^(NSArray *orders)
-        {
-            self.noOrdersLabel.text = @"No Cancelled\nOr Returned Orders"; // in case there are zero orders
-            self.ordersForTableView = [self.myOrderManager searchOrders:orders withString:self.myTopView.searchBarTextField.text];
-            [self.orderTableView reloadData];
-        }];
-    
-    [self.orderTableView reloadData];
+    self.noOrdersLabel.hidden = YES;
 }
 
 #pragma mark - tableview delegate/datasource
@@ -237,19 +216,16 @@
 
 - (NSInteger) numberOfSectionsInTableView:(UITableView *)tableView
 {
-    if ( self.ordersForTableView.count > 0 || self.myOrderManager.isLoadingOrders )
+    if ( self.ordersForTableView.count > 0 || self.statusesFirstLoad || self.searchesFirstLoad )
         self.noOrdersLabel.hidden = YES;
     else
         self.noOrdersLabel.hidden = NO;
     
+    self.statusesFirstLoad = NO;
+    self.searchesFirstLoad = NO;
+    
     if ( self.myOrderManager.isLoadingOrders )
         return [self.ordersForTableView count]+1;
-//    
-//    if ( self.wasRefreshingOrdersBeforeOverride )
-//    {
-//        self.wasRefreshingOrdersBeforeOverride = NO;
-//        return [self.ordersForTableView count]+1;
-//    }
     
     return [self.ordersForTableView count];
 }
@@ -303,18 +279,14 @@
         cell.confirmDeliveryButton.hidden = YES;
         cell.loadingIndicator.hidden = YES;
         
-        Order * tmpOrder = (Order *)[self.ordersForTableView objectAtIndex:indexPath.section];
-        
-        //gesture recognizers
-        for ( UIGestureRecognizer * gesture in [[cell contentView] gestureRecognizers] )
-            [[cell contentView] removeGestureRecognizer:gesture];
-        
-        UILongPressGestureRecognizer * overrideReadyGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(overrideOrderReady:)];
-        [cell.contentView addGestureRecognizer:overrideReadyGesture];
-        
-        UISwipeGestureRecognizer * swipeLeftGesture = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeLeft:)];
-        swipeLeftGesture.direction = UISwipeGestureRecognizerDirectionLeft;
-        [cell.contentView addGestureRecognizer:swipeLeftGesture];
+        Order * tmpOrder;
+        if ( [self.ordersForTableView count] > 0 )
+            tmpOrder = (Order *)[self.ordersForTableView objectAtIndex:indexPath.section];
+        else
+        {
+            cell.dateLabel.text = @"Error Loading Data";
+            return cell;
+        }
         
         //if the order is from today, display the time, otherwise display the date
         NSCalendar *cal = [NSCalendar currentCalendar];
@@ -327,15 +299,20 @@
             [self.myDateFormatter setDateFormat:@"M/d/yy"];
         
         cell.dateLabel.text = [self.myDateFormatter stringFromDate:tmpOrder.placeTime];
-        cell.idLabel.text = [NSString stringWithFormat:@"%@", tmpOrder.orderId];
+        cell.idLabel.text = [NSString stringWithFormat:@"%@", tmpOrder.wcsOrderId];
         cell.buyerNameLabel.text = [[NSString stringWithFormat:@"%@ %@", tmpOrder.buyerFirstName, tmpOrder.buyerLastName] capitalizedString];
         cell.buyerEmail.text = tmpOrder.buyerEmail;
         
-        if ( [tmpOrder.buyerPhoneNumber intValue] == 0 )
+        NSString * phoneString;
+        if ( [tmpOrder.buyerPhoneNumber intValue] == 0 && [tmpOrder.deliveryPhoneNumber intValue] == 0 )
             cell.buyerPhoneLabel.text = @"No Phone Provided";
         else
         {
-            NSString * phoneString = [NSString stringWithFormat:@"%@", tmpOrder.buyerPhoneNumber];
+            if ( [tmpOrder.deliveryPhoneNumber intValue] != 0 && tmpOrder.hasDeliveryItems )
+                phoneString = [NSString stringWithFormat:@"%@", tmpOrder.deliveryPhoneNumber];
+            else
+                phoneString = [NSString stringWithFormat:@"%@", tmpOrder.buyerPhoneNumber];
+            
             if ( [phoneString length] == 11 )
                 cell.buyerPhoneLabel.text = [NSString stringWithFormat:@"(%@) %@-%@", [phoneString substringWithRange:NSMakeRange(1, 3)], [phoneString substringWithRange:NSMakeRange(4, 3)], [phoneString substringWithRange:NSMakeRange(7, 4)]];
             else if ( [phoneString length] == 10 )
@@ -345,50 +322,51 @@
         }
         
         cell.runnerNameLabel.text = [NSString stringWithFormat:@"%@", tmpOrder.runnerId];
-        cell.statusLabel.text = tmpOrder.runnerStatus;
+        cell.statusLabel.text = [tmpOrder stringFromRunnerStatus];
+        
         if ( tmpOrder.isKeynoteOrder )
             cell.keynoteOrderLabel.hidden = NO;
         else
             cell.keynoteOrderLabel.hidden = YES;
         
-        if ( [tmpOrder.anchorStatus isEqualToString:@"Return Initiated"] )
-        {
-            cell.statusLabel.text = @"Return\nInitiated";
-            cell.colorDot.backgroundColor = [UIColor colorWithRed:(float)82/255 green:(float)210/255 blue:(float)128/255 alpha:1];
-        }
-        else if ( [tmpOrder.status isEqualToString:@"Cancelled"] || [tmpOrder.status isEqualToString:@"Returned"] || [tmpOrder.status isEqualToString:@"Rejected"] )
-        {
-            cell.statusLabel.text = tmpOrder.status;
-            cell.colorDot.backgroundColor = [UIColor lightGrayColor];
-        }
-        else if ( [tmpOrder.runnerStatus isEqualToString:@"Open"] )
-            cell.colorDot.backgroundColor = [UIColor colorWithRed:(float)241/255 green:(float)68/255 blue:(float)51/255 alpha:1];
-        else if ( [tmpOrder.runnerStatus isEqualToString:@"Running"] )
-            cell.colorDot.backgroundColor = [UIColor colorWithRed:(float)254/255 green:(float)174/255 blue:(float)17/255 alpha:1];
-        else if ( [tmpOrder.runnerStatus isEqualToString:@"Picked Up"] )
-            cell.colorDot.backgroundColor = [UIColor colorWithRed:(float)254/255 green:(float)174/255 blue:(float)17/255 alpha:1];
-        else if ( [tmpOrder.runnerStatus isEqualToString:@"At Station"] )
-        {
-            cell.statusLabel.text = @"Pending\nAt Station";
-            cell.colorDot.backgroundColor = [UIColor colorWithRed:(float)82/255 green:(float)210/255 blue:(float)128/255 alpha:1];
-            
-            if ( [tmpOrder.anchorStatus isEqualToString:@"At Station"] )
-            {
-                cell.confirmDeliveryButton.hidden = NO;
-                cell.statusLabel.text = @"At Station";
-                cell.colorDot.backgroundColor = [UIColor colorWithRed:(float)239/255 green:(float)118/255 blue:(float)37/255 alpha:1];
-            }
-            else if ( [tmpOrder.anchorStatus isEqualToString:@"Delivered"] )
-            {
-                cell.statusLabel.text = @"Delivered";
-                cell.colorDot.backgroundColor = [UIColor colorWithRed:(float)109/255 green:(float)202/255 blue:(float)72/255 alpha:1];
-            }
-        }
-        
-        if ( [self.swipedOrders containsObject:tmpOrder.orderId] )
-            cell.setStatusButtons.frame = CGRectMake(550, cell.setStatusButtons.frame.origin.y, cell.setStatusButtons.frame.size.width, cell.setStatusButtons.frame.size.height);
+        if ( tmpOrder.hasDeliveryItems )
+            cell.hasDeliveryItemsLabel.hidden = NO;
         else
-            cell.setStatusButtons.frame = CGRectMake(1000, cell.setStatusButtons.frame.origin.y, cell.setStatusButtons.frame.size.width, cell.setStatusButtons.frame.size.height);
+            cell.hasDeliveryItemsLabel.hidden = YES;
+
+        cell.statusLabel.text = tmpOrder.displayStatus;
+        cell.colorDot.backgroundColor = tmpOrder.displayColor;
+        
+        if ( tmpOrder.runnerStatus == kRunnerStatusAtStation && tmpOrder.anchorStatus == kAnchorStatusAtStation )
+            cell.confirmDeliveryButton.hidden = NO;
+        
+        
+        //swipe/longPress menu
+        for ( UIGestureRecognizer * gesture in [[cell contentView] gestureRecognizers] )
+            [[cell contentView] removeGestureRecognizer:gesture];
+        
+        UILongPressGestureRecognizer * longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPressGesture:)];
+        [cell.contentView addGestureRecognizer:longPressGesture];
+        
+        UISwipeGestureRecognizer * swipeLeftGesture = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeGesture:)];
+        swipeLeftGesture.direction = UISwipeGestureRecognizerDirectionLeft;
+        [cell.contentView addGestureRecognizer:swipeLeftGesture];
+        
+        UISwipeGestureRecognizer * swipeRightGesture = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeGesture:)];
+        swipeRightGesture.direction = UISwipeGestureRecognizerDirectionRight;
+        [cell.contentView addGestureRecognizer:swipeRightGesture];
+        
+        //if the order is open, show override
+        if ( self.myBottomView.selectedStatus == kBottomViewStatusOpen )
+            cell.overrideReadyStatusButton.hidden = NO;
+        else
+            cell.overrideReadyStatusButton.hidden = YES;
+            //the return buttons will show otherwise
+        
+        if ( [self.swipedOrderIds containsObject:tmpOrder.wcsOrderId] )
+            cell.swipeLeftMenu.frame = CGRectMake(cell.contentView.frame.size.width - cell.swipeLeftMenu.frame.size.width, cell.swipeLeftMenu.frame.origin.y, cell.swipeLeftMenu.frame.size.width, cell.swipeLeftMenu.frame.size.height);
+        else
+            cell.swipeLeftMenu.frame = CGRectMake(cell.contentView.frame.size.width, cell.swipeLeftMenu.frame.origin.y, cell.swipeLeftMenu.frame.size.width, cell.swipeLeftMenu.frame.size.height);
     }
     
     return cell;
@@ -401,18 +379,18 @@
     {
         Order * tmpOrder = [self.ordersForTableView objectAtIndex:indexPath.section];
         
-        if ( [self.swipedOrders containsObject:tmpOrder.orderId] )
+        if ( [self.swipedOrderIds containsObject:tmpOrder.wcsOrderId] )
         {
             OrderTableCell * cell = (OrderTableCell *)[self.orderTableView cellForRowAtIndexPath:indexPath];
             [UIView animateWithDuration:.5 animations:^
             {
-                cell.setStatusButtons.frame = CGRectMake(1000, cell.setStatusButtons.frame.origin.y, cell.setStatusButtons.frame.size.width, cell.setStatusButtons.frame.size.height);
+                cell.swipeLeftMenu.frame = CGRectMake(1000, cell.swipeLeftMenu.frame.origin.y, cell.swipeLeftMenu.frame.size.width, cell.swipeLeftMenu.frame.size.height);
             }];
-            [self.swipedOrders removeObject:tmpOrder.orderId];
+            [self.swipedOrderIds removeObject:tmpOrder.wcsOrderId];
         }
         else
         {
-            [self.updateOrdersTimer invalidate];
+            [self.myOrderManager stopAutoRefreshOrders:nil];
             OrderDetailViewController * modalOrderDetailViewController = [[self storyboard] instantiateViewControllerWithIdentifier:@"orderDetailPage"];
             modalOrderDetailViewController.didNavigateFromHomeScreen = NO;
             modalOrderDetailViewController.myOrder = tmpOrder;
@@ -423,39 +401,120 @@
     }
 }
 
-- (void) tableView:(UITableView *)tableView didEndDisplayingCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+- (void) handleLongPressGesture:(UILongPressGestureRecognizer *)gesture
 {
-    if ( self.indexPathForOverrideOrder == indexPath )
+    if ( gesture.state == UIGestureRecognizerStateBegan )
     {
-        self.orderForOverrideOrder = nil;
-        self.indexPathForOverrideOrder = nil;
+        OrderTableCell * cell;
+        if ( [[[UIDevice currentDevice] systemVersion] compare:@"8" options:NSNumericSearch] != NSOrderedAscending ) //iOS 8 and greater
+            cell = (OrderTableCell *)[[gesture view] superview];
+        else
+            cell = (OrderTableCell *)[[[gesture view] superview] superview];
+        
+        [self toggleSwipeMenuForCell:cell];
     }
 }
 
-- (void) handleSwipeLeft:(UISwipeGestureRecognizer *)gesture
+- (void) handleSwipeGesture:(UISwipeGestureRecognizer *)gesture
 {
-    //returns are temporarily disabled
-    /*
-    if ( [self.myBottomView.selectedStatus isEqualToString:@"cancelledReturned"] )
+    [self.orderTableView deselectRowAtIndexPath:[self.orderTableView indexPathForSelectedRow] animated:YES];
+    OrderTableCell * cell;
+    if ( [[[UIDevice currentDevice] systemVersion] compare:@"8" options:NSNumericSearch] != NSOrderedAscending ) //iOS 8 and greater
+        cell = (OrderTableCell *)[[gesture view] superview];
+    else
+        cell = (OrderTableCell *)[[[gesture view] superview] superview];
+    
+    [self toggleSwipeMenuForCell:cell];
+}
+
+- (void) toggleSwipeMenuForCell:(OrderTableCell *)cell
+{
+    Order * tmpOrder = [self.ordersForTableView objectAtIndex:[[self.orderTableView indexPathForCell:cell] section]];
+    
+    if ( [self.swipedOrderIds containsObject:tmpOrder.wcsOrderId] )
     {
-        OrderTableCell * cell = (OrderTableCell *)[[[gesture view] superview] superview];
         [UIView animateWithDuration:.5 animations:^
         {
-            cell.setStatusButtons.frame = CGRectMake(550, cell.setStatusButtons.frame.origin.y, cell.setStatusButtons.frame.size.width, cell.setStatusButtons.frame.size.height);
+            cell.swipeLeftMenu.frame = CGRectMake(cell.contentView.frame.size.width, cell.swipeLeftMenu.frame.origin.y, cell.swipeLeftMenu.frame.size.width, cell.swipeLeftMenu.frame.size.height);
         }];
-        
-        Order * tmpOrder = [self.ordersForTableView objectAtIndex:[[self.orderTableView indexPathForCell:cell] section]];
-        [self.swipedOrders addObject:tmpOrder.orderId];
+        [self.swipedOrderIds removeObject:tmpOrder.wcsOrderId];
     }
-     */
+    else
+    {
+        [UIView animateWithDuration:.5 animations:^
+        {
+            cell.swipeLeftMenu.frame = CGRectMake(cell.contentView.frame.size.width - cell.swipeLeftMenu.frame.size.width, cell.swipeLeftMenu.frame.origin.y, cell.swipeLeftMenu.frame.size.width, cell.swipeLeftMenu.frame.size.height);
+        }];
+        [self.swipedOrderIds addObject:tmpOrder.wcsOrderId];
+    }
 }
 
-- (IBAction)returnPendingAction:(id)sender
+- (IBAction)overrideReadyStatusAction:(id)sender
 {
-    //Order * tmpOrder = [self.ordersForTableView objectAtIndex:[[self.orderTableView indexPathForCell:(OrderTableCell *)[[[[sender superview] superview] superview] superview]] section]];
-    //[self.myOrderManager confirmProductReturnByCustomer: completion:<#^(BOOL success)callBack#>]
+    NSIndexPath * indexPathOfOrder;
+    if ([[[UIDevice currentDevice] systemVersion] compare:@"8" options:NSNumericSearch] != NSOrderedAscending) //iOS 8 and greater
+        indexPathOfOrder = [self.orderTableView indexPathForCell:(OrderTableCell *)[[[sender superview] superview] superview]];
+    else
+        indexPathOfOrder = [self.orderTableView indexPathForCell:(OrderTableCell *)[[[[sender superview] superview] superview] superview]];
     
-    [SVProgressHUD showImage:nil status:@"Coming Soon"];
+    __block Order * overrideOrder = [self.ordersForTableView objectAtIndex:[indexPathOfOrder section]];
+    
+    [[[UIAlertView alloc] initWithTitle:@"Override Status"
+                                message:[NSString stringWithFormat:@"Override Order# %@\nStatus to Ready?", overrideOrder.wcsOrderId]
+                       cancelButtonItem:[RIButtonItem itemWithLabel:@"Yes" action:^
+                                        {
+                                            [SVProgressHUD show];
+                                            [self.myOrderManager overrideConfirmOrderAtStation:overrideOrder completion:^(NSString * error)
+                                            {
+                                                if ( error )
+                                                {
+                                                    [SVProgressHUD dismiss];
+                                                    [[[UIAlertView alloc] initWithTitle:@"Override Order Status"
+                                                                                message:[NSString stringWithFormat:@"Issue changing status:\n%@", error]
+                                                                       cancelButtonItem:[RIButtonItem itemWithLabel:@"OK" action:^
+                                                                                        {
+                                                                                            //
+                                                                                        }]
+                                                                       otherButtonItems:nil] show];
+                                                }
+                                                else
+                                                {
+                                                    for ( Order * tmpOrder in self.ordersForTableView )
+                                                    {
+                                                        if ( [tmpOrder.wcsOrderId isEqual:overrideOrder.wcsOrderId] )
+                                                        {
+                                                            overrideOrder = tmpOrder;
+                                                            break;
+                                                        }
+                                                    }
+                                                    
+                                                    if ( [self.ordersForTableView containsObject:overrideOrder] )
+                                                    {
+                                                        NSIndexPath * overrideIndex = [NSIndexPath indexPathForItem:0 inSection:[self.ordersForTableView indexOfObject:overrideOrder]];
+                                                        NSMutableArray * tmpOrders = [self.ordersForTableView mutableCopy];
+                                                        [tmpOrders removeObject:overrideOrder];
+                                                        self.ordersForTableView = tmpOrders;
+                                                        [self.orderTableView deleteSections:[NSIndexSet indexSetWithIndex:[overrideIndex section]] withRowAnimation:UITableViewRowAnimationRight];
+                                                        
+                                                        for ( NSNumber * tmpOrderId in self.swipedOrderIds )
+                                                        {
+                                                            if ( [tmpOrderId isEqual:overrideOrder.wcsOrderId] )
+                                                            {
+                                                                [self.swipedOrderIds removeObject:tmpOrderId];
+                                                                break;
+                                                            }
+                                                        }
+                                                        [SVProgressHUD showSuccessWithStatus:@"Status Changed"];
+                                                    }
+                                                    else
+                                                        [SVProgressHUD showErrorWithStatus:@"Issue Locating Order"];
+                                                }
+                                            }];
+                                        }]
+                       otherButtonItems:[RIButtonItem itemWithLabel:@"Cancel" action:^
+                                        {
+                                            //
+                                        }], nil] show];
 }
 
 - (IBAction)returnCompleteAction:(id)sender
@@ -463,12 +522,12 @@
     [SVProgressHUD showImage:nil status:@"Coming Soon"];
 }
 
-- (IBAction)returnRejected:(id)sender
+- (IBAction)returnRejectedAction:(id)sender
 {
     [SVProgressHUD showImage:nil status:@"Coming Soon"];
 }
 
-#pragma mark - didScrollToBottom/loadMoreOrders
+#pragma mark - didScrollToBottom/forceRefreshOrders
 - (void) scrollViewDidScroll:(UIScrollView *)scrollView
 {
     if ( self.lastContentOffset < scrollView.contentOffset.y ) //scrolling down
@@ -479,7 +538,7 @@
             if ( [self.myDate timeIntervalSinceNow] + 3 < [[NSDate date] timeIntervalSinceNow] )
             {
                 self.myDate = [NSDate date];
-                [self loadMoreOrders];
+                [self forceRefreshOrders];
             }
         }
     }
@@ -487,183 +546,128 @@
     self.lastContentOffset = scrollView.contentOffset.x;
 }
 
-- (void) loadMoreOrders
+- (void) forceRefreshOrders
 {
-    if ( [self.myBottomView.selectedStatus isEqualToString:@"open"] )
-        [self.myOrderManager loadOpenOrders];
-    else if ( [self.myBottomView.selectedStatus isEqualToString:@"ready"] )
-        [self.myOrderManager loadReadyOrders];
-    else
-        [self.myOrderManager loadDeliveredOrders];
-    
+    [self.myOrderManager loadOrdersWithStatus:[EnumTypes LoadOrderStatusFromBottomViewStatus:self.myBottomView.selectedStatus] completion:nil];
     [self.orderTableView reloadData];
 }
 
 #pragma mark - order manager delegate
-- (void) didFinishLoadingOrders:(NSArray *)orders withStatusOpen:(BOOL)open ready:(BOOL)ready delivered:(BOOL)delivered cancelledReturned:(BOOL)cancelledReturned
+- (void) didStartLoadingOrdersWithStatus:(LoadOrderStatus)loadOrderStatus
 {
-    if ( self.myOrderManager.isUpdatingOrder )
+    if ( self.myOrderManager.isUpdatingOrder ) //not sure if i this is necessary
         return;
     
-    if ( [self.myBottomView.selectedStatus isEqualToString:@"open"] && open == YES && ready == NO && delivered == NO )
+    [self.orderTableView reloadData];
+}
+
+- (void) didFinishLoadingOrders:(NSArray *)orders status:(LoadOrderStatus)loadOrderStatus error:(NSString *)error
+{
+    //i need to check for an error
+    
+    self.ordersForTableView = orders;
+    self.myTopView.searchActivityIndicator.hidden = YES;
+    self.myTopView.keynoteActivityIndicator.hidden = YES;
+    [self.myTopView.searchActivityIndicator stopAnimating];
+    [self.myTopView.keynoteActivityIndicator stopAnimating];
+    [self.myTopView.searchBarTextField setClearButtonMode:UITextFieldViewModeWhileEditing];
+    
+    switch (loadOrderStatus)
     {
-        self.noOrdersLabel.text = @"No Open Orders"; // in case there are zero orders
-        self.ordersForTableView = orders;
-        self.myTopView.orderNumberLabel.text = [NSString stringWithFormat:@"%lu", (unsigned long)[orders count]];
-    }
-    else if ( [self.myBottomView.selectedStatus isEqualToString:@"ready"] && open == NO && ready == YES && delivered == NO )
-    {
-        self.noOrdersLabel.text = @"No Ready Orders"; // in case there are zero orders
-        self.ordersForTableView = orders;
-    }
-    else if ( [self.myBottomView.selectedStatus isEqualToString:@"delivered"] && open == NO && ready == NO && delivered == YES )
-    {
-        self.noOrdersLabel.text = @"No Delivered Orders"; // in case there are zero orders
-        self.ordersForTableView = orders;
-    }
-    else if ( [self.myBottomView.selectedStatus isEqualToString:@"cancelledReturned"] && open == NO && ready == NO && delivered == NO && cancelledReturned == YES )
-    {
-        self.noOrdersLabel.text = @"No Cancelled\nOr Returned Orders"; // in case there are zero orders
-        self.ordersForTableView = orders;
-    }
-    else
-    {
-        // this is in case something funky happened
-        [self refreshOrders];
-        return;
+        case kLoadOrderStatusOpen:
+            self.noOrdersLabel.text = @"No Open Orders";
+            self.myTopView.orderNumberLabel.text = [NSString stringWithFormat:@"%i", (int)[orders count]];
+            break;
+            
+        case kLoadOrderStatusReady:
+            self.noOrdersLabel.text = @"No Ready Orders";
+            break;
+            
+        case kLoadOrderStatusDelivered:
+            self.noOrdersLabel.text = @"No Delivered Orders";
+            break;
+            
+        case kLoadOrderStatusCancelledReturned:
+            self.noOrdersLabel.text = @"No Cancelled\nOr Returned Orders";
+            break;
+            
+        default:
+            self.ordersForTableView = @[];
+            NSLog(@"invalide loadOrderStatus returned from loadOrdersWithStatus");
     }
     
     if ( [self.myTopView.searchBarTextField.text length] != 0 )
+    {
         self.ordersForTableView = [self.myOrderManager searchOrders:self.ordersForTableView withString:self.myTopView.searchBarTextField.text];
+        self.noOrdersLabel.text = [NSString stringWithFormat:@"%@ Matching\n\"%@\"", self.noOrdersLabel.text, self.myTopView.searchBarTextField.text];
+    }
     
     [self.orderTableView reloadData];
 }
 
 - (IBAction)confirmOrderDelivery:(id)sender
 {
-    self.myOrderManager.isUpdatingOrder = YES;
-    
     OrderTableCell * cell;
     if ( [[[UIDevice currentDevice] systemVersion] compare:@"8" options:NSNumericSearch] != NSOrderedAscending ) //iOS 8 and greater
-         cell = (OrderTableCell *)[[sender superview] superview];
+        cell = (OrderTableCell *)[[sender superview] superview];
     else
         cell = (OrderTableCell *)[[[sender superview] superview] superview];
     
-    Order * tmpOrder = [self.ordersForTableView objectAtIndex:[[self.orderTableView indexPathForCell:cell] section]];
+    __block Order * confirmDeliveryOrder = [self.ordersForTableView objectAtIndex:[[self.orderTableView indexPathForCell:cell] section]];
     
     [SVProgressHUD showWithStatus:@"Setting Status"];
-    [self.myOrderManager confirmDeliveryForOrder:tmpOrder completion:^(BOOL success)
+    [self.myOrderManager confirmDeliveryForOrder:confirmDeliveryOrder completion:^(BOOL success)
     {
         if ( success )
         {
-            [SVProgressHUD showSuccessWithStatus:@"Status Saved"];
-            [self.orderTableView reloadData];
-            NSMutableArray * tmpOrders = [self.ordersForTableView mutableCopy];
-            [tmpOrders removeObject:tmpOrder];
-            self.ordersForTableView = tmpOrders;
+            for ( Order * tmpOrder in self.ordersForTableView )
+            {
+                if ( [tmpOrder.wcsOrderId isEqual:confirmDeliveryOrder.wcsOrderId] )
+                {
+                    confirmDeliveryOrder = tmpOrder;
+                    break;
+                }
+            }
             
-            @try
+            if ( [self.ordersForTableView containsObject:confirmDeliveryOrder] )
             {
-                [self.orderTableView deleteSections:[NSIndexSet indexSetWithIndex:[[self.orderTableView indexPathForCell:cell] section]] withRowAnimation:UITableViewRowAnimationRight];
+                NSIndexPath * confirmDeliveryIndex = [NSIndexPath indexPathForItem:0 inSection:[self.ordersForTableView indexOfObject:confirmDeliveryOrder]];
+                NSMutableArray * tmpOrders = [self.ordersForTableView mutableCopy];
+                [tmpOrders removeObjectAtIndex:confirmDeliveryIndex.section];
+                self.ordersForTableView = tmpOrders;
+                [self.orderTableView deleteSections:[NSIndexSet indexSetWithIndex:[confirmDeliveryIndex section]] withRowAnimation:UITableViewRowAnimationRight];
+                [SVProgressHUD showSuccessWithStatus:@"Status Saved"];
             }
-            @catch (NSException *exception)
-            {
-                NSLog(@"exception : %@", exception);
-            }
+            else
+                [SVProgressHUD showErrorWithStatus:@"Issue Locating Order"];
         }
         else
-        {
             [SVProgressHUD showErrorWithStatus:@"Issue Changing Status"];
-        }
-        
-        self.myOrderManager.isUpdatingOrder = NO;
     }];
-}
-
-- (void) overrideOrderReady:(UILongPressGestureRecognizer *)gesture
-{
-    if ( gesture.state == UIGestureRecognizerStateBegan && [self.myBottomView.selectedStatus isEqualToString:@"open"] )
-    {
-        self.myOrderManager.isUpdatingOrder = YES;
-        if ([[[UIDevice currentDevice] systemVersion] compare:@"8" options:NSNumericSearch] != NSOrderedAscending) //iOS 8 and greater
-            self.indexPathForOverrideOrder = [self.orderTableView indexPathForCell:(UITableViewCell *)[[gesture view] superview]];
-        else
-            self.indexPathForOverrideOrder = [self.orderTableView indexPathForCell:(UITableViewCell *)[[[gesture view] superview] superview]];
-        
-        self.orderForOverrideOrder = [self.ordersForTableView objectAtIndex:[self.indexPathForOverrideOrder section]];
-        
-        [[[UIAlertView alloc] initWithTitle:@"Override Status"
-                                    message:[NSString stringWithFormat:@"Override Order# %@\nStatus to Ready?", self.orderForOverrideOrder.orderId]
-                           cancelButtonItem:[RIButtonItem itemWithLabel:@"Yes" action:^
-        {
-            [SVProgressHUD show];
-            [self.myOrderManager overrideConfirmOrderAtStation:self.orderForOverrideOrder completion:^(NSString * error)
-            {
-                if ( error )
-                {
-                    [SVProgressHUD dismiss];
-                    [[[UIAlertView alloc] initWithTitle:@"Override Order Status"
-                                                message:[NSString stringWithFormat:@"Issue changing status:\n%@", error]
-                                       cancelButtonItem:[RIButtonItem itemWithLabel:@"OK" action:^
-                                                        {
-                                                             //
-                                                        }]
-                                       otherButtonItems:nil] show];
-                }
-                else
-                {
-                    [self.orderTableView reloadData];
-                    NSMutableArray * tmpOrders = [[NSMutableArray alloc] initWithArray:self.ordersForTableView];
-                    [tmpOrders removeObject:self.orderForOverrideOrder];
-                    self.ordersForTableView = tmpOrders;
-                    
-                    @try
-                    {
-                        [self.orderTableView deleteSections:[NSIndexSet indexSetWithIndex:[self.indexPathForOverrideOrder section]] withRowAnimation:UITableViewRowAnimationRight];
-                    }
-                    @catch (NSException *exception) {
-                        NSLog(@"%@", exception);
-                    }
-                    
-                    [SVProgressHUD showSuccessWithStatus:@"Status Changed"];
-                }
-                
-                self.myOrderManager.isUpdatingOrder = NO;
-            }];
-        }]
-        otherButtonItems:[RIButtonItem itemWithLabel:@"Cancel" action:^
-        {
-            self.myOrderManager.isUpdatingOrder = NO;
-        }], nil] show];
-    }
 }
 
 - (void) didFinishPrintingReceiptForOrder:(Order *)order
 {
-    NSLog(@"receipt printed for order id : %@", order.orderId);
+    NSLog(@"receipt printed for order id : %@", order.wcsOrderId);
 }
 
 - (void) didFailPrintingReceiptForOrder:(Order *)order
 {
-    NSLog(@"failed printing receipt for order id : %@", order.orderId);
+    NSLog(@"failed printing receipt for order id : %@", order.wcsOrderId);
 }
 
 #pragma mark - misc.
-- (void) refreshOrders
+- (BOOL) refreshOrders
 {
-    if ( self.myOrderManager.isUpdatingOrder )
-        return;
+    if ( self.myOrderManager.isUpdatingOrder || self.myOrderManager.isLoadingOrders )
+        return NO;
     
-    if ( [[self.myBottomView selectedStatus] isEqualToString:@"open"] )
-        [self.myOrderManager loadOpenOrders];
-    else if ( [[self.myBottomView selectedStatus] isEqualToString:@"ready"] )
-        [self.myOrderManager loadReadyOrders];
-    else if ( [[self.myBottomView selectedStatus] isEqualToString:@"delivered"] )
-        [self.myOrderManager loadDeliveredOrders];
-    else if ( [[self.myBottomView selectedStatus] isEqualToString:@"cancelledReturned"] )
-        [self.myOrderManager loadCancelledReturnedOrders];
+    [self.myOrderManager stopAutoRefreshOrders:^
+    {
+        [self.myOrderManager startAutoRefreshOrdersWithStatus:[EnumTypes LoadOrderStatusFromBottomViewStatus:self.myBottomView.selectedStatus] timeInterval:10];
+    }];
     
-    [self.orderTableView reloadData];
+    return YES;
 }
 
 - (void) keyboardWillShow
@@ -691,41 +695,6 @@
 -(UIStatusBarStyle)preferredStatusBarStyle
 {
     return UIStatusBarStyleLightContent;
-}
-
-- (IBAction)manualPrintAction:(id)sender
-{
-    OrderTableCell * cell;
-    if ( [[[UIDevice currentDevice] systemVersion] compare:@"8" options:NSNumericSearch] != NSOrderedAscending ) //iOS 8 and greater
-        cell = (OrderTableCell *)[[sender superview] superview];
-    else
-        cell = (OrderTableCell *)[[[sender superview] superview] superview];
-    
-    Order * tmpOrder = [self.ordersForTableView objectAtIndex:[[self.orderTableView indexPathForCell:cell] section]];
-    
-    //basically a preview print
-    /*[self.myPrintManager webViewForReceiptOrder:tmpOrder completion:^(UIWebView *webView)
-    {
-        [self.view addSubview:webView];
-    }];*/
-    
-    
-    //iOS 8 introduced printToPrinter method, bypassing additional dialog box
-    [SVProgressHUD showWithStatus:@"Printing"];
-    if ( [[[UIDevice currentDevice] systemVersion] compare:@"8" options:NSNumericSearch] != NSOrderedAscending ) //iOS 8 and greater
-    {
-        [self.myPrintManager printReceiptForOrder:tmpOrder fromView:nil completion:^(BOOL success)
-        {
-            [SVProgressHUD showSuccessWithStatus:@"Printed Successfully"];
-        }];
-    }
-    else
-    {
-        [self.myPrintManager printReceiptForOrder:tmpOrder fromView:(UIButton *)sender completion:^(BOOL success)
-        {
-            [SVProgressHUD showSuccessWithStatus:@"Printed Successfully"];
-        }];
-    }
 }
 
 - (IBAction)sortOrders:(id)sender

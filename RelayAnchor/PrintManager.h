@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "Order.h"
 
-@interface PrintManager : NSObject <UIPrinterPickerControllerDelegate, UIWebViewDelegate>
+@interface PrintManager : NSObject <UIWebViewDelegate>
 
 + (PrintManager *)sharedPrintManager;
 
@@ -20,7 +20,7 @@
 @property UIWebView * myWebView;
 
 - (void) presentFromRect:(CGRect)rect inView:(UIView *)view animated:(BOOL)animated completionHandler:(UIPrinterPickerCompletionHandler)callBack;
-- (void) printReceiptForOrder:(Order *)order fromView:(UIView *)view completion:(void(^)(BOOL success))callBack;
+- (void) printReceiptForOrder:(Order *)order fromView:(UIView *)view completion:(void(^)(BOOL success, NSString * error))callBack;
 - (void) webViewForReceiptOrder:(Order *)order completion:(void(^)(UIWebView * webView))callBack;
 
 @end

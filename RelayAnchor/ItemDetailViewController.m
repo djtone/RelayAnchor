@@ -13,6 +13,7 @@
 #import "UIAlertView+Blocks.h"
 #import "OrderDetailViewController.h"
 #import "MyCameraViewController.h"
+#import "AccountManager.h"
 
 @implementation ItemDetailViewController
 
@@ -41,22 +42,6 @@
     self.returnReceiptAlphaOverlay = [[UIView alloc] initWithFrame:CGRectMake(0, 70, 1024, 618)];
     [self.returnReceiptAlphaOverlay setBackgroundColor:[UIColor colorWithWhite:0.3 alpha:.5]];
     
-    //images
-    if ( self.myProduct.productImage != nil )
-        self.imagePlaceholder.image = self.myProduct.productImage;
-    
-    if ( self.myProduct.purchaseReceiptImage != nil )
-    {
-        self.purchaseReceiptImageView.image = self.myProduct.purchaseReceiptImage;
-        self.purchaseReceiptView.receiptImageView.image = self.myProduct.purchaseReceiptImage;
-    }
-    
-    if ( self.myProduct.returnReceiptImage != nil )
-    {
-        self.returnReceiptImageView.image = self.myProduct.returnReceiptImage;
-        self.returnReceiptView.receiptImageView.image = self.myProduct.returnReceiptImage;
-    }
-    
     //email
     self.myEmailView = [[[NSBundle mainBundle] loadNibNamed:@"EmailView" owner:self options:nil] firstObject];
     self.myEmailView.delegate = self;
@@ -68,6 +53,9 @@
     self.myTopView.delegate = self;
     self.myTopView.searchView.hidden = YES;
     self.myTopView.searchSeparator.hidden = YES;
+    self.myTopView.printerButton.hidden = YES;
+    self.myTopView.keynoteOrdersButton.hidden = YES;
+    self.myTopView.keynoteOrdersSwitch.hidden = YES;
     if ( self.tmpOrderNumber != -1 )
     {
         self.myTopView.orderNumberLabel.text = [NSString stringWithFormat:@"%i", self.tmpOrderNumber];
@@ -80,89 +68,27 @@
     self.myBottomView.delegate = self;
     [self.view addSubview:self.myBottomView];
     
-    //title
-    self.orderIdLabel.text = [NSString stringWithFormat:@"Order %@", self.myProduct.myOrder.orderId];
-    self.itemNameLabel.text = [NSString stringWithFormat:@"%@", self.myProduct.name];
-    
-    //product details
-    self.colorLabel.text = self.myProduct.color;
-    self.sizeLabel.text = self.myProduct.size;
-    self.descriptionTextView.text = self.myProduct.productDescription;
+    if ( ! [self.myProduct.productDescription isEqualToString:@""] )
+        self.descriptionTextView.text = self.myProduct.productDescription;
     self.priceLabel.text = [NSString stringWithFormat:@"%.2f", [self.myProduct.price floatValue]];
     self.storeNameLabel.text = self.myProduct.store;
     if ( self.myProduct.isDeliveryItem )
         self.deliveryItemLabel.hidden = NO;
-    
-    //return buttons
-    if ( self.myProduct.isReturn )
+    if ( [self.myProduct.buyerComments isEqualToString:@""] )
     {
-        self.returnReceiptStuff.hidden = NO;
+        self.commentsTitleLabel.hidden = YES;
+        self.commentsTextView.hidden = YES;
+    }
+    else
+        self.commentsTextView.text = self.myProduct.buyerComments;
+    
+    //contact views
+    //this [runnerAddressLabel setText] should change. the login response should return the mall address. and the mall object should add an address property
+    if ( [[[[AccountManager sharedInstance] selectedMall] name] isEqualToString:@"Oakbrook Mall"] )
+        self.runnerAddressLabel.text = @"100 Oakbrook Center\nOak Brook, IL";
+    else if ( [[[[AccountManager sharedInstance] selectedMall] name] isEqualToString:@"Water Tower Mall"] )
+        self.runnerAddressLabel.text = @"835 N Michigan Ave\nChicago, IL";
         
-        if ( [self.myProduct.anchorStatus isEqualToString:@"Return Initiated"]  )
-            self.returnedByCustomerButton.hidden = NO;
-    }
-    
-    //status bar
-    //-check marks
-    if ( [self.myProduct.runnerStatus isEqualToString:@"Picked Up"] || [self.myProduct.runnerStatus isEqualToString:@"At Station"] || [self.myProduct.anchorStatus isEqualToString:@"Delivered"] )
-        self.statusPickUpCheckMark.hidden = NO;
-    if ( [self.myProduct.anchorStatus isEqualToString:@"At Station"] || [self.myProduct.anchorStatus isEqualToString:@"Delivered"] || [self.myProduct.anchorStatus isEqualToString:@"Return Initiated"] )
-        self.statusAtStationCheckMark.hidden = NO;
-    if ( [self.myProduct.anchorStatus isEqualToString:@"Delivered"] || [self.myProduct.anchorStatus isEqualToString:@"Return Initiated"] )
-        self.statusDeliveredCheckMark.hidden = NO;
-    //-buttons
-    if ( [self.myProduct.runnerStatus isEqualToString:@"At Station"] && ! [self.myProduct.anchorStatus isEqualToString:@"At Station"] && ! [self.myProduct.anchorStatus isEqualToString:@"Delivered"] && ! [self.myProduct.anchorStatus isEqualToString:@"Return Initiated"] )
-        self.atStationButton.hidden = NO;
-    else if ( [self.myProduct.anchorStatus isEqualToString:@"At Station"] )
-        self.deliveredButton.hidden = NO;
-    //-issue icons
-    if ( [self.myProduct.status isEqualToString:@"Cancelled"] )
-    {
-        self.statusIssueCancelButton.hidden = NO;
-            if ( [self.myProduct.anchorStatus isEqualToString:@"Return Initiated"]  )
-                self.statusIssueReturnTextView.text = @"Customer is returning item.";
-    }
-    if ( self.myProduct.isSubstitute )
-        self.statusIssueSubstituteButton.hidden = NO;
-    
-    //contact member/runner
-    if ( [self.myProduct.runnerFirstName length] + [self.myProduct.runnerLastName length] == 0 )
-        self.runnerNameLabel.text = @"No Name Provided";
-    else
-        self.runnerNameLabel.text = [NSString stringWithFormat:@"%@ %@", self.myProduct.runnerFirstName, self.myProduct.runnerLastName];
-    
-    if ( [self.myProduct.runnerPhoneNumber intValue] == 0 )
-        self.runnerPhoneLabel.text = @"No Phone Provided";
-    else
-    {
-        NSString * phoneString = [NSString stringWithFormat:@"%@", self.myProduct.runnerPhoneNumber];
-        if ( [phoneString length] == 11 )
-            self.runnerPhoneLabel.text = [NSString stringWithFormat:@"(%@) %@-%@", [phoneString substringWithRange:NSMakeRange(1, 3)], [phoneString substringWithRange:NSMakeRange(4, 3)], [phoneString substringWithRange:NSMakeRange(7, 4)]];
-        else if ( [phoneString length] == 10 )
-            self.runnerPhoneLabel.text = [NSString stringWithFormat:@"(%@) %@-%@", [phoneString substringWithRange:NSMakeRange(0, 3)], [phoneString substringWithRange:NSMakeRange(3, 3)], [phoneString substringWithRange:NSMakeRange(6, 4)]];
-        else
-            self.runnerPhoneLabel.text = phoneString;
-    }
-    
-    if ( [self.myProduct.myOrder.buyerFirstName length] + [self.myProduct.myOrder.buyerLastName length] == 0 )
-        self.runnerNameLabel.text = @"No Name Provided";
-    else
-        self.buyerNameLabel.text = [NSString stringWithFormat:@"%@ %@", self.myProduct.myOrder.buyerFirstName, self.myProduct.myOrder.buyerLastName];
-    
-    //self.buyerFulfillmentLabel.text = //this should change based on delivery or pickup
-    
-    if ( [self.myProduct.myOrder.buyerPhoneNumber intValue] == 0 )
-        self.buyerPhoneLabel.text = @"No Phone Provided";
-    else
-    {
-        NSString * phoneString = [NSString stringWithFormat:@"%@", self.myProduct.myOrder.buyerPhoneNumber];
-        if ( [phoneString length] == 11 )
-            self.buyerPhoneLabel.text = [NSString stringWithFormat:@"(%@) %@-%@", [phoneString substringWithRange:NSMakeRange(1, 3)], [phoneString substringWithRange:NSMakeRange(4, 3)], [phoneString substringWithRange:NSMakeRange(7, 4)]];
-        else if ( [phoneString length] == 10 )
-            self.buyerPhoneLabel.text = [NSString stringWithFormat:@"(%@) %@-%@", [phoneString substringWithRange:NSMakeRange(0, 3)], [phoneString substringWithRange:NSMakeRange(3, 3)], [phoneString substringWithRange:NSMakeRange(6, 4)]];
-        else
-            self.buyerPhoneLabel.text = phoneString;
-    }
     
     self.myContactView = [[[NSBundle mainBundle] loadNibNamed:@"ContactView" owner:self options:nil] firstObject];
     self.myContactView.delegate = self;
@@ -172,16 +98,43 @@
     [self.contactMemberTapView addGestureRecognizer:contactMemberTap];
     UITapGestureRecognizer * contactRunnerTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(presentContactRunner)];
     [self.contactRunnerTapView addGestureRecognizer:contactRunnerTap];
+    
+    //product details
+    [self updateDetails];
 }
 
 #pragma mark - top view delegate
 - (void) didPressLogout
 {
-    UIViewController * modalToDismissFrom = self;
-    while ( ! [[[modalToDismissFrom presentingViewController] restorationIdentifier] isEqualToString:@"loginPage"] )
-        modalToDismissFrom = [modalToDismissFrom presentingViewController];
-    modalToDismissFrom = [modalToDismissFrom presentingViewController];
-    [modalToDismissFrom dismissViewControllerAnimated:YES completion:nil];
+    //[self] specific stuff
+    //nothing to do here
+    
+    //handling the UI
+    UIViewController * homePage = self;
+    while ( ! [[[homePage presentingViewController] restorationIdentifier] isEqualToString:@"loginPage"] )
+        homePage = [homePage presentingViewController];
+    UIViewController * loginPage = [homePage presentingViewController];
+    
+    UIGraphicsBeginImageContext(self.view.window.bounds.size);
+    [self.view.window.layer renderInContext:UIGraphicsGetCurrentContext()];
+    UIImage * overlayImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    UIImageView * imageOverlay = [[UIImageView alloc] initWithImage:overlayImage];
+    
+    if ( [[[UIDevice currentDevice] systemVersion] compare:@"8" options:NSNumericSearch] == NSOrderedAscending ) //iOS 7 and lesser
+    {
+        if ( [[UIDevice currentDevice] orientation] == UIDeviceOrientationLandscapeRight || self.interfaceOrientation == 4 )
+            imageOverlay.transform = CGAffineTransformMakeRotation(M_PI_2);
+        else
+            imageOverlay.transform = CGAffineTransformMakeRotation(-M_PI_2);
+    }
+    
+    imageOverlay.frame = CGRectMake(0, 0, 1024, 768);
+    [homePage.view addSubview:imageOverlay];
+    [loginPage dismissViewControllerAnimated:YES completion:^
+    {
+        [loginPage dismissViewControllerAnimated:NO completion:nil];
+    }];
 }
 
 - (void) didPressAlertButton
@@ -199,49 +152,63 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
+- (void) didChangeMall
+{
+    //go back to order page
+    
+    [self.refreshTimer invalidate];
+    OrderDetailViewController * orderDetailViewController = (OrderDetailViewController *)self.presentingViewController;
+    [orderDetailViewController.refreshTimer invalidate];
+    OrdersViewController * ordersViewController = (OrdersViewController *)orderDetailViewController.presentingViewController;
+    
+    self.myOrderManager.delegate = ordersViewController;
+    [ordersViewController myTopView].orderNumberLabel.text = self.myTopView.orderNumberLabel.text;
+    [ordersViewController.myOrderManager startAutoRefreshOrdersWithStatus:[EnumTypes LoadOrderStatusFromBottomViewStatus:ordersViewController.myBottomView.selectedStatus] timeInterval:10];
+    
+    UIGraphicsBeginImageContext(self.view.window.bounds.size);
+    [self.view.window.layer renderInContext:UIGraphicsGetCurrentContext()];
+    UIImage * overlayImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    UIImageView * imageOverlay = [[UIImageView alloc] initWithImage:overlayImage];
+    
+    if ( [[[UIDevice currentDevice] systemVersion] compare:@"8" options:NSNumericSearch] == NSOrderedAscending ) //iOS 7 and lesser
+    {
+        if ( [[UIDevice currentDevice] orientation] == UIDeviceOrientationLandscapeRight || self.interfaceOrientation == 4 )
+            imageOverlay.transform = CGAffineTransformMakeRotation(M_PI_2);
+        else
+            imageOverlay.transform = CGAffineTransformMakeRotation(-M_PI_2);
+    }
+    
+    imageOverlay.frame = CGRectMake(0, 0, 1024, 768);
+    [orderDetailViewController.view addSubview:imageOverlay];
+    [self dismissViewControllerAnimated:NO completion:nil];
+    ordersViewController.ordersForTableView = @[];
+    [ordersViewController refreshOrders];
+    [ordersViewController dismissViewControllerAnimated:YES completion:^
+    {
+        [imageOverlay removeFromSuperview];
+    }];
+}
+
 #pragma mark - bottom view delegate
-- (void) didPressOpen
+- (void) didChangeStatus:(enum BottomViewStatus)selectedStatus
 {
     [self.refreshTimer invalidate];
     UIViewController * modalToDismissFrom = self;
     while ( ! [[[modalToDismissFrom presentingViewController] restorationIdentifier] isEqualToString:@"homePage"] )
         modalToDismissFrom = [modalToDismissFrom presentingViewController];
     self.myOrderManager.delegate = (id<OrderManagerDelegate>)modalToDismissFrom;
-    [[(OrdersViewController *)modalToDismissFrom myBottomView] performSelector:@selector(openButtonAction:) withObject:self afterDelay:0];
-    [modalToDismissFrom dismissViewControllerAnimated:NO completion:nil];
-}
-
-- (void) didPressReady
-{
-    [self.refreshTimer invalidate];
-    UIViewController * modalToDismissFrom = self;
-    while ( ! [[[modalToDismissFrom presentingViewController] restorationIdentifier] isEqualToString:@"homePage"] )
-        modalToDismissFrom = [modalToDismissFrom presentingViewController];
-    self.myOrderManager.delegate = (id<OrderManagerDelegate>)modalToDismissFrom;
-    [[(OrdersViewController *)modalToDismissFrom myBottomView] performSelector:@selector(readyButtonAction:) withObject:self afterDelay:0];
-    [modalToDismissFrom dismissViewControllerAnimated:NO completion:nil];
-}
-
-- (void) didPressDelivered
-{
-    [self.refreshTimer invalidate];
-    UIViewController * modalToDismissFrom = self;
-    while ( ! [[[modalToDismissFrom presentingViewController] restorationIdentifier] isEqualToString:@"homePage"] )
-        modalToDismissFrom = [modalToDismissFrom presentingViewController];
-    self.myOrderManager.delegate = (id<OrderManagerDelegate>)modalToDismissFrom;
-    [[(OrdersViewController *)modalToDismissFrom myBottomView] performSelector:@selector(deliveredButtonAction:) withObject:self afterDelay:0];
-    [modalToDismissFrom dismissViewControllerAnimated:NO completion:nil];
-}
-
-- (void) didPressCancelledReturned
-{
-    [self.refreshTimer invalidate];
-    UIViewController * modalToDismissFrom = self;
-    while ( ! [[[modalToDismissFrom presentingViewController] restorationIdentifier] isEqualToString:@"homePage"] )
-        modalToDismissFrom = [modalToDismissFrom presentingViewController];
-    self.myOrderManager.delegate = (id<OrderManagerDelegate>)modalToDismissFrom;
-    [[(OrdersViewController *)modalToDismissFrom myBottomView] performSelector:@selector(cancelledReturnedButtonAction:) withObject:self afterDelay:0];
-    [modalToDismissFrom dismissViewControllerAnimated:NO completion:nil];
+    
+    if ( selectedStatus == kBottomViewStatusOpen )
+        [[(OrdersViewController *)modalToDismissFrom myBottomView] performSelector:@selector(openButtonAction:) withObject:self afterDelay:0];
+    else if ( selectedStatus == kBottomViewStatusReady )
+        [[(OrdersViewController *)modalToDismissFrom myBottomView] performSelector:@selector(readyButtonAction:) withObject:self afterDelay:0];
+    else if ( selectedStatus == kBottomViewStatusDelivered )
+        [[(OrdersViewController *)modalToDismissFrom myBottomView] performSelector:@selector(deliveredButtonAction:) withObject:self afterDelay:0];
+    else if ( selectedStatus == kBottomViewStatusCancelledReturned )
+        [[(OrdersViewController *)modalToDismissFrom myBottomView] performSelector:@selector(cancelledReturnedButtonAction:) withObject:self afterDelay:0];
+    
+    [modalToDismissFrom dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - contact view delegate
@@ -269,8 +236,8 @@
         [self dismissContactView];
         
         self.myEmailView.emailLabel.text = self.myContactView.emailAddress;
-        self.myEmailView.subjectTextField.text = [NSString stringWithFormat:@"Order Ready: #%@", self.myProduct.myOrder.orderId];
-        self.myEmailView.bodyTextView.text = [NSString stringWithFormat:@"Dear %@ %@,\n\nYour item is now ready for pickup.\n\nRegards,\nSYW Relay Team\n------------------------------------\nOrder ID: %@\nItem ID: %@\nDescription: %@\nSize: %@\nColor: %@\nPrice: $%.2f\n\nRunner: %@ %@", self.myProduct.myOrder.buyerFirstName, self.myProduct.myOrder.buyerLastName, self.myProduct.myOrder.orderId, self.myProduct.productId, self.myProduct.productDescription, self.myProduct.size, self.myProduct.color, [self.myProduct.salePrice floatValue], self.myProduct.runnerFirstName, self.myProduct.runnerLastName];
+        self.myEmailView.subjectTextField.text = [NSString stringWithFormat:@"Order Ready: #%@", self.myProduct.myOrder.wcsOrderId];
+        self.myEmailView.bodyTextView.text = [NSString stringWithFormat:@"Dear %@ %@,\n\nYour item is now ready for pickup.\n\nRegards,\nSYW Relay Team\n------------------------------------\nOrder ID: %@\nItem ID: %@\nDescription: %@\nSize: %@\nColor: %@\nPrice: $%.2f\n\nRunner: %@ %@", self.myProduct.myOrder.buyerFirstName, self.myProduct.myOrder.buyerLastName, self.myProduct.myOrder.wcsOrderId, self.myProduct.productId, self.myProduct.productDescription, self.myProduct.size, self.myProduct.color, [self.myProduct.salePrice floatValue], self.myProduct.runnerFirstName, self.myProduct.runnerLastName];
         
         [self.view addSubview:self.emailViewAlphaOverlay];
         [self.view addSubview:self.myEmailView];
@@ -297,11 +264,12 @@
     self.myContactView.titleLabel.text = @"Contact the Member";
     self.myContactView.nameLabel.text = [NSString stringWithFormat:@"%@ %@", self.myProduct.myOrder.buyerFirstName, self.myProduct.myOrder.buyerLastName];
     self.myContactView.emailAddress = self.myProduct.myOrder.buyerEmail;
+    self.myContactView.addressLabel.text = [self.buyerAddressLabel.text stringByReplacingOccurrencesOfString:@"\n" withString:@", "];
     
     if ( [self.myProduct.myOrder.buyerPhoneNumber intValue] == 0 )
     {
         self.myContactView.phoneLabel.text = @"No Phone Provided";
-        self.myContactView.phoneIcon.frame = CGRectMake(153, 127, 13, 14);
+        self.myContactView.phoneIcon.frame = CGRectMake(153, self.myContactView.phoneIcon.frame.origin.y, self.myContactView.phoneIcon.frame.size.width, self.myContactView.phoneIcon.frame.size.height);
     }
     else
     {
@@ -313,7 +281,7 @@
         else
             self.myContactView.phoneLabel.text = phoneString;
         
-        self.myContactView.phoneIcon.frame = CGRectMake(170, 127, 13, 14);
+        self.myContactView.phoneIcon.frame = CGRectMake(170, self.myContactView.phoneIcon.frame.origin.y, self.myContactView.phoneIcon.frame.size.width, self.myContactView.phoneIcon.frame.size.height);
     }
     
     [self.view addSubview:self.contactViewAlphaOverlay];
@@ -331,11 +299,12 @@
         self.myContactView.nameLabel.text = runnerName;
     
     self.myContactView.emailAddress = [NSString stringWithFormat:@"%@", self.myProduct.runnerId];
+    self.myContactView.addressLabel.text = [self.runnerAddressLabel.text stringByReplacingOccurrencesOfString:@"\n" withString:@", "];
     
     if ( [self.myProduct.runnerPhoneNumber intValue] == 0 )
     {
         self.myContactView.phoneLabel.text = @"No Phone Provided";
-        self.myContactView.phoneIcon.frame = CGRectMake(153, 127, 13, 14);
+        self.myContactView.phoneIcon.frame = CGRectMake(153, self.myContactView.phoneIcon.frame.origin.y, self.myContactView.phoneIcon.frame.size.width, self.myContactView.phoneIcon.frame.size.height);
     }
     else
     {
@@ -347,7 +316,7 @@
         else
             self.myContactView.phoneLabel.text = phoneString;
         
-        self.myContactView.phoneIcon.frame = CGRectMake(170, 127, 13, 14);
+        self.myContactView.phoneIcon.frame = CGRectMake(170, self.myContactView.phoneIcon.frame.origin.y, self.myContactView.phoneIcon.frame.size.width, self.myContactView.phoneIcon.frame.size.height);
     }
     
     [self.view addSubview:self.contactViewAlphaOverlay];
@@ -464,7 +433,10 @@
 #pragma mark - misc.
 - (void) getOrderDetails
 {
-    [self.myOrderManager loadOrderDetailsForOrder:self.myProduct.myOrder];
+    if ( self.myOrderManager.isUpdatingOrder )
+        return;
+    
+    [self.myOrderManager loadOrderDetailsForOrder:self.myProduct.myOrder completion:nil];
 }
 
 - (void)updateDetails
@@ -488,6 +460,9 @@
     //title
     if ( ! [self.itemNameLabel.text isEqualToString:self.myProduct.name] )
         self.itemNameLabel.text = [NSString stringWithFormat:@"%@", self.myProduct.name];
+    
+    if ( ! [self.orderIdLabel.text isEqualToString:[NSString stringWithFormat:@"Order %@", self.myProduct.myOrder.wcsOrderId]] )
+        self.orderIdLabel.text = [NSString stringWithFormat:@"Order %@", self.myProduct.myOrder.wcsOrderId];
     
     //product details
     if ( ! [self.colorLabel.text isEqualToString:self.myProduct.color] )
@@ -532,50 +507,71 @@
         if ( [self.myProduct.anchorStatus isEqualToString:@"Return Initiated"]  )
             self.statusIssueReturnTextView.text = @"Customer is returning item.";
     }
-    if ( self.myProduct.isSubstitute )
+    else if ( self.myProduct.isSubstitute )
         self.statusIssueSubstituteButton.hidden = NO;
     
+    if ( self.myProduct.isReturn )
+    {
+        self.returnReceiptStuff.hidden = NO;
+        
+        if ( [self.myProduct.anchorStatus isEqualToString:@"Return Initiated"]  )
+            self.returnedByCustomerButton.hidden = NO;
+    }
+    
     //contact member/runner
+    NSString * buyerAddressString = [NSString stringWithFormat:@"%@\n%@, %@", self.myProduct.buyerAddress, self.myProduct.buyerCity, self.myProduct.buyerState];
+    if ( ! [self.buyerAddressLabel.text isEqualToString:buyerAddressString] )
+        self.buyerAddressLabel.text = buyerAddressString;
+    
+    NSString * runnerNameString;
     if ( [self.myProduct.runnerFirstName length] + [self.myProduct.runnerLastName length] == 0 )
-        self.runnerNameLabel.text = @"No Name Provided";
+        runnerNameString = @"No Name Provided";
     else
-        self.runnerNameLabel.text = [NSString stringWithFormat:@"%@ %@", self.myProduct.runnerFirstName, self.myProduct.runnerLastName];
+        runnerNameString = [NSString stringWithFormat:@"%@ %@", self.myProduct.runnerFirstName, self.myProduct.runnerLastName];
+    if ( ! [self.runnerNameLabel.text isEqualToString:runnerNameString] )
+        self.runnerNameLabel.text = runnerNameString;
     
+    NSString * runnerPhoneString;
     if ( [self.myProduct.runnerPhoneNumber intValue] == 0 )
-        self.runnerPhoneLabel.text = @"No Phone Provided";
+        runnerPhoneString = @"No Phone Provided";
     else
     {
-        NSString * phoneString = [NSString stringWithFormat:@"%@", self.myProduct.runnerPhoneNumber];
-        if ( [phoneString length] == 11 )
-            self.runnerPhoneLabel.text = [NSString stringWithFormat:@"(%@) %@-%@", [phoneString substringWithRange:NSMakeRange(1, 3)], [phoneString substringWithRange:NSMakeRange(4, 3)], [phoneString substringWithRange:NSMakeRange(7, 4)]];
-        else if ( [phoneString length] == 10 )
-            self.runnerPhoneLabel.text = [NSString stringWithFormat:@"(%@) %@-%@", [phoneString substringWithRange:NSMakeRange(0, 3)], [phoneString substringWithRange:NSMakeRange(3, 3)], [phoneString substringWithRange:NSMakeRange(6, 4)]];
-        else
-            self.runnerPhoneLabel.text = phoneString;
+        runnerPhoneString = [NSString stringWithFormat:@"%@", self.myProduct.runnerPhoneNumber];
+        if ( [runnerPhoneString length] == 11 )
+            runnerPhoneString = [NSString stringWithFormat:@"(%@) %@-%@", [runnerPhoneString substringWithRange:NSMakeRange(1, 3)], [runnerPhoneString substringWithRange:NSMakeRange(4, 3)], [runnerPhoneString substringWithRange:NSMakeRange(7, 4)]];
+        else if ( [runnerPhoneString length] == 10 )
+            runnerPhoneString = [NSString stringWithFormat:@"(%@) %@-%@", [runnerPhoneString substringWithRange:NSMakeRange(0, 3)], [runnerPhoneString substringWithRange:NSMakeRange(3, 3)], [runnerPhoneString substringWithRange:NSMakeRange(6, 4)]];
     }
+    if ( ! [self.runnerPhoneLabel.text isEqualToString:runnerPhoneString] )
+        self.runnerPhoneLabel.text = runnerPhoneString;
     
+    NSString * buyerNameString;
     if ( [self.myProduct.myOrder.buyerFirstName length] + [self.myProduct.myOrder.buyerLastName length] == 0 )
-        self.runnerNameLabel.text = @"No Name Provided";
+        buyerNameString = @"No Name Provided";
     else
-    {
-        if ( ! [self.buyerNameLabel.text isEqualToString:[NSString stringWithFormat:@"%@ %@", self.myProduct.myOrder.buyerFirstName, self.myProduct.myOrder.buyerLastName]] )
-            self.buyerNameLabel.text = [NSString stringWithFormat:@"%@ %@", self.myProduct.myOrder.buyerFirstName, self.myProduct.myOrder.buyerLastName];
-    }
+        buyerNameString = [NSString stringWithFormat:@"%@ %@", self.myProduct.myOrder.buyerFirstName, self.myProduct.myOrder.buyerLastName];
+    if ( ! [self.buyerNameLabel.text isEqualToString:buyerNameString] )
+        self.buyerNameLabel.text = buyerNameString;
     
     //self.buyerFulfillmentLabel.text = //this should change based on delivery or pickup
     
-    if ( [self.myProduct.myOrder.buyerPhoneNumber intValue] == 0 )
-        self.buyerPhoneLabel.text = @"No Phone Provided";
+    NSString * phoneString; //should use [DataMethods FormattedPhoneNumber] instead
+    if ( [self.myProduct.myOrder.buyerPhoneNumber intValue] == 0 && [self.myProduct.myOrder.deliveryPhoneNumber intValue] == 0 )
+        phoneString = @"No Phone Provided";
     else
     {
-        NSString * phoneString = [NSString stringWithFormat:@"%@", self.myProduct.myOrder.buyerPhoneNumber];
-        if ( [phoneString length] == 11 )
-            self.buyerPhoneLabel.text = [NSString stringWithFormat:@"(%@) %@-%@", [phoneString substringWithRange:NSMakeRange(1, 3)], [phoneString substringWithRange:NSMakeRange(4, 3)], [phoneString substringWithRange:NSMakeRange(7, 4)]];
-        else if ( [phoneString length] == 10 )
-            self.buyerPhoneLabel.text = [NSString stringWithFormat:@"(%@) %@-%@", [phoneString substringWithRange:NSMakeRange(0, 3)], [phoneString substringWithRange:NSMakeRange(3, 3)], [phoneString substringWithRange:NSMakeRange(6, 4)]];
+        if ( [self.myProduct.myOrder.deliveryPhoneNumber intValue] != 0 && self.myProduct.isDeliveryItem )
+            phoneString = [NSString stringWithFormat:@"%@", self.myProduct.myOrder.deliveryPhoneNumber];
         else
-            self.buyerPhoneLabel.text = phoneString;
+            phoneString = [NSString stringWithFormat:@"%@", self.myProduct.myOrder.buyerPhoneNumber];
+            
+        if ( [phoneString length] == 11 )
+            phoneString = [NSString stringWithFormat:@"(%@) %@-%@", [phoneString substringWithRange:NSMakeRange(1, 3)], [phoneString substringWithRange:NSMakeRange(4, 3)], [phoneString substringWithRange:NSMakeRange(7, 4)]];
+        else if ( [phoneString length] == 10 )
+            phoneString = [NSString stringWithFormat:@"(%@) %@-%@", [phoneString substringWithRange:NSMakeRange(0, 3)], [phoneString substringWithRange:NSMakeRange(3, 3)], [phoneString substringWithRange:NSMakeRange(6, 4)]];
     }
+    if ( ! [self.buyerPhoneLabel.text isEqualToString:phoneString] )
+        self.buyerPhoneLabel.text = phoneString;
 }
 
 - (void)didReceiveMemoryWarning
@@ -910,6 +906,9 @@
 #pragma mark - order manager delegate
 - (void) didFinishLoadingOrderDetails:(Order *)order
 {
+    if ( [self.myOrderManager isUpdatingOrder] )
+        return;
+    
     for ( int i = 0; i < [order.products count]; i++ )
     {
         if ( [[(Product *)[order.products objectAtIndex:i] productId] isEqual:self.myProduct.productId] )
@@ -953,7 +952,7 @@
     }
 }
 
-- (void) didFinishLoadingOrders:(NSArray *)orders withStatusOpen:(BOOL)open ready:(BOOL)ready delivered:(BOOL)delivered cancelledReturned:(BOOL)cancelledReturned
+- (void) didFinishLoadingOrders:(NSArray *)orders withStatusOpen:(BOOL)open ready:(BOOL)ready delivered:(BOOL)delivered cancelledReturned:(BOOL)cancelledReturned success:(BOOL)success
 {
     // setting the top view bell thing number
     if ( open )
@@ -961,7 +960,7 @@
         int numberOfOpenOrders = 0;
         for ( int i = 0; i < [orders count]; i++ )
         {
-            if ( [[(Order *)[orders objectAtIndex:i] status] isEqualToString:@"Open"] )
+            if ( [(Order *)[orders objectAtIndex:i] status] == kStatusOpen )
                 numberOfOpenOrders++;
         }
         self.myTopView.orderNumberLabel.text = [NSString stringWithFormat:@"%i", numberOfOpenOrders];
@@ -1012,12 +1011,12 @@
 
 - (void) didFinishPrintingReceiptForOrder:(Order *)order
 {
-    NSLog(@"receipt printed for order id : %@", order.orderId);
+    NSLog(@"receipt printed for order id : %@", order.wcsOrderId);
 }
 
 - (void) didFailPrintingReceiptForOrder:(Order *)order
 {
-    NSLog(@"failed printing receipt for order id : %@", order.orderId);
+    NSLog(@"failed printing receipt for order id : %@", order.wcsOrderId);
 }
 
 @end

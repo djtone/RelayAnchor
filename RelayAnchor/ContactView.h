@@ -25,7 +25,6 @@
 @property (weak, nonatomic) IBOutlet UILabel *phoneLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *phoneIcon;
 @property (weak, nonatomic) IBOutlet UILabel *addressLabel;
-@property (weak, nonatomic) IBOutlet UILabel *stationLabel;
 @property NSString * emailAddress; // this is a data holder - used to pass to the email view
 
 - (IBAction)closeWindowAction:(id)sender;

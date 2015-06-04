@@ -40,6 +40,8 @@
 @property (weak, nonatomic) IBOutlet UILabel *priceLabel;
 @property (weak, nonatomic) IBOutlet UILabel *storeNameLabel;
 @property (weak, nonatomic) IBOutlet UITextView *descriptionTextView;
+@property (weak, nonatomic) IBOutlet UILabel *commentsTitleLabel;
+@property (weak, nonatomic) IBOutlet UITextView *commentsTextView;
 
 @property (weak, nonatomic) IBOutlet UIImageView *purchaseReceiptImageView;
 @property (weak, nonatomic) IBOutlet UIView *returnReceiptStuff;
@@ -47,12 +49,10 @@
 @property BOOL isPurchaseReceipt; //used for the camera delegate function
 
 @property (weak, nonatomic) IBOutlet UILabel *runnerNameLabel;
-@property (weak, nonatomic) IBOutlet UILabel *runnerStationLabel;
 @property (weak, nonatomic) IBOutlet UILabel *runnerPhoneLabel;
 @property (weak, nonatomic) IBOutlet UILabel *runnerAddressLabel;
 
 @property (weak, nonatomic) IBOutlet UILabel *buyerNameLabel;
-@property (weak, nonatomic) IBOutlet UILabel *buyerFulfillmentLabel;
 @property (weak, nonatomic) IBOutlet UILabel *buyerPhoneLabel;
 @property (weak, nonatomic) IBOutlet UILabel *buyerAddressLabel;
 

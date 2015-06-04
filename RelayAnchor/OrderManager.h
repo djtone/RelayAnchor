@@ -9,14 +9,16 @@
 #import <Foundation/Foundation.h>
 #import "Product.h"
 #import "Order.h"
-//#import "PrintManager.h"
+#import "EnumTypes.h"
+
 
 @protocol OrderManagerDelegate <NSObject>
 
 @optional
 
 //order
-- (void) didFinishLoadingOrders:(NSArray *)orders withStatusOpen:(BOOL)open ready:(BOOL)ready delivered:(BOOL)delivered cancelledReturned:(BOOL)cancelledReturned;
+- (void) didStartLoadingOrdersWithStatus:(LoadOrderStatus)loadOrderStatus;
+- (void) didFinishLoadingOrders:(NSArray *)orders status:(LoadOrderStatus)loadOrderStatus error:(NSString *)error;
 - (void) didFinishLoadingOrderDetails:(Order *)order;
 
 //product
@@ -33,26 +35,23 @@
 @end
 
 
-@interface OrderManager : NSObject <NSURLConnectionDataDelegate>
+
+
+@interface OrderManager : NSObject <NSURLConnectionDataDelegate, NSURLSessionDelegate, NSURLSessionDataDelegate, NSURLSessionTaskDelegate>
 
 + (OrderManager *) sharedInstanceWithDelegate:(id)delegate;
 + (OrderManager *) sharedInstance;
 
 @property id <OrderManagerDelegate> delegate;
 
-- (void) loadAllOrders;
-- (void) loadAllOrdersWithCompletion:(void(^)(NSArray * orders))callBack;
-- (void) loadOpenOrders;
-- (void) loadOpenOrdersWithCompletion:(void(^)(NSArray * orders))callBack;
-- (void) loadReadyOrders;
-- (void) loadReadyOrdersWithCompletion:(void(^)(NSArray * orders))callBack;
-- (void) loadDeliveredOrders;
-- (void) loadDeliveredOrdersWithCompletion:(void(^)(NSArray * orders))callBack;
-- (void) loadCancelledReturnedOrders;
-- (void) loadCancelledReturnedOrdersWithCompletion:(void(^)(NSArray * orders))callBack;
+- (void) loadOrdersWithStatus:(LoadOrderStatus)loadOrderStatus completion:(void (^)(NSArray * orders))callBack;
+- (void) startAutoRefreshOrdersWithStatus:(LoadOrderStatus)loadOrderStatus timeInterval:(float)timeInterval;
+- (void) stopAutoRefreshOrders:(void(^)())completion;
 
-- (void) loadOrderDetailsForOrder:(Order *)order;
+- (void) cancelLoadOrders:(void(^)())callBack;
+
 - (void) loadOrderDetailsForOrder:(Order *)order completion:(void(^)(Order * order))callBack;
+- (void) loadImageType:(NSString*)type forProduct:(Product *)product;
 
 - (NSArray *) searchOrders:(NSArray *)orders withString:(NSString *)searchString;
 - (NSArray *) searchProducts:(NSArray *)products withString:(NSString *)searchString;
@@ -68,16 +67,26 @@
 - (void) confirmProductReturnByCustomer:(Product *)product completion:(void (^)(BOOL success))callBack;
 - (void) confirmProductReturnToStore:(Product *)product completion:(void (^)(BOOL success))callBack;
 - (void) confirmProductReturnRejected:(Product *)product completion:(void (^)(BOOL success))callBack;
+- (void) cancelProduct:(Product *)product completion:(void (^)(BOOL success, NSString * errorMessage))callBack;
 
+@property NSTimer * autoRefreshOrdersTimer;
+@property NSTimer * autoRefreshOrderDetailsTimer;
+@property NSURLSession * myNSURLSession;
+@property NSMutableDictionary * responsesData;
+@property NSMutableDictionary * completionBlocks;
+//@property (copy) void (^loadOrdersCompletionBlock)(NSArray * orders);
 @property NSString * sellerId;
+@property NSURLConnection * receiptConnection;
+@property NSDateFormatter * myDateFormatter;
+@property BOOL showKeynoteOrders;
+
 @property BOOL isUpdatingOrder;
 @property BOOL isLoadingOrders;
 @property BOOL isLoadingOrderDetails;
 @property BOOL isUploadingReceipt;
-@property NSURLConnection * receiptConnection;
-@property NSDateFormatter * myDateFormatter;
 
-@property int numberOfOrdersReturned;
++ (void) currentTasks:(void(^)(BOOL isLoadingOrders, BOOL isLoadingOrderDetails, BOOL isUpdatingOrder, BOOL isUploadingReceipt))completion;
+//@property int numberOfOrdersReturned;
 
 + (NSMutableArray *) sortOrders:(NSMutableArray *)tmpOrders;
 

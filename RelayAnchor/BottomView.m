@@ -23,70 +23,72 @@
 
 - (IBAction)openButtonAction:(id)sender
 {
-    if ([self.delegate respondsToSelector:@selector(didPressOpen)])
+    if ( self.selectedStatus != kBottomViewStatusOpen )
     {
+        [self resetButtons];
+        self.selectedStatus = kBottomViewStatusOpen;
         self.triangleSelectionIcon.frame = CGRectMake(79, self.triangleSelectionIcon.frame.origin.y, self.triangleSelectionIcon.frame.size.width, self.triangleSelectionIcon.frame.size.height);
         self.triangleSelectionIcon.hidden = NO;
-        [self resetButtonColors];
         [self.openButton setImage:[UIImage imageNamed:@"BottomView_Open_Selected.png"] forState:UIControlStateNormal];
-        [self.delegate didPressOpen];
-        self.selectedStatus = @"open";
+        
+        if ( [self.delegate respondsToSelector:@selector(didChangeStatus:)] )
+            [self.delegate didChangeStatus:self.selectedStatus];
     }
-    else
-        NSLog(@"delegate did not implement didPressOpen");
 }
 
 - (IBAction)readyButtonAction:(id)sender
 {
-    if ([self.delegate respondsToSelector:@selector(didPressReady)])
+    if ( self.selectedStatus != kBottomViewStatusReady )
     {
+        [self resetButtons];
+        self.selectedStatus = kBottomViewStatusReady;
         self.triangleSelectionIcon.frame = CGRectMake(302, self.triangleSelectionIcon.frame.origin.y, self.triangleSelectionIcon.frame.size.width, self.triangleSelectionIcon.frame.size.height);
         self.triangleSelectionIcon.hidden = NO;
-        [self resetButtonColors];
         [self.readyButton setImage:[UIImage imageNamed:@"BottomView_Ready_Selected.png"] forState:UIControlStateNormal];
-        [self.delegate didPressReady];
-        self.selectedStatus = @"ready";
+        
+        if ( [self.delegate respondsToSelector:@selector(didChangeStatus:)] )
+            [self.delegate didChangeStatus:self.selectedStatus];
     }
-    else
-        NSLog(@"delegate did not implement didPressReady");
 }
 
 - (IBAction)deliveredButtonAction:(id)sender
 {
-    if ([self.delegate respondsToSelector:@selector(didPressDelivered)])
+    if ( self.selectedStatus != kBottomViewStatusDelivered )
     {
+        [self resetButtons];
+        self.selectedStatus = kBottomViewStatusDelivered;
         self.triangleSelectionIcon.frame = CGRectMake(559, self.triangleSelectionIcon.frame.origin.y, self.triangleSelectionIcon.frame.size.width, self.triangleSelectionIcon.frame.size.height);
         self.triangleSelectionIcon.hidden = NO;
-        [self resetButtonColors];
         [self.deliveredButton setImage:[UIImage imageNamed:@"BottomView_Delivered_Selected.png"] forState:UIControlStateNormal];
-        [self.delegate didPressDelivered];
-        self.selectedStatus = @"delivered";
+        
+        if ( [self.delegate respondsToSelector:@selector(didChangeStatus:)] )
+            [self.delegate didChangeStatus:self.selectedStatus];
     }
-    else
-        NSLog(@"delegate did not implement didPressDelivered");
 }
 
 - (IBAction)cancelledReturnedButtonAction:(id)sender
 {
-    if ([self.delegate respondsToSelector:@selector(didPressCancelledReturned)])
+    if ( self.selectedStatus != kBottomViewStatusCancelledReturned )
     {
+        [self resetButtons];
+        self.selectedStatus = kBottomViewStatusCancelledReturned;
         self.triangleSelectionIcon.frame = CGRectMake(848, self.triangleSelectionIcon.frame.origin.y, self.triangleSelectionIcon.frame.size.width, self.triangleSelectionIcon.frame.size.height);
         self.triangleSelectionIcon.hidden = NO;
-        [self resetButtonColors];
         [self.cancelledReturnedButton setImage:[UIImage imageNamed:@"BottomView_CancelledReturned_Selected.png"] forState:UIControlStateNormal];
-        [self.delegate didPressCancelledReturned];
-        self.selectedStatus = @"cancelledReturned";
+        
+        if ( [self.delegate respondsToSelector:@selector(didChangeStatus:)] )
+            [self.delegate didChangeStatus:self.selectedStatus];
     }
-    else
-        NSLog(@"delegate did not implement didPressCancelledReturned");
 }
 
-- (void) resetButtonColors
+- (void) resetButtons
 {
+    self.triangleSelectionIcon.hidden = YES;
     [self.openButton setImage:[UIImage imageNamed:@"BottomView_Open.png"] forState:UIControlStateNormal];
     [self.readyButton setImage:[UIImage imageNamed:@"BottomView_Ready.png"] forState:UIControlStateNormal];
     [self.deliveredButton setImage:[UIImage imageNamed:@"BottomView_Delivered.png"] forState:UIControlStateNormal];
     [self.cancelledReturnedButton setImage:[UIImage imageNamed:@"BottomView_CancelledReturned.png"] forState:UIControlStateNormal];
+    self.selectedStatus = kBottomViewStatusNil;
 }
 
 @end

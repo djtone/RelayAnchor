@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" initialViewController="ZTE-rS-Bco">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6751" systemVersion="14C109" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" initialViewController="ZTE-rS-Bco">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6736"/>
     </dependencies>
     <scenes>
         <!--Login View Controller-->
@@ -59,7 +59,7 @@
                                     <action selector="loginAction:" destination="ZTE-rS-Bco" eventType="touchUpInside" id="UfF-YZ-bFw"/>
                                 </connections>
                             </button>
-                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Password:" minimumFontSize="17" id="axC-xY-2bB">
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Password:" minimumFontSize="17" clearButtonMode="whileEditing" id="axC-xY-2bB">
                                 <rect key="frame" x="386" y="401" width="301" height="47"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -81,7 +81,7 @@
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                             </view>
-                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Email:" minimumFontSize="17" id="qzw-GB-3jf">
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Email:" minimumFontSize="17" clearButtonMode="whileEditing" id="qzw-GB-3jf">
                                 <rect key="frame" x="386" y="351" width="301" height="47"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -318,6 +318,13 @@
                                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                             <color key="color" red="0.93725490199999995" green="0.46274509800000002" blue="0.1450980392" alpha="1" colorSpace="calibratedRGB"/>
                                                         </activityIndicatorView>
+                                                        <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="*This is a keynote order*" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Hnc-fC-PVK">
+                                                            <rect key="frame" x="341" y="28" width="317" height="21"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                            <fontDescription key="fontDescription" type="italicSystem" pointSize="14"/>
+                                                            <color key="textColor" red="0.93333333330000001" green="0.46274509800000002" blue="0.14117647059999999" alpha="1" colorSpace="calibratedRGB"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
                                                     </subviews>
                                                 </tableViewCellContentView>
                                                 <userDefinedRuntimeAttributes>
@@ -332,6 +339,7 @@
                                                     <outlet property="colorDot" destination="fDm-Wk-moI" id="qZu-2h-fRo"/>
                                                     <outlet property="dateLabel" destination="rNL-mF-a3E" id="wbe-SP-Ht9"/>
                                                     <outlet property="idLabel" destination="mm6-af-TfA" id="Sge-wo-MuW"/>
+                                                    <outlet property="keynoteOrderLabel" destination="Hnc-fC-PVK" id="AHU-d7-Pfh"/>
                                                     <outlet property="loadingIndicator" destination="XCj-Ao-ZDd" id="ASP-VX-d9t"/>
                                                     <outlet property="runnerNameLabel" destination="hFn-5C-uzw" id="ngG-ay-YBJ"/>
                                                     <outlet property="statusLabel" destination="TPe-dT-3AR" id="73f-XB-63N"/>
@@ -446,32 +454,55 @@ Phone</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Welcome_DefaultMallImage.png" id="d14-zl-6cZ">
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Welcome_oakbrook.png" id="d14-zl-6cZ">
                                 <rect key="frame" x="0.0" y="70" width="1024" height="321"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
-                            <view alpha="0.70000000000000007" contentMode="scaleToFill" id="Cax-Za-4yi">
-                                <rect key="frame" x="0.0" y="70" width="1024" height="46"/>
+                            <view alpha="0.40000000000000002" contentMode="scaleToFill" id="Cax-Za-4yi">
+                                <rect key="frame" x="0.0" y="70" width="1024" height="321"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <subviews>
-                                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Oakbrook Mall" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="KyR-5s-cIX">
-                                        <rect key="frame" x="27" y="12" width="235" height="21"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="18"/>
-                                        <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                </subviews>
                                 <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="KyR-5s-cIX">
+                                <rect key="frame" x="0.0" y="160" width="1024" height="72"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <attributedString key="attributedText">
+                                    <fragment content="Oakbrook">
+                                        <attributes>
+                                            <color key="NSColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                            <font key="NSFont" size="58" name="HelveticaNeue-Bold"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
+                                        </attributes>
+                                    </fragment>
+                                    <fragment content=" Mall">
+                                        <attributes>
+                                            <color key="NSColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                            <font key="NSFont" size="58" name="HelveticaNeue"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
+                                        </attributes>
+                                    </fragment>
+                                </attributedString>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="PHK-I5-S4B">
+                                <rect key="frame" x="261" y="224" width="501" height="57"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <string key="text">Runners are ready and our customers are now placing orders.
+Take a look at what is happening now.</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" red="0.90196078430000004" green="0.90196078430000004" blue="0.90196078430000004" alpha="1" colorSpace="calibratedRGB"/>
                     </view>
                     <navigationItem key="navigationItem" id="jJt-Xm-8XR"/>
                     <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     <connections>
+                        <outlet property="mallNameLabel" destination="KyR-5s-cIX" id="PxP-JG-Moa"/>
                         <outlet property="noOrdersLabel" destination="YgC-Lb-6fV" id="Krc-6L-XeK"/>
                         <outlet property="orderTableView" destination="16B-Fq-NSR" id="WJM-y1-Pya"/>
+                        <outlet property="welcomeImageView" destination="d14-zl-6cZ" id="JeH-5M-NZ3"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="jHe-Gj-9bj" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -500,14 +531,14 @@ Phone</string>
                                 <rect key="frame" x="0.0" y="70" width="1024" height="619"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <subviews>
-                                    <label hidden="YES" opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No Orders" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="9wu-pV-Vdw">
+                                    <label hidden="YES" opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No Orders" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="9wu-pV-Vdw">
                                         <rect key="frame" x="12" y="150" width="1000" height="109"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <fontDescription key="fontDescription" type="boldSystem" pointSize="30"/>
                                         <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" delaysContentTouches="NO" dataMode="prototypes" style="grouped" separatorStyle="none" rowHeight="60" sectionHeaderHeight="10" sectionFooterHeight="10" id="QhU-BT-Zpw">
+                                    <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" delaysContentTouches="NO" dataMode="prototypes" style="grouped" separatorStyle="none" rowHeight="48" sectionHeaderHeight="10" sectionFooterHeight="10" id="QhU-BT-Zpw">
                                         <rect key="frame" x="12" y="64" width="1000" height="555"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
@@ -618,29 +649,23 @@ Phone</string>
                                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                             <color key="color" red="0.93725490199999995" green="0.46274509800000002" blue="0.1450980392" alpha="1" colorSpace="calibratedRGB"/>
                                                         </activityIndicatorView>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="*keynote order*" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="8DU-U4-J2o">
+                                                            <rect key="frame" x="342" y="28" width="317" height="21"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                            <fontDescription key="fontDescription" type="italicSystem" pointSize="14"/>
+                                                            <color key="textColor" red="0.93333333330000001" green="0.46274509800000002" blue="0.14117647059999999" alpha="1" colorSpace="calibratedRGB"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
                                                         <view contentMode="scaleToFill" id="Evg-Bz-cAv">
-                                                            <rect key="frame" x="1000" y="0.0" width="450" height="48"/>
+                                                            <rect key="frame" x="700" y="0.0" width="300" height="48"/>
                                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                             <subviews>
-                                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="OAX-uT-d3m">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="150" height="48"/>
-                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                                    <color key="backgroundColor" red="1" green="0.68235294117647061" blue="0.070588235294117646" alpha="1" colorSpace="calibratedRGB"/>
-                                                                    <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                                                    <state key="normal" title="Return Pending">
-                                                                        <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                                                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                                                    </state>
-                                                                    <connections>
-                                                                        <action selector="returnPendingAction:" destination="aWL-Xc-zsy" eventType="touchUpInside" id="ynu-w0-eZu"/>
-                                                                    </connections>
-                                                                </button>
                                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="UP1-0b-5Av">
-                                                                    <rect key="frame" x="150" y="0.0" width="150" height="48"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="150" height="48"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                                     <color key="backgroundColor" red="0.93333333333333335" green="0.46274509803921571" blue="0.14117647058823529" alpha="1" colorSpace="calibratedRGB"/>
                                                                     <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                                                    <state key="normal" title="Return Complete">
+                                                                    <state key="normal" title="Return Confirmed">
                                                                         <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                                                     </state>
@@ -649,7 +674,7 @@ Phone</string>
                                                                     </connections>
                                                                 </button>
                                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="Hsj-4K-HpC">
-                                                                    <rect key="frame" x="300" y="0.0" width="150" height="48"/>
+                                                                    <rect key="frame" x="150" y="0.0" width="150" height="48"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                                     <color key="backgroundColor" red="0.94509803921568625" green="0.27058823529411763" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
                                                                     <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
@@ -658,27 +683,30 @@ Phone</string>
                                                                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                                                     </state>
                                                                     <connections>
-                                                                        <action selector="returnRejected:" destination="aWL-Xc-zsy" eventType="touchUpInside" id="8xh-Qo-qBY"/>
+                                                                        <action selector="returnRejectedAction:" destination="aWL-Xc-zsy" eventType="touchUpInside" id="Vh7-Zj-ZLM"/>
+                                                                    </connections>
+                                                                </button>
+                                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="OAX-uT-d3m">
+                                                                    <rect key="frame" x="0.0" y="0.0" width="300" height="48"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                                    <color key="backgroundColor" red="1" green="0.68235294117647061" blue="0.070588235294117646" alpha="1" colorSpace="calibratedRGB"/>
+                                                                    <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                                                    <state key="normal" title="Override Ready Status">
+                                                                        <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                                                    </state>
+                                                                    <connections>
+                                                                        <action selector="overrideReadyStatusAction:" destination="aWL-Xc-zsy" eventType="touchUpInside" id="EoS-48-sgb"/>
                                                                     </connections>
                                                                 </button>
                                                             </subviews>
                                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                                         </view>
-                                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="jQG-0I-cxh">
-                                                            <rect key="frame" x="917" y="30" width="30" height="30"/>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="delivery items" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="lPj-wC-6k4">
+                                                            <rect key="frame" x="4" y="29" width="368" height="21"/>
                                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                            <state key="normal" image="printerIcon.png">
-                                                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                                            </state>
-                                                            <connections>
-                                                                <action selector="manualPrintAction:" destination="aWL-Xc-zsy" eventType="touchUpInside" id="86b-Fy-3OG"/>
-                                                            </connections>
-                                                        </button>
-                                                        <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="*This is a keynote order*" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="8DU-U4-J2o">
-                                                            <rect key="frame" x="336" y="37" width="329" height="21"/>
-                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                            <fontDescription key="fontDescription" type="italicSystem" pointSize="17"/>
-                                                            <color key="textColor" red="0.93333333330000001" green="0.46274509800000002" blue="0.14117647059999999" alpha="1" colorSpace="calibratedRGB"/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                                                            <color key="textColor" red="0.65129813759999999" green="0.65129813759999999" blue="0.65129813759999999" alpha="1" colorSpace="calibratedRGB"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                     </subviews>
@@ -695,12 +723,14 @@ Phone</string>
                                                     <outlet property="colorDot" destination="tp8-wL-iHW" id="Rdn-WA-Ikj"/>
                                                     <outlet property="confirmDeliveryButton" destination="YBI-ho-dZh" id="Aof-jf-ScG"/>
                                                     <outlet property="dateLabel" destination="yPs-Y8-2eo" id="G3M-Hk-MTp"/>
+                                                    <outlet property="hasDeliveryItemsLabel" destination="lPj-wC-6k4" id="hya-aT-q7d"/>
                                                     <outlet property="idLabel" destination="oD2-yE-vmV" id="rAA-GB-3rc"/>
                                                     <outlet property="keynoteOrderLabel" destination="8DU-U4-J2o" id="viB-YH-MCi"/>
                                                     <outlet property="loadingIndicator" destination="29v-wL-5WU" id="4rh-qQ-6f7"/>
+                                                    <outlet property="overrideReadyStatusButton" destination="OAX-uT-d3m" id="0e2-Tp-p7r"/>
                                                     <outlet property="runnerNameLabel" destination="Ahr-2j-Btm" id="APo-JR-meR"/>
-                                                    <outlet property="setStatusButtons" destination="Evg-Bz-cAv" id="I3o-wV-jYL"/>
                                                     <outlet property="statusLabel" destination="VEP-sA-Bph" id="xkw-Mj-sce"/>
+                                                    <outlet property="swipeLeftMenu" destination="Evg-Bz-cAv" id="Ppv-cB-8wj"/>
                                                 </connections>
                                             </tableViewCell>
                                         </prototypes>
@@ -1019,43 +1049,6 @@ Phone</string>
                                                     <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <view contentMode="scaleToFill" id="ZUu-QO-Fg9">
-                                                    <rect key="frame" x="1000" y="0.0" width="300" height="141"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <subviews>
-                                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="WCm-fQ-ZST">
-                                                            <rect key="frame" x="90" y="18" width="120" height="30"/>
-                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                            <state key="normal" title="return pending">
-                                                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                                            </state>
-                                                            <connections>
-                                                                <action selector="setStatusReturnPendingAction:" destination="a2o-hh-hQT" eventType="touchUpInside" id="BoB-3j-YSV"/>
-                                                            </connections>
-                                                        </button>
-                                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="3K7-hu-JaF">
-                                                            <rect key="frame" x="90" y="56" width="120" height="30"/>
-                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                            <state key="normal" title="return confirmed">
-                                                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                                            </state>
-                                                            <connections>
-                                                                <action selector="setStatusReturnConfirmedAction:" destination="a2o-hh-hQT" eventType="touchUpInside" id="B5F-VK-A4g"/>
-                                                            </connections>
-                                                        </button>
-                                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="PFz-7C-L3x">
-                                                            <rect key="frame" x="90" y="91" width="120" height="30"/>
-                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                            <state key="normal" title="return rejected">
-                                                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                                            </state>
-                                                            <connections>
-                                                                <action selector="setStatusReturnRejectedAction:" destination="a2o-hh-hQT" eventType="touchUpInside" id="Zt4-ZZ-wls"/>
-                                                            </connections>
-                                                        </button>
-                                                    </subviews>
-                                                    <color key="backgroundColor" red="0.96078431369999995" green="0.96078431369999995" blue="0.96078431369999995" alpha="1" colorSpace="calibratedRGB"/>
-                                                </view>
                                                 <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="whiteLarge" id="el5-sT-Dk5">
                                                     <rect key="frame" x="481" y="52" width="37" height="37"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -1089,12 +1082,59 @@ Phone</string>
                                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <view contentMode="scaleToFill" id="ZUu-QO-Fg9">
+                                                    <rect key="frame" x="700" y="0.0" width="300" height="141"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <subviews>
+                                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="3K7-hu-JaF">
+                                                            <rect key="frame" x="0.0" y="0.0" width="300" height="71"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                            <color key="backgroundColor" red="0.93333333330000001" green="0.46274509800000002" blue="0.14117647059999999" alpha="1" colorSpace="calibratedRGB"/>
+                                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                                                            <state key="normal" title="Return Confirmed">
+                                                                <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                                            </state>
+                                                            <connections>
+                                                                <action selector="setStatusReturnConfirmedAction:" destination="a2o-hh-hQT" eventType="touchUpInside" id="B5F-VK-A4g"/>
+                                                            </connections>
+                                                        </button>
+                                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="PFz-7C-L3x">
+                                                            <rect key="frame" x="0.0" y="70" width="300" height="71"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                            <color key="backgroundColor" red="0.94509803920000002" green="0.27058823529999998" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                                                            <state key="normal" title="Return Rejected">
+                                                                <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                                            </state>
+                                                            <connections>
+                                                                <action selector="setStatusReturnRejectedAction:" destination="a2o-hh-hQT" eventType="touchUpInside" id="Zt4-ZZ-wls"/>
+                                                            </connections>
+                                                        </button>
+                                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="WCm-fQ-ZST">
+                                                            <rect key="frame" x="0.0" y="0.0" width="300" height="141"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                            <color key="backgroundColor" red="1" green="0.68235294120000001" blue="0.070588235289999995" alpha="1" colorSpace="calibratedRGB"/>
+                                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="18"/>
+                                                            <state key="normal" title="Cancel Item by Anchor">
+                                                                <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                                            </state>
+                                                            <connections>
+                                                                <action selector="cancelItemAction:" destination="a2o-hh-hQT" eventType="touchUpInside" id="BmM-RP-ap6"/>
+                                                            </connections>
+                                                        </button>
+                                                    </subviews>
+                                                    <color key="backgroundColor" red="0.96078431369999995" green="0.96078431369999995" blue="0.96078431369999995" alpha="1" colorSpace="calibratedRGB"/>
+                                                </view>
                                             </subviews>
                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" red="0.93333333330000001" green="0.46274509800000002" blue="0.14117647059999999" alpha="1" colorSpace="calibratedRGB"/>
                                         <connections>
                                             <outlet property="atStationButton" destination="crT-Rl-zLJ" id="ixd-CK-acX"/>
+                                            <outlet property="cancelItemButton" destination="WCm-fQ-ZST" id="pUZ-mo-iko"/>
                                             <outlet property="colorLabel" destination="cWU-il-Ubx" id="7Qp-mC-T13"/>
                                             <outlet property="deliveredButton" destination="xkf-ck-fbI" id="8V7-N0-pht"/>
                                             <outlet property="imagePlaceholder" destination="8n4-Wr-Sab" id="3mE-CU-aeq"/>
@@ -1103,7 +1143,6 @@ Phone</string>
                                             <outlet property="loadingIndicator" destination="el5-sT-Dk5" id="bkN-uJ-WqG"/>
                                             <outlet property="priceLabel" destination="aRv-VE-uGk" id="9th-mv-5GC"/>
                                             <outlet property="quantityLabel" destination="fWe-f3-Xjx" id="SIg-oB-Q1a"/>
-                                            <outlet property="setStatusButtonsView" destination="ZUu-QO-Fg9" id="qGK-3d-uyw"/>
                                             <outlet property="sizeLabel" destination="xMH-3v-4Ok" id="FmS-wY-KBK"/>
                                             <outlet property="statusAtStationCheckMark" destination="Xjv-5e-Nmc" id="7Bk-ib-pzl"/>
                                             <outlet property="statusDeliveredCheckMark" destination="Wcy-Yo-bz9" id="tKp-7X-qG6"/>
@@ -1113,6 +1152,7 @@ Phone</string>
                                             <outlet property="statusOrderedCheckMark" destination="s1d-tK-ftI" id="Gcr-Cf-dsl"/>
                                             <outlet property="statusPickedUpCheckMark" destination="0xr-gC-hzJ" id="wfb-aw-Fe7"/>
                                             <outlet property="storeNameLabel" destination="rW7-rE-ZaD" id="Nzk-Ah-7NZ"/>
+                                            <outlet property="swipeLeftMenu" destination="ZUu-QO-Fg9" id="mE8-X1-uuh"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -1264,27 +1304,20 @@ Phone</string>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     </imageView>
                                                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Runner Name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="wqS-kT-39W">
-                                                        <rect key="frame" x="87" y="6" width="175" height="21"/>
+                                                        <rect key="frame" x="87" y="12" width="175" height="21"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
-                                                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Oakbrook Anchor 1" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Lg3-Tb-mgt">
-                                                        <rect key="frame" x="87" y="27" width="175" height="21"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
-                                                        <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
-                                                        <nil key="highlightedColor"/>
-                                                    </label>
                                                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="800-246-8734" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="7ZP-LY-Un1">
-                                                        <rect key="frame" x="87" y="44" width="175" height="21"/>
+                                                        <rect key="frame" x="87" y="34" width="175" height="21"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                         <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="tsA-hk-kgW">
-                                                        <rect key="frame" x="87" y="61" width="175" height="34"/>
+                                                        <rect key="frame" x="87" y="52" width="175" height="34"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <string key="text">100 Oakbrook Center
 Oak Brook, IL</string>
@@ -1339,27 +1372,20 @@ Oak Brook, IL</string>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     </imageView>
                                                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Buyer Name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="QQ1-Wg-3jw">
-                                                        <rect key="frame" x="87" y="6" width="175" height="21"/>
+                                                        <rect key="frame" x="87" y="12" width="175" height="21"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
-                                                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Oakbrook Anchor 1" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Btr-u6-T3u">
-                                                        <rect key="frame" x="87" y="27" width="175" height="21"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
-                                                        <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
-                                                        <nil key="highlightedColor"/>
-                                                    </label>
                                                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="450-564-8723" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="1Gh-SR-wr5">
-                                                        <rect key="frame" x="87" y="44" width="175" height="21"/>
+                                                        <rect key="frame" x="87" y="34" width="175" height="21"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                         <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="KH7-bs-CKT">
-                                                        <rect key="frame" x="87" y="61" width="175" height="34"/>
+                                                        <rect key="frame" x="87" y="52" width="175" height="34"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <string key="text">100 Oakbrook Center
 Oak Brook, IL</string>
@@ -1730,10 +1756,11 @@ Receipt</string>
                     <connections>
                         <outlet property="atStationButton" destination="1ar-ut-d7O" id="UFZ-ij-V1f"/>
                         <outlet property="buyerAddressLabel" destination="KH7-bs-CKT" id="2es-aa-UD3"/>
-                        <outlet property="buyerFulfillmentLabel" destination="Btr-u6-T3u" id="dxd-8S-Rtz"/>
                         <outlet property="buyerNameLabel" destination="QQ1-Wg-3jw" id="g3W-LR-fMC"/>
                         <outlet property="buyerPhoneLabel" destination="1Gh-SR-wr5" id="5AJ-lS-ylX"/>
                         <outlet property="colorLabel" destination="v9a-WU-daL" id="9Sb-Ef-4xj"/>
+                        <outlet property="commentsTextView" destination="k22-SY-Tdh" id="pod-d7-ejO"/>
+                        <outlet property="commentsTitleLabel" destination="rgY-Rt-u8Q" id="Njk-Bx-q9X"/>
                         <outlet property="contactMemberTapView" destination="X0m-kt-xV5" id="eJy-5P-qTR"/>
                         <outlet property="contactRunnerTapView" destination="Kpu-Ws-BVQ" id="2Tp-lo-wFX"/>
                         <outlet property="deliveredButton" destination="Ukn-kx-KBa" id="Y0V-zz-AZX"/>
@@ -1752,7 +1779,6 @@ Receipt</string>
                         <outlet property="runnerAddressLabel" destination="tsA-hk-kgW" id="M1K-fT-oma"/>
                         <outlet property="runnerNameLabel" destination="wqS-kT-39W" id="14Q-JX-8bG"/>
                         <outlet property="runnerPhoneLabel" destination="7ZP-LY-Un1" id="gQV-un-MuF"/>
-                        <outlet property="runnerStationLabel" destination="Lg3-Tb-mgt" id="ZPC-qR-sJE"/>
                         <outlet property="sizeLabel" destination="J4V-Uw-7Pl" id="RSi-hk-R3V"/>
                         <outlet property="statusAtStationCheckMark" destination="hhf-wQ-Blz" id="hTM-kh-cZQ"/>
                         <outlet property="statusDeliveredCheckMark" destination="PkL-3A-0pf" id="P5t-ER-1Ub"/>
@@ -1956,10 +1982,9 @@ Receipt</string>
         <image name="OrderDetail_ItemStoreIcon.png" width="11" height="13"/>
         <image name="OrderDetail_ThumbsUp.png" width="44" height="44"/>
         <image name="ThumbsUp.png" width="22" height="18"/>
-        <image name="Welcome_DefaultMallImage.png" width="1024" height="321"/>
+        <image name="Welcome_oakbrook.png" width="1024" height="321"/>
         <image name="iPhone_cameraOverlay_circleButton.png" width="66" height="66"/>
         <image name="iPhone_cameraOverlay_flashIcon.png" width="12" height="20"/>
-        <image name="printerIcon.png" width="50" height="50"/>
     </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
