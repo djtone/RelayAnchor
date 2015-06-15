@@ -32,7 +32,7 @@ static AccountManager * sharedAccountManager = nil;
         //if no sort preferences are found, create default sort preferences
         if ( ! [[NSUserDefaults standardUserDefaults] valueForKey:@"orderSortPreferences"] )
         {
-            sharedAccountManager.orderSortPreferences = [@[@[@"Order Date", @YES],
+            sharedAccountManager.orderSortPreferences = [@[@[@"Order Date", @NO],
                                                            @[@"Order ID", @YES],
                                                            @[@"Buyer Name", @YES],
                                                            @[@"Buyer Email", @YES],

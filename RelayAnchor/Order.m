@@ -28,6 +28,7 @@
         self.buyerFirstName = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"firstName"] withAlternative:@""];
         self.buyerLastName = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"lastName"] withAlternative:@""];
         self.runnerId = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"runnerId"] withAlternative:[NSNumber numberWithInt:0]];
+        self.runnerName = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"runnerName"] withAlternative:@""];
         self.anchorId = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"anchorId"] withAlternative:[NSNumber numberWithInt:0]];
         self.buyerEmail = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"buyerEmail"] withAlternative:@""];
         
@@ -40,6 +41,8 @@
         self.hasDeliveryItems = NO;
         if ( [[DataMethods checkForNull:[dictionaryResponse valueForKey:@"hasDelivItems"] withAlternative:nil] intValue] != 0 )
             self.hasDeliveryItems = YES;
+        self.deliverySlot = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"deliverySlotText"] withAlternative:@""];
+        self.pickupLocation = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"fulfillmentLabel"] withAlternative:@""];
         
         NSString * apiRunnerStatus = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"runnerStatus"] withAlternative:@"Open"];
         if ( [apiRunnerStatus isEqualToString:@"RUNNING"] )
@@ -95,41 +98,6 @@
         self.returnReceiptImage = nil;
         
         [self displayStatus]; //sets display color - ill change it eventually.. maybe
-        //for displaying in table views
-        /*
-        self.displayStatus = self.runnerStatus;
-        if ( [self.anchorStatus isEqualToString:@"Return Initiated"] )
-        {
-            self.displayStatus = @"Return\nInitiated";
-            self.displayColor = [UIColor colorWithRed:(float)82/255 green:(float)210/255 blue:(float)128/255 alpha:1];
-        }
-        else if ( self.status == kCancelled || self.status == kReturned || self.status == kReturnRejected )
-        {
-            self.displayStatus = self.status;
-            self.displayColor = [UIColor lightGrayColor];
-        }
-        else if ( [self.runnerStatus isEqualToString:@"Open"] )
-            self.displayColor = [UIColor colorWithRed:(float)241/255 green:(float)68/255 blue:(float)51/255 alpha:1];
-        else if ( [self.runnerStatus isEqualToString:@"Running"] )
-            self.displayColor = [UIColor colorWithRed:(float)254/255 green:(float)174/255 blue:(float)17/255 alpha:1];
-        else if ( [self.runnerStatus isEqualToString:@"Picked Up"] )
-            self.displayColor = [UIColor colorWithRed:(float)254/255 green:(float)174/255 blue:(float)17/255 alpha:1];
-        else if ( [self.runnerStatus isEqualToString:@"At Station"] )
-        {
-            self.displayStatus = @"Pending\nAt Station";
-            self.displayColor = [UIColor colorWithRed:(float)82/255 green:(float)210/255 blue:(float)128/255 alpha:1];
-            
-            if ( [self.anchorStatus isEqualToString:@"At Station"] )
-            {
-                self.displayStatus = @"At Station";
-                self.displayColor = [UIColor colorWithRed:(float)239/255 green:(float)118/255 blue:(float)37/255 alpha:1];
-            }
-            else if ( [self.anchorStatus isEqualToString:@"Delivered"] )
-            {
-                self.displayStatus = @"Delivered";
-                self.displayColor = [UIColor colorWithRed:(float)109/255 green:(float)202/255 blue:(float)72/255 alpha:1];
-            }
-        }*/
 
         self.isChangingStatus = NO;
     }
@@ -206,6 +174,11 @@
         self.displayColor = [UIColor colorWithRed:(float)241/255 green:(float)68/255 blue:(float)51/255 alpha:1];
     }
 
+    NSString *deviceType = [UIDevice currentDevice].model;
+    
+    if ( [deviceType containsString:@"iPhone"] )
+        displayStatus = [displayStatus stringByReplacingOccurrencesOfString:@"\n" withString:@" "];
+    
     return displayStatus;
 }
 

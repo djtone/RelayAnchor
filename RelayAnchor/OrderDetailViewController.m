@@ -86,6 +86,26 @@
     [printButton addTarget:self action:@selector(printAction:) forControlEvents:UIControlEventTouchUpInside];
     [headerView addSubview:printButton];
     
+    UILabel * fulfillmentLabel = [[UILabel alloc] initWithFrame:CGRectMake(270, 0, 1000, 50)];
+    [fulfillmentLabel setBackgroundColor:[UIColor clearColor]];
+    [fulfillmentLabel setFont:[UIFont systemFontOfSize:20]];
+    [fulfillmentLabel setTextColor:[UIColor grayColor]];
+    NSString * fulfillmentText;
+    if ( self.myOrder.hasDeliveryItems )
+    {
+        fulfillmentText = @"Delivery";
+        if ( [self.myOrder.deliverySlot length] > 0 )
+            fulfillmentText =  [@"Delivery : "  stringByAppendingString:self.myOrder.deliverySlot];
+    }
+    else
+    {
+        fulfillmentText = @"Store Pickup";
+        if ( [self.myOrder.pickupLocation length] > 0 )
+            fulfillmentText = [@"Store Pickup : " stringByAppendingString:self.myOrder.pickupLocation];
+    }
+    [fulfillmentLabel setText:fulfillmentText];
+    [headerView addSubview:fulfillmentLabel];
+    
     return headerView;
 }
 
@@ -268,8 +288,8 @@
 #pragma mark - set status actions
 - (IBAction)cancelItemAction:(id)sender
 {
-    [SVProgressHUD showImage:nil status:@"Coming Soon"];
-    /*
+    //[SVProgressHUD showImage:nil status:@"Coming Soon"];
+    
     ItemTableCell * cell;
     if ( [[[UIDevice currentDevice] systemVersion] compare:@"8" options:NSNumericSearch] != NSOrderedAscending ) //iOS 8 and greater
         cell = (ItemTableCell *)[[[sender superview] superview] superview];
@@ -305,7 +325,7 @@
                                otherButtonItems:nil] show];
         }
     }];
-     */
+    
 }
 
 - (IBAction)setStatusReturnConfirmedAction:(id)sender

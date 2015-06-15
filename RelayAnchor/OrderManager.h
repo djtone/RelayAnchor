@@ -44,6 +44,8 @@
 
 @property id <OrderManagerDelegate> delegate;
 
+@property NSMutableDictionary * cachedOrders;
+
 - (void) loadOrdersWithStatus:(LoadOrderStatus)loadOrderStatus completion:(void (^)(NSArray * orders))callBack;
 - (void) startAutoRefreshOrdersWithStatus:(LoadOrderStatus)loadOrderStatus timeInterval:(float)timeInterval;
 - (void) stopAutoRefreshOrders:(void(^)())completion;

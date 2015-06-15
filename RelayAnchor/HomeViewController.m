@@ -251,7 +251,7 @@
                 cell.buyerPhoneLabel.text = phoneString;
         }
         
-        cell.runnerNameLabel.text = [NSString stringWithFormat:@"%@", tmpOrder.runnerId];
+        cell.runnerNameLabel.text = [NSString stringWithFormat:@"%@", tmpOrder.runnerName];
         cell.statusLabel.text = [tmpOrder stringFromRunnerStatus];
         if ( tmpOrder.isKeynoteOrder )
             cell.keynoteOrderLabel.hidden = NO;

@@ -10,6 +10,7 @@
 
 @interface iPhone_LoginViewController : UIViewController
 
+@property (weak, nonatomic) IBOutlet UILabel *versionLabel;
 @property (weak, nonatomic) IBOutlet UITextField *emailTextField;
 @property (weak, nonatomic) IBOutlet UITextField *passwordTextField;
 @property (weak, nonatomic) IBOutlet UISwitch *rememberEmailSwitch;

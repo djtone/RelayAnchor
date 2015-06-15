@@ -10,6 +10,7 @@
 #import "UIAlertView+Blocks.h"
 #import "AccountManager.h"
 #import <Crashlytics/Crashlytics.h>
+#import "MFSideMenu.h"
 
 @implementation AppDelegate
 
@@ -32,6 +33,13 @@
                                              }]
                            otherButtonItems:nil] show];*/
     }
+    
+    UIViewController * mainController = self.window.rootViewController;
+    UIViewController * sideMenu = [[UIStoryboard storyboardWithName:@"iPhone" bundle:nil] instantiateViewControllerWithIdentifier:@"sideMenu"];
+    MFSideMenuContainerViewController * container = [MFSideMenuContainerViewController containerWithCenterViewController:mainController leftMenuViewController:sideMenu rightMenuViewController:nil];
+    
+    self.window.rootViewController = container;
+    [self.window makeKeyAndVisible];
     
     return YES;
 }

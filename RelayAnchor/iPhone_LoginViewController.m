@@ -9,12 +9,19 @@
 #import "iPhone_LoginViewController.h"
 #import "SVProgressHUD.h"
 #import "AccountManager.h"
+#import "CreateAPIStrings.h"
 
 @implementation iPhone_LoginViewController
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    NSString * version = [[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleVersionKey];
+    if ( [[CreateAPIStrings baseUrl] isEqualToString:@"http://shopyourwaylocal.com/SYWRelayServices"] )
+        self.versionLabel.text = version;
+    else
+        self.versionLabel.text = [NSString stringWithFormat:@"QA %@", version];
     
     self.emailTextField.text = [[AccountManager sharedInstance] rememberedEmail];
     if ( [[AccountManager sharedInstance] rememberedEmail] != nil )
@@ -23,10 +30,6 @@
         [self.rememberEmailSwitch setOn:NO];
 }
 
--(UIStatusBarStyle)preferredStatusBarStyle
-{
-    return UIStatusBarStyleDefault;
-}
 
 - (IBAction)rememberEmailAction:(id)sender
 {
@@ -82,6 +85,11 @@
 - (BOOL) prefersStatusBarHidden
 {
     return NO;
+}
+
+-(UIStatusBarStyle)preferredStatusBarStyle
+{
+    return UIStatusBarStyleDefault;
 }
 
 - (void)didReceiveMemoryWarning

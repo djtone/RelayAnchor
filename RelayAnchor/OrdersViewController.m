@@ -321,7 +321,7 @@
                 cell.buyerPhoneLabel.text = phoneString;
         }
         
-        cell.runnerNameLabel.text = [NSString stringWithFormat:@"%@", tmpOrder.runnerId];
+        cell.runnerNameLabel.text = [NSString stringWithFormat:@"%@", tmpOrder.runnerName];
         cell.statusLabel.text = [tmpOrder stringFromRunnerStatus];
         
         if ( tmpOrder.isKeynoteOrder )
@@ -329,10 +329,19 @@
         else
             cell.keynoteOrderLabel.hidden = YES;
         
+        cell.hasDeliveryItemsLabel.hidden = NO;
         if ( tmpOrder.hasDeliveryItems )
-            cell.hasDeliveryItemsLabel.hidden = NO;
+        {
+            cell.hasDeliveryItemsLabel.text = @"Delivery";
+            if ( [tmpOrder.deliverySlot length] > 0 )
+                cell.hasDeliveryItemsLabel.text =  [@"Delivery : "  stringByAppendingString:tmpOrder.deliverySlot];
+        }
         else
-            cell.hasDeliveryItemsLabel.hidden = YES;
+        {
+            cell.hasDeliveryItemsLabel.text = @"Store Pickup";
+            if ( [tmpOrder.pickupLocation length] > 0 )
+                cell.hasDeliveryItemsLabel.text = [@"Store Pickup : " stringByAppendingString:tmpOrder.pickupLocation];
+        }
 
         cell.statusLabel.text = tmpOrder.displayStatus;
         cell.colorDot.backgroundColor = tmpOrder.displayColor;

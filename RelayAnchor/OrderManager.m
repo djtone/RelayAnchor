@@ -21,13 +21,22 @@ static OrderManager * sharedOrderManager = nil;
     if ( sharedOrderManager == nil )
     {
         sharedOrderManager = [[OrderManager alloc] init];
-        sharedOrderManager.myNSURLSession = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:sharedOrderManager delegateQueue:nil];
+        sharedOrderManager.cachedOrders = [@{[EnumTypes stringFromLoadOrderStatus:kLoadOrderStatusOpen]: [@[] mutableCopy],
+                                             [EnumTypes stringFromLoadOrderStatus:kLoadOrderStatusReady]: [@[] mutableCopy],
+                                             [EnumTypes stringFromLoadOrderStatus:kLoadOrderStatusDelivered]: [@[] mutableCopy],
+                                             [EnumTypes stringFromLoadOrderStatus:kLoadOrderStatusCancelledReturned]: [@[] mutableCopy]} mutableCopy];
+        NSURLSessionConfiguration * tmpSessionConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
+        [tmpSessionConfig setTimeoutIntervalForRequest:300];
+        sharedOrderManager.myNSURLSession = [NSURLSession sessionWithConfiguration:tmpSessionConfig delegate:sharedOrderManager delegateQueue:nil];
         sharedOrderManager.responsesData = [[NSMutableDictionary alloc] init];
         sharedOrderManager.isUpdatingOrder = NO;
         sharedOrderManager.isLoadingOrders = NO;
         sharedOrderManager.isLoadingOrderDetails = NO;
         sharedOrderManager.isUploadingReceipt = NO;
-        sharedOrderManager.showKeynoteOrders = NO;
+        if ( [[CreateAPIStrings baseUrl] isEqualToString:@"http://sywlapp301p.qa.ch3.s.com:8680/SYWRelayServices"] )
+            sharedOrderManager.showKeynoteOrders = YES;
+        else
+            sharedOrderManager.showKeynoteOrders = NO;
         sharedOrderManager.myDateFormatter = [[NSDateFormatter alloc] init];
         [sharedOrderManager.myDateFormatter setDateFormat:@"M/d/yy"];
     }
@@ -59,6 +68,7 @@ static OrderManager * sharedOrderManager = nil;
     {
         NSURLRequest * request = [CreateAPIStrings createRequestWithBaseUrl:baseUrl paramString:paramString isPostRequest:NO];
         NSURLSessionDataTask * loadOrdersDataTask = [self.myNSURLSession dataTaskWithRequest:request];
+        
         loadOrdersDataTask.taskDescription = [EnumTypes stringFromLoadOrderStatus:loadOrderStatus];
         
         if ( callBack )
@@ -188,6 +198,8 @@ static OrderManager * sharedOrderManager = nil;
             
             dispatch_async(dispatch_get_main_queue(), ^
             {
+                [self.cachedOrders setValue:tmpOrders forKey:task.taskDescription]; //not sure if this is correct
+                
                 void(^completionBlock)(NSArray *) = self.completionBlocks[@(task.taskIdentifier)];
                 if ( completionBlock )
                     completionBlock(tmpOrders);
@@ -339,6 +351,9 @@ static OrderManager * sharedOrderManager = nil;
 
 - (NSArray *) searchOrders:(NSArray *)orders withString:(NSString *)searchString
 {
+    if ( ! searchString.length )
+        return orders;
+    
     searchString = [searchString lowercaseString];
     NSMutableArray * filteredOrders = [[NSMutableArray alloc] init];
     
@@ -351,7 +366,8 @@ static OrderManager * sharedOrderManager = nil;
             [[[NSString stringWithFormat:@"%@ %@", tmpOrder.buyerFirstName, tmpOrder.buyerLastName] lowercaseString] rangeOfString:searchString].location != NSNotFound ||
             [[[NSString stringWithFormat:@"%@", tmpOrder.buyerEmail] lowercaseString] rangeOfString:searchString].location != NSNotFound ||
             [[[NSString stringWithFormat:@"%@", tmpOrder.buyerPhoneNumber] lowercaseString] rangeOfString:searchString].location != NSNotFound ||
-            [[[NSString stringWithFormat:@"%@", tmpOrder.runnerId] lowercaseString] rangeOfString:searchString].location != NSNotFound ||
+            [[[NSString stringWithFormat:@"%@", tmpOrder.runnerName] lowercaseString] rangeOfString:searchString].location != NSNotFound ||
+            [[[NSString stringWithFormat:@"%@", tmpOrder.pickupLocation] lowercaseString] rangeOfString:searchString].location != NSNotFound ||
             [[[NSString stringWithFormat:@"%@", [tmpOrder stringFromRunnerStatus]] lowercaseString] rangeOfString:searchString].location != NSNotFound ||
             [[[NSString stringWithFormat:@"%@", tmpOrder.displayStatus] lowercaseString] rangeOfString:searchString].location != NSNotFound ||
             [[[tmpOrder stringFromStatus] lowercaseString] rangeOfString:searchString].location != NSNotFound )

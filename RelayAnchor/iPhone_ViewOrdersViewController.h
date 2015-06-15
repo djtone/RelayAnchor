@@ -7,9 +7,24 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "OrderManager.h"
 
-@interface iPhone_ViewOrdersViewController : UIViewController
+@interface iPhone_ViewOrdersViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, UITabBarDelegate, OrderManagerDelegate, UITextFieldDelegate, UIActionSheetDelegate>
 
-- (IBAction)backButtonAction:(id)sender;
+@property OrderManager * myOrderManager;
+@property NSArray * ordersForTableView;
+@property NSDateFormatter * myDateFormatter;
+@property LoadOrderStatus selectedOrderStatus;
+@property float lastContentOffset;
+@property (weak, nonatomic) IBOutlet UIImageView *mallImageView;
+@property (weak, nonatomic) IBOutlet UIView *mallImageOverlay;
+@property (weak, nonatomic) IBOutlet UITableView * myTableView;
+@property (weak, nonatomic) IBOutlet UITabBar * myTabBar;
+@property (weak, nonatomic) IBOutlet UITextField * searchTextField;
+@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *loadingIndicator;
+
+- (IBAction)searchAction:(id)sender;
+- (IBAction)sortByAction:(id)sender;
+- (IBAction)sideMenuAction:(id)sender;
 
 @end

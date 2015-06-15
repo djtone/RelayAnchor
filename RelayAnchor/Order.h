@@ -28,10 +28,13 @@
 @property RunnerStatus runnerStatus;
 @property AnchorStatus anchorStatus;
 @property NSNumber * runnerId;
+@property NSString * runnerName;
 @property NSNumber * anchorId;
 @property NSString * buyerEmail;
 @property BOOL isKeynoteOrder;
 @property BOOL hasDeliveryItems;
+@property NSString * deliverySlot;
+@property NSString * pickupLocation;
 
 - (NSString *)stringFromStatus; // switch this to the [EnumTypes string] method //;/
 - (NSString *)stringFromRunnerStatus; // switch this to the [EnumTypes string] method //;/
