@@ -153,6 +153,7 @@
 		6E57216F1ACDC8AB00E1CF16 /* TopView_printerIconX.png in Resources */ = {isa = PBXBuildFile; fileRef = 6E57216D1ACDC8AB00E1CF16 /* TopView_printerIconX.png */; };
 		6E5721711AD46E4300E1CF16 /* TopView_Logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 6E5721701AD46E4300E1CF16 /* TopView_Logo.png */; };
 		6E5721741AE170B400E1CF16 /* EnumTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E5721731AE170B400E1CF16 /* EnumTypes.m */; };
+		6E5C2D521B388041007E6FDE /* iPhone_ForgotPasswordViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E5C2D511B388041007E6FDE /* iPhone_ForgotPasswordViewController.m */; };
 		6E6C25CF1B2A0BAB00531FBC /* MFSideMenuContainerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E6C25CA1B2A0BAB00531FBC /* MFSideMenuContainerViewController.m */; };
 		6E6C25D01B2A0BAB00531FBC /* MFSideMenuShadow.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E6C25CC1B2A0BAB00531FBC /* MFSideMenuShadow.m */; };
 		6E6C25D11B2A0BAB00531FBC /* UIViewController+MFSideMenuAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E6C25CE1B2A0BAB00531FBC /* UIViewController+MFSideMenuAdditions.m */; };
@@ -381,6 +382,8 @@
 		6E5721701AD46E4300E1CF16 /* TopView_Logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = TopView_Logo.png; sourceTree = "<group>"; };
 		6E5721721AE170B400E1CF16 /* EnumTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EnumTypes.h; sourceTree = "<group>"; };
 		6E5721731AE170B400E1CF16 /* EnumTypes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EnumTypes.m; sourceTree = "<group>"; };
+		6E5C2D501B388041007E6FDE /* iPhone_ForgotPasswordViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iPhone_ForgotPasswordViewController.h; sourceTree = "<group>"; };
+		6E5C2D511B388041007E6FDE /* iPhone_ForgotPasswordViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iPhone_ForgotPasswordViewController.m; sourceTree = "<group>"; };
 		6E6C25C81B2A0BAB00531FBC /* MFSideMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MFSideMenu.h; sourceTree = "<group>"; };
 		6E6C25C91B2A0BAB00531FBC /* MFSideMenuContainerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MFSideMenuContainerViewController.h; sourceTree = "<group>"; };
 		6E6C25CA1B2A0BAB00531FBC /* MFSideMenuContainerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MFSideMenuContainerViewController.m; sourceTree = "<group>"; };
@@ -874,11 +877,11 @@
 			isa = PBXGroup;
 			children = (
 				6E4A1C921B2741090029C61C /* ViewOrders_OpenButton.png */,
+				6E4A1C981B2743B20029C61C /* ViewOrders_OpenButton_Selected.png */,
 				6E4A1C941B2743B20029C61C /* ViewOrders_CancelledButton_Selected.png */,
 				6E4A1C951B2743B20029C61C /* ViewOrders_CancelledButton.png */,
 				6E4A1C961B2743B20029C61C /* ViewOrders_DeliveredButton_Selected.png */,
 				6E4A1C971B2743B20029C61C /* ViewOrders_DeliveredButton.png */,
-				6E4A1C981B2743B20029C61C /* ViewOrders_OpenButton_Selected.png */,
 				6E4A1C991B2743B20029C61C /* ViewOrders_ReadyButton_Selected.png */,
 				6E4A1C9A1B2743B20029C61C /* ViewOrders_ReadyButton.png */,
 				6E763A7F1B2629EB00CDB2BD /* ViewOrders_SearchBar.png */,
@@ -986,6 +989,8 @@
 			children = (
 				6ED507871B0E8227007D3E5D /* iPhone_LoginViewController.h */,
 				6ED507881B0E8227007D3E5D /* iPhone_LoginViewController.m */,
+				6E5C2D501B388041007E6FDE /* iPhone_ForgotPasswordViewController.h */,
+				6E5C2D511B388041007E6FDE /* iPhone_ForgotPasswordViewController.m */,
 				6ED507B71B0FC8CE007D3E5D /* iPhone_ManageAccountViewController.h */,
 				6ED507B81B0FC8CE007D3E5D /* iPhone_ManageAccountViewController.m */,
 				6ED507A41B0FBFF7007D3E5D /* iPhone_ViewOrdersViewController.h */,
@@ -1236,6 +1241,7 @@
 				13B46A031997134800D8057E /* TopView.m in Sources */,
 				1366A4AD19918FA2000BF383 /* AppDelegate.m in Sources */,
 				6E17B4751AAF691F00506ED4 /* AcceptPictureViewController.m in Sources */,
+				6E5C2D521B388041007E6FDE /* iPhone_ForgotPasswordViewController.m in Sources */,
 				13A4F99819C0FCB5009AA0BA /* RIButtonItem.m in Sources */,
 				6ED507B91B0FC8CE007D3E5D /* iPhone_ManageAccountViewController.m in Sources */,
 				6E57215D1ACC9B9C00E1CF16 /* SVProgressHUD.m in Sources */,

@@ -38,7 +38,8 @@
     {
         self.myTableView.hidden = NO;
         [self.loadingIndicator stopAnimating];
-        return 1;
+        return self.ordersForTableView.count;
+        //return 1;
     }
     else
     {
@@ -49,16 +50,18 @@
 
 - (NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    if ( self.ordersForTableView.count )
-        return self.ordersForTableView.count;
-    else
-        return 50;
+    return 1;
+//    if ( self.ordersForTableView.count )
+//        return self.ordersForTableView.count;
+//    else
+//        return 50;
 }
 
 - (UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     iPhone_OrderCell * cell = [tableView dequeueReusableCellWithIdentifier:@"iPhoneOrderCell"];
-    Order * tmpOrder = [self.ordersForTableView objectAtIndex:indexPath.row];
+    cell.layer.borderColor = [[UIColor colorWithRed:(float)170/255 green:(float)170/255 blue:(float)170/255 alpha:1] CGColor];
+    Order * tmpOrder = [self.ordersForTableView objectAtIndex:indexPath.section];
     
     CGSize textSize;
     cell.orderIdLabel.text = [NSString stringWithFormat:@"Order %@", tmpOrder.wcsOrderId];
@@ -98,6 +101,16 @@
     [cell.fulfillmentImageView setFrame:CGRectMake((self.myTableView.frame.size.width - (29 + imageDiff)) - textSize.width, cell.fulfillmentImageView.frame.origin.y, cell.fulfillmentImageView.frame.size.width, cell.fulfillmentImageView.frame.size.height)];
     
     return cell;
+}
+
+- (UIView *) tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
+{
+    return [[UIView alloc] init];
+}
+
+- (float) tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+{
+    return 10;
 }
 
 - (void) scrollViewDidScroll:(UIScrollView *)scrollView

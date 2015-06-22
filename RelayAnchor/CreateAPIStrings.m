@@ -11,10 +11,10 @@
 
 @implementation CreateAPIStrings
 
-//NSString * const baseUrl = @"http://shopyourwaylocal.com/SYWRelayServices";
+NSString * const baseUrl = @"http://shopyourwaylocal.com/SYWRelayServices";
 //NSString * const baseUrl = @"http://sywlapp404p.prod.ch4.s.com:8180/SYWRelayServices";
 //NSString * const baseUrl = @"http://sywl-pilotvip.prod.ch4.s.com/SYWRelayServices";
-NSString * const baseUrl = @"http://sywlapp301p.qa.ch3.s.com:8680/SYWRelayServices";
+//NSString * const baseUrl = @"http://sywlapp301p.qa.ch3.s.com:8680/SYWRelayServices";
 //NSString * const baseUrl = @"http://sywlapp302p.qa.ch3.s.com:8680/SYWRelayServices";
 
 + (NSString *)baseUrl
