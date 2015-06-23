@@ -14,17 +14,6 @@
 
 @implementation iPhone_ForgotPasswordViewController
 
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-}
-
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-}
-
-
 - (IBAction)sendAction:(id)sender
 {
     if ( [self.emailTextField.text length] == 0 )

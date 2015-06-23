@@ -8,14 +8,18 @@
 
 #import <UIKit/UIKit.h>
 
-@interface iPhone_LoginViewController : UIViewController
+@interface iPhone_LoginViewController : UIViewController <UITextFieldDelegate>
 
 @property (weak, nonatomic) IBOutlet UILabel *versionLabel;
 @property (weak, nonatomic) IBOutlet UITextField *emailTextField;
 @property (weak, nonatomic) IBOutlet UITextField *passwordTextField;
 @property (weak, nonatomic) IBOutlet UISwitch *rememberEmailSwitch;
+@property (weak, nonatomic) IBOutlet UIButton *signInButton;
 
 - (IBAction)rememberEmailAction:(id)sender;
 - (IBAction)loginAction:(id)sender;
+
+- (IBAction)emailTextFieldChanged:(id)sender;
+- (IBAction)passwordTextFieldChanged:(id)sender;
 
 @end

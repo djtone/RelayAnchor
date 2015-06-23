@@ -208,9 +208,4 @@
                                         }], nil] show];
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-}
-
 @end

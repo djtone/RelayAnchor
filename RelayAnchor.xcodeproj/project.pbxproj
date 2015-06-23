@@ -176,6 +176,32 @@
 		6E9F10C11AA8518200299FA4 /* this_is_how_i_mall.png in Resources */ = {isa = PBXBuildFile; fileRef = 6E9F10C01AA8518200299FA4 /* this_is_how_i_mall.png */; };
 		6E9F10C41AA85DC300299FA4 /* fulfillmentDelivery.png in Resources */ = {isa = PBXBuildFile; fileRef = 6E9F10C21AA85DC300299FA4 /* fulfillmentDelivery.png */; };
 		6E9F10C51AA85DC300299FA4 /* fulfillmentPickUp.png in Resources */ = {isa = PBXBuildFile; fileRef = 6E9F10C31AA85DC300299FA4 /* fulfillmentPickUp.png */; };
+		6EAB0D601B39D5170067DF67 /* iPhone_AssignRunner_BottomGradient.png in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB0D471B39D5170067DF67 /* iPhone_AssignRunner_BottomGradient.png */; };
+		6EAB0D611B39D5170067DF67 /* iPhone_ChangeMallButton.png in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB0D481B39D5170067DF67 /* iPhone_ChangeMallButton.png */; };
+		6EAB0D621B39D5170067DF67 /* iPhone_Contact_Mail.png in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB0D491B39D5170067DF67 /* iPhone_Contact_Mail.png */; };
+		6EAB0D631B39D5170067DF67 /* iPhone_Contact_Phone.png in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB0D4A1B39D5170067DF67 /* iPhone_Contact_Phone.png */; };
+		6EAB0D641B39D5170067DF67 /* iPhone_ItemDetail_ChatIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB0D4B1B39D5170067DF67 /* iPhone_ItemDetail_ChatIcon.png */; };
+		6EAB0D651B39D5170067DF67 /* iPhone_ItemDetail_DeliveredThumb.png in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB0D4C1B39D5170067DF67 /* iPhone_ItemDetail_DeliveredThumb.png */; };
+		6EAB0D661B39D5170067DF67 /* iPhone_ItemDetail_ReceiptButton.png in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB0D4D1B39D5170067DF67 /* iPhone_ItemDetail_ReceiptButton.png */; };
+		6EAB0D671B39D5170067DF67 /* iPhone_ItemDetail_ReturnedArrows.png in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB0D4E1B39D5170067DF67 /* iPhone_ItemDetail_ReturnedArrows.png */; };
+		6EAB0D681B39D5170067DF67 /* iPhone_LoginLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB0D4F1B39D5170067DF67 /* iPhone_LoginLogo.png */; };
+		6EAB0D691B39D5170067DF67 /* iPhone_OrderDetail_ColorIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB0D501B39D5170067DF67 /* iPhone_OrderDetail_ColorIcon.png */; };
+		6EAB0D6A1B39D5170067DF67 /* iPhone_OrderDetail_PriceIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB0D511B39D5170067DF67 /* iPhone_OrderDetail_PriceIcon.png */; };
+		6EAB0D6B1B39D5170067DF67 /* iPhone_OrderDetail_ReceiptButton.png in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB0D521B39D5170067DF67 /* iPhone_OrderDetail_ReceiptButton.png */; };
+		6EAB0D6C1B39D5170067DF67 /* iPhone_OrderDetail_RightArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB0D531B39D5170067DF67 /* iPhone_OrderDetail_RightArrow.png */; };
+		6EAB0D6D1B39D5170067DF67 /* iPhone_OrderDetail_SizeIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB0D541B39D5170067DF67 /* iPhone_OrderDetail_SizeIcon.png */; };
+		6EAB0D6E1B39D5170067DF67 /* iPhone_OrderDetail_StoreIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB0D551B39D5170067DF67 /* iPhone_OrderDetail_StoreIcon.png */; };
+		6EAB0D6F1B39D5170067DF67 /* iPhone_RunnerStar_Gold.png in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB0D561B39D5170067DF67 /* iPhone_RunnerStar_Gold.png */; };
+		6EAB0D701B39D5170067DF67 /* iPhone_RunnerStar_Grey.png in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB0D571B39D5170067DF67 /* iPhone_RunnerStar_Grey.png */; };
+		6EAB0D711B39D5170067DF67 /* iPhone_SelectMall_Selected.png in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB0D581B39D5170067DF67 /* iPhone_SelectMall_Selected.png */; };
+		6EAB0D721B39D5170067DF67 /* iPhone_SelectMall_Unselected.png in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB0D591B39D5170067DF67 /* iPhone_SelectMall_Unselected.png */; };
+		6EAB0D731B39D5170067DF67 /* iPhone_SortBy_Name.png in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB0D5A1B39D5170067DF67 /* iPhone_SortBy_Name.png */; };
+		6EAB0D741B39D5170067DF67 /* iPhone_SortBy_Newest.png in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB0D5B1B39D5170067DF67 /* iPhone_SortBy_Newest.png */; };
+		6EAB0D751B39D5170067DF67 /* iPhone_SortBy_Oldest.png in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB0D5C1B39D5170067DF67 /* iPhone_SortBy_Oldest.png */; };
+		6EAB0D761B39D5170067DF67 /* iPhone_SortBy_Status.png in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB0D5D1B39D5170067DF67 /* iPhone_SortBy_Status.png */; };
+		6EAB0D771B39D5170067DF67 /* iPhone_TopLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB0D5E1B39D5170067DF67 /* iPhone_TopLogo.png */; };
+		6EAB0D781B39D5170067DF67 /* iPhone_ViewOrders_IssueIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 6EAB0D5F1B39D5170067DF67 /* iPhone_ViewOrders_IssueIcon.png */; };
+		6EAB0D7E1B39E8B20067DF67 /* iPhone_OrderDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6EAB0D7D1B39E8B20067DF67 /* iPhone_OrderDetailViewController.m */; };
 		6EB001471ABC9EC0005FA341 /* Mall.m in Sources */ = {isa = PBXBuildFile; fileRef = 6EB001461ABC9EC0005FA341 /* Mall.m */; };
 		6EB348851AA0F1DB003E551F /* PrintManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 6EB348841AA0F1DB003E551F /* PrintManager.m */; };
 		6ED507791B03AEAE007D3E5D /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6ED507781B03AEAE007D3E5D /* Crashlytics.framework */; };
@@ -414,6 +440,33 @@
 		6E9F10C01AA8518200299FA4 /* this_is_how_i_mall.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = this_is_how_i_mall.png; sourceTree = "<group>"; };
 		6E9F10C21AA85DC300299FA4 /* fulfillmentDelivery.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fulfillmentDelivery.png; sourceTree = "<group>"; };
 		6E9F10C31AA85DC300299FA4 /* fulfillmentPickUp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fulfillmentPickUp.png; sourceTree = "<group>"; };
+		6EAB0D471B39D5170067DF67 /* iPhone_AssignRunner_BottomGradient.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhone_AssignRunner_BottomGradient.png; sourceTree = "<group>"; };
+		6EAB0D481B39D5170067DF67 /* iPhone_ChangeMallButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhone_ChangeMallButton.png; sourceTree = "<group>"; };
+		6EAB0D491B39D5170067DF67 /* iPhone_Contact_Mail.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhone_Contact_Mail.png; sourceTree = "<group>"; };
+		6EAB0D4A1B39D5170067DF67 /* iPhone_Contact_Phone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhone_Contact_Phone.png; sourceTree = "<group>"; };
+		6EAB0D4B1B39D5170067DF67 /* iPhone_ItemDetail_ChatIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhone_ItemDetail_ChatIcon.png; sourceTree = "<group>"; };
+		6EAB0D4C1B39D5170067DF67 /* iPhone_ItemDetail_DeliveredThumb.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhone_ItemDetail_DeliveredThumb.png; sourceTree = "<group>"; };
+		6EAB0D4D1B39D5170067DF67 /* iPhone_ItemDetail_ReceiptButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhone_ItemDetail_ReceiptButton.png; sourceTree = "<group>"; };
+		6EAB0D4E1B39D5170067DF67 /* iPhone_ItemDetail_ReturnedArrows.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhone_ItemDetail_ReturnedArrows.png; sourceTree = "<group>"; };
+		6EAB0D4F1B39D5170067DF67 /* iPhone_LoginLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhone_LoginLogo.png; sourceTree = "<group>"; };
+		6EAB0D501B39D5170067DF67 /* iPhone_OrderDetail_ColorIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhone_OrderDetail_ColorIcon.png; sourceTree = "<group>"; };
+		6EAB0D511B39D5170067DF67 /* iPhone_OrderDetail_PriceIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhone_OrderDetail_PriceIcon.png; sourceTree = "<group>"; };
+		6EAB0D521B39D5170067DF67 /* iPhone_OrderDetail_ReceiptButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhone_OrderDetail_ReceiptButton.png; sourceTree = "<group>"; };
+		6EAB0D531B39D5170067DF67 /* iPhone_OrderDetail_RightArrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhone_OrderDetail_RightArrow.png; sourceTree = "<group>"; };
+		6EAB0D541B39D5170067DF67 /* iPhone_OrderDetail_SizeIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhone_OrderDetail_SizeIcon.png; sourceTree = "<group>"; };
+		6EAB0D551B39D5170067DF67 /* iPhone_OrderDetail_StoreIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhone_OrderDetail_StoreIcon.png; sourceTree = "<group>"; };
+		6EAB0D561B39D5170067DF67 /* iPhone_RunnerStar_Gold.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhone_RunnerStar_Gold.png; sourceTree = "<group>"; };
+		6EAB0D571B39D5170067DF67 /* iPhone_RunnerStar_Grey.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhone_RunnerStar_Grey.png; sourceTree = "<group>"; };
+		6EAB0D581B39D5170067DF67 /* iPhone_SelectMall_Selected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhone_SelectMall_Selected.png; sourceTree = "<group>"; };
+		6EAB0D591B39D5170067DF67 /* iPhone_SelectMall_Unselected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhone_SelectMall_Unselected.png; sourceTree = "<group>"; };
+		6EAB0D5A1B39D5170067DF67 /* iPhone_SortBy_Name.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhone_SortBy_Name.png; sourceTree = "<group>"; };
+		6EAB0D5B1B39D5170067DF67 /* iPhone_SortBy_Newest.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhone_SortBy_Newest.png; sourceTree = "<group>"; };
+		6EAB0D5C1B39D5170067DF67 /* iPhone_SortBy_Oldest.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhone_SortBy_Oldest.png; sourceTree = "<group>"; };
+		6EAB0D5D1B39D5170067DF67 /* iPhone_SortBy_Status.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhone_SortBy_Status.png; sourceTree = "<group>"; };
+		6EAB0D5E1B39D5170067DF67 /* iPhone_TopLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhone_TopLogo.png; sourceTree = "<group>"; };
+		6EAB0D5F1B39D5170067DF67 /* iPhone_ViewOrders_IssueIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhone_ViewOrders_IssueIcon.png; sourceTree = "<group>"; };
+		6EAB0D7C1B39E8B20067DF67 /* iPhone_OrderDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iPhone_OrderDetailViewController.h; sourceTree = "<group>"; };
+		6EAB0D7D1B39E8B20067DF67 /* iPhone_OrderDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iPhone_OrderDetailViewController.m; sourceTree = "<group>"; };
 		6EB001451ABC9EC0005FA341 /* Mall.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mall.h; sourceTree = "<group>"; };
 		6EB001461ABC9EC0005FA341 /* Mall.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Mall.m; sourceTree = "<group>"; };
 		6EB348831AA0F1DA003E551F /* PrintManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrintManager.h; sourceTree = "<group>"; };
@@ -876,6 +929,11 @@
 		6E763A761B2629B600CDB2BD /* ViewOrders */ = {
 			isa = PBXGroup;
 			children = (
+				6EAB0D5A1B39D5170067DF67 /* iPhone_SortBy_Name.png */,
+				6EAB0D5B1B39D5170067DF67 /* iPhone_SortBy_Newest.png */,
+				6EAB0D5C1B39D5170067DF67 /* iPhone_SortBy_Oldest.png */,
+				6EAB0D5D1B39D5170067DF67 /* iPhone_SortBy_Status.png */,
+				6EAB0D5F1B39D5170067DF67 /* iPhone_ViewOrders_IssueIcon.png */,
 				6E4A1C921B2741090029C61C /* ViewOrders_OpenButton.png */,
 				6E4A1C981B2743B20029C61C /* ViewOrders_OpenButton_Selected.png */,
 				6E4A1C941B2743B20029C61C /* ViewOrders_CancelledButton_Selected.png */,
@@ -955,6 +1013,38 @@
 			path = img;
 			sourceTree = "<group>";
 		};
+		6EAB0D791B39D55B0067DF67 /* ItemDetail */ = {
+			isa = PBXGroup;
+			children = (
+				6EAB0D4B1B39D5170067DF67 /* iPhone_ItemDetail_ChatIcon.png */,
+				6EAB0D4C1B39D5170067DF67 /* iPhone_ItemDetail_DeliveredThumb.png */,
+				6EAB0D4D1B39D5170067DF67 /* iPhone_ItemDetail_ReceiptButton.png */,
+				6EAB0D4E1B39D5170067DF67 /* iPhone_ItemDetail_ReturnedArrows.png */,
+			);
+			name = ItemDetail;
+			sourceTree = "<group>";
+		};
+		6EAB0D7A1B39D5680067DF67 /* OrderDetail */ = {
+			isa = PBXGroup;
+			children = (
+				6EAB0D501B39D5170067DF67 /* iPhone_OrderDetail_ColorIcon.png */,
+				6EAB0D511B39D5170067DF67 /* iPhone_OrderDetail_PriceIcon.png */,
+				6EAB0D521B39D5170067DF67 /* iPhone_OrderDetail_ReceiptButton.png */,
+				6EAB0D531B39D5170067DF67 /* iPhone_OrderDetail_RightArrow.png */,
+				6EAB0D541B39D5170067DF67 /* iPhone_OrderDetail_SizeIcon.png */,
+				6EAB0D551B39D5170067DF67 /* iPhone_OrderDetail_StoreIcon.png */,
+			);
+			name = OrderDetail;
+			sourceTree = "<group>";
+		};
+		6EAB0D7B1B39D59C0067DF67 /* Login */ = {
+			isa = PBXGroup;
+			children = (
+				6EAB0D4F1B39D5170067DF67 /* iPhone_LoginLogo.png */,
+			);
+			name = Login;
+			sourceTree = "<group>";
+		};
 		6ED5077C1B0D0026007D3E5D /* iPhone */ = {
 			isa = PBXGroup;
 			children = (
@@ -971,6 +1061,15 @@
 		6ED5077D1B0D0038007D3E5D /* images */ = {
 			isa = PBXGroup;
 			children = (
+				6EAB0D5E1B39D5170067DF67 /* iPhone_TopLogo.png */,
+				6EAB0D471B39D5170067DF67 /* iPhone_AssignRunner_BottomGradient.png */,
+				6EAB0D491B39D5170067DF67 /* iPhone_Contact_Mail.png */,
+				6EAB0D4A1B39D5170067DF67 /* iPhone_Contact_Phone.png */,
+				6EAB0D481B39D5170067DF67 /* iPhone_ChangeMallButton.png */,
+				6EAB0D561B39D5170067DF67 /* iPhone_RunnerStar_Gold.png */,
+				6EAB0D571B39D5170067DF67 /* iPhone_RunnerStar_Grey.png */,
+				6EAB0D581B39D5170067DF67 /* iPhone_SelectMall_Selected.png */,
+				6EAB0D591B39D5170067DF67 /* iPhone_SelectMall_Unselected.png */,
 				6E4A1CA21B274A3D0029C61C /* SideBarButton.png */,
 				6E975C3E1B14F09300315905 /* iPhone_minusCircle.png */,
 				6E975C3F1B14F09300315905 /* iPhone_plusCircle.png */,
@@ -978,6 +1077,9 @@
 				6ED507841B0E7F76007D3E5D /* welcomeGradient2.png */,
 				6ED507821B0E45C6007D3E5D /* iPhone_LaunchImage.png */,
 				6ED507AE1B0FC107007D3E5D /* iPhone_NavigationBackButton.png */,
+				6EAB0D7B1B39D59C0067DF67 /* Login */,
+				6EAB0D7A1B39D5680067DF67 /* OrderDetail */,
+				6EAB0D791B39D55B0067DF67 /* ItemDetail */,
 				6E763A761B2629B600CDB2BD /* ViewOrders */,
 				6E975C4D1B2242DF00315905 /* OrderCell */,
 			);
@@ -995,6 +1097,8 @@
 				6ED507B81B0FC8CE007D3E5D /* iPhone_ManageAccountViewController.m */,
 				6ED507A41B0FBFF7007D3E5D /* iPhone_ViewOrdersViewController.h */,
 				6ED507A51B0FBFF7007D3E5D /* iPhone_ViewOrdersViewController.m */,
+				6EAB0D7C1B39E8B20067DF67 /* iPhone_OrderDetailViewController.h */,
+				6EAB0D7D1B39E8B20067DF67 /* iPhone_OrderDetailViewController.m */,
 			);
 			name = viewControllers;
 			sourceTree = "<group>";
@@ -1083,6 +1187,8 @@
 				132ED6A4199825AD00D6FBF1 /* ItemDetail_PictureFrame.png in Resources */,
 				13C3450119EED92500519FA8 /* OrderDetail_ItemStatusBar.png in Resources */,
 				13A4F9A119C1FC0F009AA0BA /* BottomView_Delivered.png in Resources */,
+				6EAB0D621B39D5170067DF67 /* iPhone_Contact_Mail.png in Resources */,
+				6EAB0D701B39D5170067DF67 /* iPhone_RunnerStar_Grey.png in Resources */,
 				13DAC4C21995246000FF1D1C /* Banner_RelayAnchorLogo.png in Resources */,
 				1394E2F319C8F44700332D9E /* Contact_MailButton.png in Resources */,
 				6E7712241AADF685008655CD /* printerReceiptHeader.png in Resources */,
@@ -1092,6 +1198,7 @@
 				6ED507831B0E45C6007D3E5D /* iPhone_LaunchImage.png in Resources */,
 				6E17B4781AAF73B700506ED4 /* CropAdjuster_BottomRight.png in Resources */,
 				6ED507811B0D0141007D3E5D /* welcomeGradient.png in Resources */,
+				6EAB0D731B39D5170067DF67 /* iPhone_SortBy_Name.png in Resources */,
 				13C344FB19EED83E00519FA8 /* ItemDetail_StatusBar.png in Resources */,
 				1394E2F419C8F44700332D9E /* Contact_TextButton.png in Resources */,
 				6E2790931AA8DB4E00D2A3D3 /* DJ5CTRIAL.otf in Resources */,
@@ -1107,13 +1214,18 @@
 				13C344FD19EED85000519FA8 /* ItemDetail_ThumbsUp.png in Resources */,
 				13A4F9B219C2057C009AA0BA /* Login_LoginButton.png in Resources */,
 				132ED6A7199825AD00D6FBF1 /* ItemDetail_RunnerTrackingIcon.png in Resources */,
+				6EAB0D641B39D5170067DF67 /* iPhone_ItemDetail_ChatIcon.png in Resources */,
 				13302E8019D360DF00D0227B /* TopView_SearchBar.png in Resources */,
+				6EAB0D771B39D5170067DF67 /* iPhone_TopLogo.png in Resources */,
 				6E57215C1ACC9B9C00E1CF16 /* SVProgressHUD.bundle in Resources */,
 				13A4F9A219C1FC0F009AA0BA /* BottomView_Open.png in Resources */,
 				6E4A1C9C1B2743B20029C61C /* ViewOrders_CancelledButton.png in Resources */,
+				6EAB0D6F1B39D5170067DF67 /* iPhone_RunnerStar_Gold.png in Resources */,
 				6E17B47C1AAF73DB00506ED4 /* iPhone_cameraOverlay_circleButton.png in Resources */,
+				6EAB0D751B39D5170067DF67 /* iPhone_SortBy_Oldest.png in Resources */,
 				132ED6A2199825AD00D6FBF1 /* ItemDetail_MemberIcon.png in Resources */,
 				132ED699199825AD00D6FBF1 /* BottomView_ViewSeparator.png in Resources */,
+				6EAB0D6D1B39D5170067DF67 /* iPhone_OrderDetail_SizeIcon.png in Resources */,
 				6E9F10C51AA85DC300299FA4 /* fulfillmentPickUp.png in Resources */,
 				1394E2F619C8F9D600332D9E /* Contact_PhoneIcon.png in Resources */,
 				6E57216E1ACDC8AB00E1CF16 /* TopView_printerIcon.png in Resources */,
@@ -1129,12 +1241,16 @@
 				132ED6B2199825AD00D6FBF1 /* OrderDetail_ItemStoreIcon.png in Resources */,
 				1394E2FC19CB27A300332D9E /* ItemDetail_DeliveredButton.png in Resources */,
 				6E4A1C931B2741090029C61C /* ViewOrders_OpenButton.png in Resources */,
+				6EAB0D671B39D5170067DF67 /* iPhone_ItemDetail_ReturnedArrows.png in Resources */,
 				13C344FF19EED87E00519FA8 /* OrderDetail_ThumbsUp.png in Resources */,
 				1366A4B219918FA2000BF383 /* Images.xcassets in Resources */,
 				6E975C551B22461100315905 /* iPhone_OrderCell_LocationIcon.png in Resources */,
 				6E975C411B14F09300315905 /* iPhone_plusCircle.png in Resources */,
+				6EAB0D721B39D5170067DF67 /* iPhone_SelectMall_Unselected.png in Resources */,
 				13108DC319C21F43005D3E60 /* Login_Logo.png in Resources */,
 				6E27908B1AA8DB4100D2A3D3 /* relaySlips.css in Resources */,
+				6EAB0D691B39D5170067DF67 /* iPhone_OrderDetail_ColorIcon.png in Resources */,
+				6EAB0D681B39D5170067DF67 /* iPhone_LoginLogo.png in Resources */,
 				13A4F9A919C20073009AA0BA /* BottomView_Delivered_Selected.png in Resources */,
 				132ED6B0199825AD00D6FBF1 /* OrderDetail_ItemStatusCheckMark.png in Resources */,
 				6E975C4F1B2242EF00315905 /* iPhone_OrderCell_RunnerIcon.png in Resources */,
@@ -1144,6 +1260,8 @@
 				6E17B4791AAF73B700506ED4 /* CropAdjuster_TopLeft.png in Resources */,
 				132ED6AB199825AD00D6FBF1 /* OrderDetail_ContactMemberIcon.png in Resources */,
 				6E9F10B71AA781BF00299FA4 /* pickupIcons.png in Resources */,
+				6EAB0D6B1B39D5170067DF67 /* iPhone_OrderDetail_ReceiptButton.png in Resources */,
+				6EAB0D6C1B39D5170067DF67 /* iPhone_OrderDetail_RightArrow.png in Resources */,
 				6E2E51461AB2132F00C35755 /* sortTriangleDown.png in Resources */,
 				138A7DD51A5468F400F7F5FD /* ItemDetail_IssueTextFrame2.png in Resources */,
 				13436F8319C223FA00094973 /* LaunchImage.png in Resources */,
@@ -1159,6 +1277,7 @@
 				1300034219988D1200AF77DB /* Banner_ProfileFrame.png in Resources */,
 				6E9F10C11AA8518200299FA4 /* this_is_how_i_mall.png in Resources */,
 				13A4F9B119C2057C009AA0BA /* Login_UsernameIcon.png in Resources */,
+				6EAB0D6E1B39D5170067DF67 /* iPhone_OrderDetail_StoreIcon.png in Resources */,
 				1300034619988EEC00AF77DB /* Banner_SelectMallIcon.png in Resources */,
 				6E5721711AD46E4300E1CF16 /* TopView_Logo.png in Resources */,
 				6E4A1CA01B2743B20029C61C /* ViewOrders_ReadyButton_Selected.png in Resources */,
@@ -1167,12 +1286,19 @@
 				6E2790961AA8DB4E00D2A3D3 /* glyphicons-halflings-regular.svg in Resources */,
 				6E2790A31AA8DCF700D2A3D3 /* relay.html in Resources */,
 				6E4A1C9B1B2743B20029C61C /* ViewOrders_CancelledButton_Selected.png in Resources */,
+				6EAB0D741B39D5170067DF67 /* iPhone_SortBy_Newest.png in Resources */,
 				1362FAC119C79A5A00C015C6 /* EmailView.xib in Resources */,
 				6E2E51471AB2132F00C35755 /* sortTriangleUp.png in Resources */,
+				6EAB0D631B39D5170067DF67 /* iPhone_Contact_Phone.png in Resources */,
 				6E763A8B1B2629EB00CDB2BD /* ViewOrders_SearchButton.png in Resources */,
+				6EAB0D711B39D5170067DF67 /* iPhone_SelectMall_Selected.png in Resources */,
 				132ED6AD199825AD00D6FBF1 /* OrderDetail_ItemDetailsButton.png in Resources */,
+				6EAB0D6A1B39D5170067DF67 /* iPhone_OrderDetail_PriceIcon.png in Resources */,
 				13A4F99B19C0FCB5009AA0BA /* UIAlertView-Blocks.podspec in Resources */,
 				6E27909C1AA8DB8000D2A3D3 /* bootstrap.min.js in Resources */,
+				6EAB0D651B39D5170067DF67 /* iPhone_ItemDetail_DeliveredThumb.png in Resources */,
+				6EAB0D761B39D5170067DF67 /* iPhone_SortBy_Status.png in Resources */,
+				6EAB0D781B39D5170067DF67 /* iPhone_ViewOrders_IssueIcon.png in Resources */,
 				6E975C561B22461100315905 /* iPhone_OrderCell_PhoneIcon.png in Resources */,
 				6ED5077B1B0CFC2A007D3E5D /* iPhone.storyboard in Resources */,
 				132ED6B1199825AD00D6FBF1 /* OrderDetail_ItemStatusIssueIcon.png in Resources */,
@@ -1183,6 +1309,8 @@
 				6E9F10C41AA85DC300299FA4 /* fulfillmentDelivery.png in Resources */,
 				6E4A1C9F1B2743B20029C61C /* ViewOrders_OpenButton_Selected.png in Resources */,
 				13A4F9AA19C20073009AA0BA /* BottomView_Open_Selected.png in Resources */,
+				6EAB0D601B39D5170067DF67 /* iPhone_AssignRunner_BottomGradient.png in Resources */,
+				6EAB0D661B39D5170067DF67 /* iPhone_ItemDetail_ReceiptButton.png in Resources */,
 				13302E7F19D360DF00D0227B /* TopView_Background.png in Resources */,
 				13A4F9A019C1FC0F009AA0BA /* BottomView_CancelledReturned.png in Resources */,
 				130263D719C39DF50007662C /* AppIcon@2x.png in Resources */,
@@ -1202,6 +1330,7 @@
 				1317B6CD19928AEE006A58BE /* Storyboard.storyboard in Resources */,
 				13A4F9AB19C20073009AA0BA /* BottomView_Ready_Selected.png in Resources */,
 				6E4A1CA11B2743B20029C61C /* ViewOrders_ReadyButton.png in Resources */,
+				6EAB0D611B39D5170067DF67 /* iPhone_ChangeMallButton.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1258,6 +1387,7 @@
 				6EB001471ABC9EC0005FA341 /* Mall.m in Sources */,
 				1300034E1999141D00AF77DB /* OrdersViewController.m in Sources */,
 				6E975C451B14F16300315905 /* AccountHeaderCell.m in Sources */,
+				6EAB0D7E1B39E8B20067DF67 /* iPhone_OrderDetailViewController.m in Sources */,
 				1366A4A919918FA2000BF383 /* main.m in Sources */,
 				1362FAC719C7A30600C015C6 /* ContactManager.m in Sources */,
 				6ED507891B0E8227007D3E5D /* iPhone_LoginViewController.m in Sources */,

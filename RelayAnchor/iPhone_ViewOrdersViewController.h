@@ -26,5 +26,6 @@
 - (IBAction)searchAction:(id)sender;
 - (IBAction)sortByAction:(id)sender;
 - (IBAction)sideMenuAction:(id)sender;
+- (IBAction)changeMallAction:(id)sender;
 
 @end

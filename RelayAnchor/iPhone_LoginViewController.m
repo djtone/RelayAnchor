@@ -17,6 +17,8 @@
 {
     [super viewDidLoad];
     
+    self.signInButton.layer.borderColor = [[UIColor colorWithWhite:1 alpha:.5] CGColor];
+    
     NSString * version = [[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleVersionKey];
     if ( [[CreateAPIStrings baseUrl] isEqualToString:@"http://shopyourwaylocal.com/SYWRelayServices"] )
         self.versionLabel.text = version;
@@ -67,6 +69,34 @@
     }
 }
 
+- (IBAction)emailTextFieldChanged:(id)sender
+{
+    if ( self.passwordTextField.text.length && self.emailTextField.text.length )
+    {
+        self.signInButton.enabled = YES;
+        self.signInButton.layer.borderColor = [[UIColor whiteColor] CGColor];
+    }
+    else
+    {
+        self.signInButton.enabled = NO;
+        self.signInButton.layer.borderColor = [[UIColor colorWithWhite:1 alpha:.5] CGColor];
+    }
+}
+
+- (IBAction)passwordTextFieldChanged:(id)sender
+{
+    if ( self.passwordTextField.text.length && self.emailTextField.text.length )
+    {
+        self.signInButton.enabled = YES;
+        self.signInButton.layer.borderColor = [[UIColor whiteColor] CGColor];
+    }
+    else
+    {
+        self.signInButton.enabled = NO;
+        self.signInButton.layer.borderColor = [[UIColor colorWithWhite:1 alpha:.5] CGColor];
+    }
+}
+
 #pragma mark - text field
 - (BOOL) textFieldShouldReturn:(UITextField *)textField
 {
@@ -84,18 +114,12 @@
 #pragma mark - misc.
 - (BOOL) prefersStatusBarHidden
 {
-    return NO;
+    return NO; //not sure this does anyhting
 }
 
 -(UIStatusBarStyle)preferredStatusBarStyle
 {
-    return UIStatusBarStyleDefault;
+    return UIStatusBarStyleLightContent;
 }
-
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-}
-
 
 @end

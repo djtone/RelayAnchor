@@ -10,6 +10,7 @@
 #import "iPhone_OrderCell.h"
 #import "AccountManager.h"
 #import "MFSideMenu.h"
+#import "SVProgressHUD.h"
 
 @implementation iPhone_ViewOrdersViewController
 
@@ -22,12 +23,8 @@
     self.myOrderManager = [OrderManager sharedInstanceWithDelegate:self];
     self.myTableView.layer.borderColor = [[UIColor lightGrayColor] CGColor];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textFieldDidChange:) name:@"UITextFieldTextDidChangeNotification" object:self.searchTextField];
-}
-
-- (void) viewWillAppear:(BOOL)animated
-{
-    self.selectedOrderStatus = kLoadOrderStatusOpen;
     [self.myTabBar setSelectedItem:[[self.myTabBar items] objectAtIndex:0]];
+    self.selectedOrderStatus = kLoadOrderStatusOpen;
     [self.myOrderManager startAutoRefreshOrdersWithStatus:kLoadOrderStatusOpen timeInterval:15];
 }
 
@@ -72,15 +69,22 @@
         textSize.width = cell.statusLabel.frame.size.width;
     [cell.dot setFrame:CGRectMake((self.myTableView.frame.size.width - 26) - textSize.width, cell.dot.frame.origin.y, cell.dot.frame.size.width, cell.dot.frame.size.height)];
     cell.dateLabel.text = [self.myDateFormatter stringFromDate:tmpOrder.placeTime];
-    cell.runnerNameLabel.text = tmpOrder.runnerName;
+    if ( tmpOrder.runnerName.length )
+    {
+        [cell.runnerNameLabel setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:14]];
+        [cell.runnerNameLabel setTextColor:[UIColor blackColor]];
+        cell.runnerNameLabel.text = tmpOrder.runnerName;
+    }
+    else
+    {
+        [cell.runnerNameLabel setFont:[UIFont boldSystemFontOfSize:13]];
+        [cell.runnerNameLabel setTextColor:[UIColor orangeColor]];
+        cell.runnerNameLabel.text = @"Not Assigned";
+    }
     textSize = [cell.runnerNameLabel.text sizeWithAttributes:@{NSFontAttributeName:[cell.runnerNameLabel font]}];
     if ( textSize.width > cell.runnerNameLabel.frame.size.width )
         textSize.width = cell.runnerNameLabel.frame.size.width;
-    [cell.runnerImageView setFrame:CGRectMake((self.myTableView.frame.size.width - 25) - textSize.width, cell.runnerImageView.frame.origin.y, cell.runnerImageView.frame.size.width, cell.runnerImageView.frame.size.height)];
-    if ( tmpOrder.runnerName.length )
-        cell.runnerImageView.hidden = NO;
-    else
-        cell.runnerImageView.hidden = YES;
+    [cell.runnerImageView setFrame:CGRectMake((self.myTableView.frame.size.width - 26) - textSize.width, cell.runnerImageView.frame.origin.y, cell.runnerImageView.frame.size.width, cell.runnerImageView.frame.size.height)];
     cell.memberNameLabel.text = [NSString stringWithFormat:@"%@ %@", tmpOrder.buyerFirstName, tmpOrder.buyerLastName];
     cell.priceLabel.text = [NSString stringWithFormat:@"$%.2f", [tmpOrder.totalPrice floatValue]];
     cell.fulfillmentAddressLabel.text = [tmpOrder.pickupLocation capitalizedString];
@@ -101,6 +105,11 @@
     [cell.fulfillmentImageView setFrame:CGRectMake((self.myTableView.frame.size.width - (29 + imageDiff)) - textSize.width, cell.fulfillmentImageView.frame.origin.y, cell.fulfillmentImageView.frame.size.width, cell.fulfillmentImageView.frame.size.height)];
     
     return cell;
+}
+
+- (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 - (UIView *) tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
@@ -253,14 +262,14 @@
     }];
 }
 
+- (IBAction)changeMallAction:(id)sender
+{
+    [SVProgressHUD showImage:nil status:@"change mall"];
+}
+
 - (IBAction)searchAction:(id)sender
 {
     [self.view endEditing:YES];
-}
-
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
 }
 
 - (UIStatusBarStyle) preferredStatusBarStyle
