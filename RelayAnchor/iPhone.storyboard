@@ -206,11 +206,11 @@
                                 <color key="backgroundColor" red="0.96078431369999995" green="0.96078431369999995" blue="0.96078431369999995" alpha="1" colorSpace="calibratedRGB"/>
                                 <inset key="separatorInset" minX="500" minY="0.0" maxX="50" maxY="0.0"/>
                                 <prototypes>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="iPhoneOrderCell" id="uAA-g6-BdC" customClass="iPhone_OrderCell">
-                                        <rect key="frame" x="0.0" y="22" width="306" height="89"/>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="iPhoneOrderCell" rowHeight="90" id="uAA-g6-BdC" customClass="iPhone_OrderCell">
+                                        <rect key="frame" x="0.0" y="22" width="306" height="90"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="uAA-g6-BdC" id="Mob-r5-O6h">
-                                            <rect key="frame" x="0.0" y="0.0" width="306" height="88"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="306" height="89.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <view contentMode="scaleToFill" id="kM2-3G-OOm">
@@ -227,7 +227,7 @@
                                                     <rect key="frame" x="8" y="4" width="192" height="21"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="May 13th, 1:16 PM" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="wba-6S-alz">
@@ -258,7 +258,7 @@
                                                     <rect key="frame" x="162" y="4" width="136" height="21"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="iPhone_OrderCell_RunnerIcon.png" id="cqA-WU-77v">
@@ -269,14 +269,14 @@
                                                     <rect key="frame" x="162" y="22" width="136" height="21"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" weight="light" pointSize="14"/>
-                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Daniel Ramirez" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="SSy-p4-j1D">
                                                     <rect key="frame" x="28" y="47" width="131" height="21"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" weight="light" pointSize="14"/>
-                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="iPhone_OrderCell_PortraitIcon.png" id="xX3-eR-t5a">
@@ -302,7 +302,7 @@
                                                     <rect key="frame" x="186" y="62" width="112" height="21"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" weight="light" pointSize="14"/>
-                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
@@ -326,7 +326,6 @@
                                             <outlet property="runnerImageView" destination="cqA-WU-77v" id="dfd-K0-3YZ"/>
                                             <outlet property="runnerNameLabel" destination="3oK-zv-vXU" id="CWi-cS-1xN"/>
                                             <outlet property="statusLabel" destination="8v3-ti-9eN" id="nIW-31-mzL"/>
-                                            <segue destination="tlc-k9-avb" kind="push" identifier="orderDetail" id="odw-oO-cTJ"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -445,11 +444,12 @@
                         <outlet property="myTabBar" destination="YiB-s3-4Z3" id="0xT-yF-mjH"/>
                         <outlet property="myTableView" destination="4Nl-BT-bke" id="2xz-L6-hry"/>
                         <outlet property="searchTextField" destination="s2J-VP-fZI" id="3tC-XU-5qh"/>
+                        <segue destination="tlc-k9-avb" kind="push" identifier="goDetails" id="41K-eE-feL"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="qIz-AT-dt1" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="840" y="578"/>
+            <point key="canvasLocation" x="1021" y="579"/>
         </scene>
         <!--I Phone Order Detail View Controller-->
         <scene sceneID="Qag-9F-2Ad">
@@ -531,14 +531,166 @@
                                     <outlet property="delegate" destination="tlc-k9-avb" id="tEE-4w-oxs"/>
                                 </connections>
                             </tabBar>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="whiteLarge" id="UFn-Ka-VEq">
+                                <rect key="frame" x="142" y="265" width="37" height="37"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="color" red="0.93333333330000001" green="0.46274509800000002" blue="0.14117647059999999" alpha="1" colorSpace="calibratedRGB"/>
+                            </activityIndicatorView>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="197" sectionHeaderHeight="22" sectionFooterHeight="22" id="CNA-Bk-bcZ">
+                                <rect key="frame" x="15" y="128" width="290" height="391"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <view key="tableHeaderView" clipsSubviews="YES" contentMode="scaleToFill" id="PIb-ya-LNn">
+                                    <rect key="frame" x="0.0" y="0.0" width="290" height="47"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <subviews>
+                                        <view contentMode="scaleToFill" id="Eaa-TP-SCf">
+                                            <rect key="frame" x="0.0" y="0.0" width="290" height="65"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        </view>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Order #" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="2CJ-37-wu3">
+                                            <rect key="frame" x="8" y="4" width="143" height="21"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="16"/>
+                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Status" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="e1L-Cl-XlD">
+                                            <rect key="frame" x="159" y="4" width="84" height="21"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="16"/>
+                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Order Date" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="cw6-DD-LiG">
+                                            <rect key="frame" x="8" y="22" width="120" height="21"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                            <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <view contentMode="scaleToFill" id="1DA-cq-3HP">
+                                            <rect key="frame" x="247" y="0.0" width="1" height="47"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                        </view>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="Wx0-q3-sWX">
+                                            <rect key="frame" x="257" y="8" width="24" height="31"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <state key="normal" image="iPhone_OrderDetail_ReceiptButton.png">
+                                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                            </state>
+                                        </button>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Runner" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="VY1-bx-zG7">
+                                            <rect key="frame" x="159" y="22" width="84" height="21"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                            <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                </view>
+                                <prototypes>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="productCell" rowHeight="199" id="h79-DM-5bT">
+                                        <rect key="frame" x="0.0" y="69" width="290" height="199"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="h79-DM-5bT" id="Uf9-lA-tab">
+                                            <rect key="frame" x="0.0" y="0.0" width="290" height="199"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <imageView userInteractionEnabled="NO" tag="4" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" id="jnw-RF-Zyf">
+                                                    <rect key="frame" x="8" y="9" width="60" height="60.5"/>
+                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                </imageView>
+                                                <label opaque="NO" userInteractionEnabled="NO" tag="1" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Product Name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Mem-H7-dnw">
+                                                    <rect key="frame" x="77" y="9" width="205" height="21"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="boldSystem" pointSize="18"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" tag="2" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Product Store" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="yZ1-7Y-hCp">
+                                                    <rect key="frame" x="77" y="31" width="205" height="21"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" tag="3" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Product Price" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="9Bq-Ai-bAV">
+                                                    <rect key="frame" x="77" y="49" width="205" height="21"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <view tag="5" contentMode="scaleToFill" id="eY6-tz-60G">
+                                                    <rect key="frame" x="8" y="87" width="274" height="93"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <subviews>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Status:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="qI7-Mw-lWR">
+                                                            <rect key="frame" x="8" y="8" width="50" height="21"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                            <fontDescription key="fontDescription" type="system" weight="medium" pointSize="15"/>
+                                                            <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
+                                                        <label opaque="NO" userInteractionEnabled="NO" tag="10" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Item Status" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="SS7-cC-gkP">
+                                                            <rect key="frame" x="66" y="8" width="200" height="21"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                                            <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
+                                                        <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="OrderDetail_ItemStatusBar.png" id="gTX-3A-bP8">
+                                                            <rect key="frame" x="9" y="37" width="257" height="48"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                        </imageView>
+                                                        <imageView userInteractionEnabled="NO" tag="6" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ItemDetail_StatusCheckMark.png" id="Rqu-ts-brw">
+                                                            <rect key="frame" x="18" y="46" width="8" height="8"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                        </imageView>
+                                                        <imageView userInteractionEnabled="NO" tag="7" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ItemDetail_StatusCheckMark.png" id="GdO-sb-SzM">
+                                                            <rect key="frame" x="83" y="46" width="8" height="8"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                        </imageView>
+                                                        <imageView userInteractionEnabled="NO" tag="8" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ItemDetail_StatusCheckMark.png" id="prL-jM-V8R">
+                                                            <rect key="frame" x="166" y="46" width="8" height="8"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                        </imageView>
+                                                        <imageView userInteractionEnabled="NO" tag="9" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ItemDetail_StatusCheckMark.png" id="HG6-xg-azj">
+                                                            <rect key="frame" x="246" y="46" width="8" height="8"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                        </imageView>
+                                                    </subviews>
+                                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                </view>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </prototypes>
+                                <connections>
+                                    <outlet property="dataSource" destination="tlc-k9-avb" id="Ob9-5e-vb8"/>
+                                    <outlet property="delegate" destination="tlc-k9-avb" id="fva-Yw-luU"/>
+                                </connections>
+                            </tableView>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" white="0.86527534964335662" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
                     <navigationItem key="navigationItem" id="E7j-gU-f6p"/>
+                    <connections>
+                        <outlet property="OrderDetailTableView" destination="CNA-Bk-bcZ" id="B75-qm-fop"/>
+                        <outlet property="orderDateLabel" destination="cw6-DD-LiG" id="xga-Gu-lRr"/>
+                        <outlet property="orderNumberLabel" destination="2CJ-37-wu3" id="ua7-Rr-kjQ"/>
+                        <outlet property="orderRunnerLabel" destination="VY1-bx-zG7" id="Y7B-Oc-Nex"/>
+                        <outlet property="orderStatusLabel" destination="e1L-Cl-XlD" id="C6b-dY-kxk"/>
+                        <outlet property="topBackView" destination="Eaa-TP-SCf" id="rU0-bF-PYR"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cYq-Cg-6zg" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1391" y="579"/>
+            <point key="canvasLocation" x="1489" y="548"/>
         </scene>
         <!--View Controller-->
         <scene sceneID="Pvh-Hj-W0W">
@@ -552,7 +704,7 @@
                                 <rect key="frame" x="16" y="20" width="288" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
@@ -590,7 +742,7 @@
                                         <rect key="frame" x="0.0" y="22" width="278" height="64"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="5JF-bz-3Bl" id="umn-zt-l3w">
-                                            <rect key="frame" x="0.0" y="0.0" width="278" height="63"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="278" height="63.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name and Address Information" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="peu-yc-Skm">
@@ -637,7 +789,7 @@
                                         <rect key="frame" x="0.0" y="86" width="278" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="RfO-gf-TUx" id="jeV-bw-LM0">
-                                            <rect key="frame" x="0.0" y="0.0" width="278" height="43"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="278" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Contact Name:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="iTq-MI-8T5">
@@ -783,8 +935,10 @@ sent to you.</string>
     <resources>
         <image name="ForgotPassword_SendButton.png" width="287" height="91"/>
         <image name="ForgotPassword_Title.png" width="481" height="199"/>
+        <image name="ItemDetail_StatusCheckMark.png" width="18" height="14"/>
         <image name="Login_PasswordIcon.png" width="39" height="19"/>
         <image name="Login_UsernameIcon.png" width="38" height="24"/>
+        <image name="OrderDetail_ItemStatusBar.png" width="454" height="60"/>
         <image name="SideBarButton.png" width="41" height="33"/>
         <image name="ViewOrders_CancelledButton.png" width="19" height="19"/>
         <image name="ViewOrders_DeliveredButton.png" width="21" height="16"/>
@@ -799,6 +953,7 @@ sent to you.</string>
         <image name="iPhone_OrderCell_PhoneIcon.png" width="25" height="28"/>
         <image name="iPhone_OrderCell_PortraitIcon.png" width="23" height="29"/>
         <image name="iPhone_OrderCell_RunnerIcon.png" width="18" height="18"/>
+        <image name="iPhone_OrderDetail_ReceiptButton.png" width="32" height="47"/>
         <image name="iPhone_TopLogo.png" width="273" height="54"/>
         <image name="iPhone_plusCircle.png" width="25" height="25"/>
     </resources>

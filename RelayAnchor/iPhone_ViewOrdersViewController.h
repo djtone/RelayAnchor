@@ -16,6 +16,8 @@
 @property NSDateFormatter * myDateFormatter;
 @property LoadOrderStatus selectedOrderStatus;
 @property float lastContentOffset;
+@property Order * myOrderToSend;
+
 @property (weak, nonatomic) IBOutlet UIImageView *mallImageView;
 @property (weak, nonatomic) IBOutlet UIView *mallImageOverlay;
 @property (weak, nonatomic) IBOutlet UITableView * myTableView;

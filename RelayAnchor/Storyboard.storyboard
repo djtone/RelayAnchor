@@ -224,7 +224,7 @@
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         <prototypes>
                                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="orderTableCell" id="qYS-p1-Ccd" customClass="OrderTableCell">
-                                                <rect key="frame" x="0.0" y="50" width="1000" height="48"/>
+                                                <rect key="frame" x="0.0" y="49.5" width="1000" height="48"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="qYS-p1-Ccd" id="yjf-jg-Rl0">
                                                     <rect key="frame" x="0.0" y="0.0" width="1000" height="48"/>
@@ -544,7 +544,7 @@ Take a look at what is happening now.</string>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         <prototypes>
                                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="orderTableCell" id="kfn-Iv-9lA" customClass="OrderTableCell">
-                                                <rect key="frame" x="0.0" y="50" width="1000" height="48"/>
+                                                <rect key="frame" x="0.0" y="49.5" width="1000" height="48"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="kfn-Iv-9lA" id="E7r-wl-ozI">
                                                     <rect key="frame" x="0.0" y="0.0" width="1000" height="48"/>
@@ -917,7 +917,7 @@ Take a look at what is happening now.</string>
                                         <rect key="frame" x="0.0" y="22" width="1000" height="142"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="mZP-R0-SL7" id="JFo-wX-H0q">
-                                            <rect key="frame" x="0.0" y="0.0" width="1000" height="141"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="1000" height="141.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <view contentMode="scaleToFill" id="4Rn-ZG-hBH" userLabel="status bar">

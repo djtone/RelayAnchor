@@ -7,6 +7,7 @@
 //
 
 #import "iPhone_ViewOrdersViewController.h"
+#import "iPhone_OrderDetailViewController.h"
 #import "iPhone_OrderCell.h"
 #import "AccountManager.h"
 #import "MFSideMenu.h"
@@ -26,6 +27,7 @@
     [self.myTabBar setSelectedItem:[[self.myTabBar items] objectAtIndex:0]];
     self.selectedOrderStatus = kLoadOrderStatusOpen;
     [self.myOrderManager startAutoRefreshOrdersWithStatus:kLoadOrderStatusOpen timeInterval:15];
+    self.myTableView.backgroundColor = [UIColor clearColor];
 }
 
 #pragma mark - table view
@@ -109,15 +111,27 @@
 
 - (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    self.myOrderToSend = [self.ordersForTableView objectAtIndex:indexPath.section];
+    [self performSegueWithIdentifier:@"goDetails" sender:nil];
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
+
+
+- (void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    if ( [segue.identifier isEqualToString:@"goDetails"] ){
+        iPhone_OrderDetailViewController *detailVc = [segue destinationViewController];
+        detailVc.myOrder = self.myOrderToSend;
+    }
+}
+
 
 - (UIView *) tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
 {
     return [[UIView alloc] init];
 }
 
-- (float) tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+- (CGFloat) tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
 {
     return 10;
 }
