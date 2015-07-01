@@ -20,5 +20,6 @@
 @property (weak, nonatomic) IBOutlet UILabel *priceLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *fulfillmentImageView;
 @property (weak, nonatomic) IBOutlet UILabel *fulfillmentAddressLabel;
+@property (weak, nonatomic) IBOutlet UIButton *assignRunnerButton;
 
 @end

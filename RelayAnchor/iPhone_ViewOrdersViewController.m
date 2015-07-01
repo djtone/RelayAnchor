@@ -13,7 +13,28 @@
 #import "MFSideMenu.h"
 #import "SVProgressHUD.h"
 
+@interface iPhone_ViewOrdersViewController ()
+@property (weak, nonatomic) IBOutlet UIView *sortByView;
+@property (weak, nonatomic) IBOutlet UIView *sortFrontView;
+@property (nonatomic, strong) NSArray *sortPreferenceArray;
+
+@property (weak, nonatomic) IBOutlet UIView *selectMallView;
+@property (weak, nonatomic) IBOutlet UIView *selectMallFrontView;
+
+@property (weak, nonatomic) IBOutlet UILabel *sortByNameLabel;
+@property (weak, nonatomic) IBOutlet UILabel *sortByOldestLabel;
+@property (weak, nonatomic) IBOutlet UILabel *sortByNewestLabel;
+@property (weak, nonatomic) IBOutlet UILabel *sortByStatusLabel;
+
+
+@property (weak, nonatomic) IBOutlet UIView *assignRunnerView;
+@property (weak, nonatomic) IBOutlet UIView *assignRunnerFrontView;
+
+@end
+
 @implementation iPhone_ViewOrdersViewController
+
+
 
 - (void)viewDidLoad
 {
@@ -28,6 +49,18 @@
     self.selectedOrderStatus = kLoadOrderStatusOpen;
     [self.myOrderManager startAutoRefreshOrdersWithStatus:kLoadOrderStatusOpen timeInterval:15];
     self.myTableView.backgroundColor = [UIColor clearColor];
+    
+    self.sortFrontView.layer.cornerRadius = 7.0;
+    self.sortFrontView.layer.borderWidth = 1.0;
+    self.sortFrontView.layer.borderColor = [[UIColor colorWithWhite:.84 alpha:0.9] CGColor];
+    
+    self.selectMallFrontView.layer.cornerRadius = 7.0;
+    self.selectMallFrontView.layer.borderWidth = 1.0;
+    self.selectMallFrontView.layer.borderColor = [[UIColor colorWithWhite:.84 alpha:0.9] CGColor];
+    
+    self.assignRunnerFrontView.layer.cornerRadius = 7.0;
+    self.assignRunnerFrontView.layer.borderWidth = 1.0;
+    self.assignRunnerFrontView.layer.borderColor = [[UIColor colorWithWhite:.84 alpha:0.9] CGColor];
 }
 
 #pragma mark - table view
@@ -56,6 +89,15 @@
 //        return 50;
 }
 
+//The button will have to send in the indexpath of the row it was selected
+-(void)assignRunner:(id)sender{
+    self.assignRunnerView.hidden = NO;
+}
+//just a temp method to close the view, as its not finished
+- (IBAction)closeAssignRunnerView:(id)sender {
+    self.assignRunnerView.hidden = YES;
+}
+
 - (UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     iPhone_OrderCell * cell = [tableView dequeueReusableCellWithIdentifier:@"iPhoneOrderCell"];
@@ -71,17 +113,22 @@
         textSize.width = cell.statusLabel.frame.size.width;
     [cell.dot setFrame:CGRectMake((self.myTableView.frame.size.width - 26) - textSize.width, cell.dot.frame.origin.y, cell.dot.frame.size.width, cell.dot.frame.size.height)];
     cell.dateLabel.text = [self.myDateFormatter stringFromDate:tmpOrder.placeTime];
+    
+    [cell.assignRunnerButton addTarget:self action:@selector(assignRunner:) forControlEvents:UIControlEventTouchUpInside];
+    
     if ( tmpOrder.runnerName.length )
     {
         [cell.runnerNameLabel setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:14]];
         [cell.runnerNameLabel setTextColor:[UIColor blackColor]];
         cell.runnerNameLabel.text = tmpOrder.runnerName;
+        cell.assignRunnerButton.hidden = YES;
     }
     else
     {
         [cell.runnerNameLabel setFont:[UIFont boldSystemFontOfSize:13]];
         [cell.runnerNameLabel setTextColor:[UIColor orangeColor]];
         cell.runnerNameLabel.text = @"Not Assigned";
+        cell.assignRunnerButton.hidden = NO;
     }
     textSize = [cell.runnerNameLabel.text sizeWithAttributes:@{NSFontAttributeName:[cell.runnerNameLabel font]}];
     if ( textSize.width > cell.runnerNameLabel.frame.size.width )
@@ -226,11 +273,75 @@
 #pragma mark - action sheet
 - (IBAction)sortByAction:(id)sender
 {
+    //show the sort view
+    self.sortByView.hidden = NO;
+ 
+    //set the label of the current "selected" sort order to orange
+    if ([self.sortPreferenceArray count] > 0) {
+        UIColor *selectedColor = [UIColor orangeColor];
+        
+        self.sortByNameLabel.textColor = [UIColor blackColor];
+        self.sortByStatusLabel.textColor = [UIColor blackColor];
+        self.sortByOldestLabel.textColor = [UIColor blackColor];
+        self.sortByNewestLabel.textColor = [UIColor blackColor];
+        
+        if ([[self.sortPreferenceArray firstObject] isEqualToString:@"Buyer Name"]) {
+            self.sortByNameLabel.textColor = selectedColor;
+            
+        }else if ([[self.sortPreferenceArray firstObject] isEqualToString:@"Status"]) {
+            self.sortByStatusLabel.textColor = selectedColor;
+        }else if ([[self.sortPreferenceArray firstObject] isEqualToString:@"Order Date"]) {
+            
+            if ([[self.sortPreferenceArray objectAtIndex:1] boolValue]) {
+                self.sortByOldestLabel.textColor = selectedColor;
+
+            }else{
+                self.sortByNewestLabel.textColor = selectedColor;
+
+            }
+        }
+    }
+    /*
     UIActionSheet * testActionSheet = [[UIActionSheet alloc] initWithTitle:@"Sort Orders" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Newest", @"Oldest", @"Name", @"Status", nil];
     [testActionSheet showFromTabBar:self.myTabBar];
+     */
 }
 
+- (IBAction)sortByNameAction:(id)sender {
+    self.sortPreferenceArray = @[@"Buyer Name", @YES];
+    [self completeSort];
+}
+- (IBAction)sortByOldestAction:(id)sender {
+    self.sortPreferenceArray = @[@"Order Date", @YES];
+    [self completeSort];
+}
+- (IBAction)sortByNewestAction:(id)sender {
+    self.sortPreferenceArray = @[@"Order Date", @NO];
+    [self completeSort];
+}
+- (IBAction)sortByStatusAction:(id)sender {
+    self.sortPreferenceArray = @[@"Status", @YES];
+    [self completeSort];
+}
 
+-(void)completeSort{
+    self.sortByView.hidden = YES;
+    
+    NSMutableArray * sortPreferences = [[AccountManager sharedInstance] orderSortPreferences];
+    for ( int i = 0; i < [sortPreferences count]; i++ )
+    {
+        if ( [[[sortPreferences objectAtIndex:i] firstObject] isEqualToString:[self.sortPreferenceArray firstObject]] )
+        {
+            [sortPreferences removeObjectAtIndex:i];
+            [sortPreferences insertObject:self.sortPreferenceArray atIndex:0];
+            break;
+        }
+    }
+    
+    [[AccountManager sharedInstance] setOrderSortPreferences:sortPreferences];
+    [[NSUserDefaults standardUserDefaults] setValue:sortPreferences forKey:@"orderSortPreferences"];
+    [self refreshOrders];
+}
 - (void) actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     NSArray * sortPreference;
@@ -278,7 +389,8 @@
 
 - (IBAction)changeMallAction:(id)sender
 {
-    [SVProgressHUD showImage:nil status:@"change mall"];
+   // [SVProgressHUD showImage:nil status:@"change mall"];
+    self.selectMallView.hidden = NO;
 }
 
 - (IBAction)searchAction:(id)sender
@@ -289,6 +401,21 @@
 - (UIStatusBarStyle) preferredStatusBarStyle
 {
     return UIStatusBarStyleLightContent;
+}
+
+
+// A new mall is selected, Chuck, do something about it
+- (IBAction)selectMallWaterTowerAction:(id)sender {
+    self.selectMallView.hidden = YES;
+
+}
+- (IBAction)selectMallWoodfieldAction:(id)sender {
+    self.selectMallView.hidden = YES;
+
+}
+- (IBAction)selectMallOakbrookAction:(id)sender {
+    self.selectMallView.hidden = YES;
+
 }
 
 @end
