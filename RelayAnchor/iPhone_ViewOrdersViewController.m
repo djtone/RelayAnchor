@@ -12,34 +12,15 @@
 #import "AccountManager.h"
 #import "MFSideMenu.h"
 #import "SVProgressHUD.h"
-
-@interface iPhone_ViewOrdersViewController ()
-@property (weak, nonatomic) IBOutlet UIView *sortByView;
-@property (weak, nonatomic) IBOutlet UIView *sortFrontView;
-@property (nonatomic, strong) NSArray *sortPreferenceArray;
-
-@property (weak, nonatomic) IBOutlet UIView *selectMallView;
-@property (weak, nonatomic) IBOutlet UIView *selectMallFrontView;
-
-@property (weak, nonatomic) IBOutlet UILabel *sortByNameLabel;
-@property (weak, nonatomic) IBOutlet UILabel *sortByOldestLabel;
-@property (weak, nonatomic) IBOutlet UILabel *sortByNewestLabel;
-@property (weak, nonatomic) IBOutlet UILabel *sortByStatusLabel;
-
-
-@property (weak, nonatomic) IBOutlet UIView *assignRunnerView;
-@property (weak, nonatomic) IBOutlet UIView *assignRunnerFrontView;
-
-@end
+#import "UIAlertView+Blocks.h"
 
 @implementation iPhone_ViewOrdersViewController
-
-
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     self.ordersForTableView = @[];
+    self.swipedOrderIds = [[NSMutableArray alloc] init];
     self.myDateFormatter = [[NSDateFormatter alloc] init];
     [self.myDateFormatter setDateStyle:NSDateFormatterMediumStyle];
     self.myOrderManager = [OrderManager sharedInstanceWithDelegate:self];
@@ -49,18 +30,31 @@
     self.selectedOrderStatus = kLoadOrderStatusOpen;
     [self.myOrderManager startAutoRefreshOrdersWithStatus:kLoadOrderStatusOpen timeInterval:15];
     self.myTableView.backgroundColor = [UIColor clearColor];
+}
+
+- (void) viewWillAppear:(BOOL)animated
+{
+    [self updateMallName];
+    [self updateWelcomeImage];
+}
+
+- (void) updateWelcomeImage
+{
+    if ( [[[[AccountManager sharedInstance] selectedMall] name] isEqualToString:@"Oakbrook Mall"] )
+        self.mallImageView.image = [UIImage imageNamed:@"Welcome_oakbrook.png"];
+    else if ( [[[[AccountManager sharedInstance] selectedMall] name] isEqualToString:@"Water Tower Mall"] )
+        self.mallImageView.image = [UIImage imageNamed:@"Welcome_waterTower.png"];
+    else if ( [[[[AccountManager sharedInstance] selectedMall] name] isEqualToString:@"Woodfield Mall"] )
+        self.mallImageView.image = [UIImage imageNamed:@"Welcome_woodfield.png"];
+}
+
+- (void) updateMallName
+{
+    NSString * mallName = [[[AccountManager sharedInstance] selectedMall] name];
+    if ( !mallName || [mallName class] == [NSNull class] )
+        return;
     
-    self.sortFrontView.layer.cornerRadius = 7.0;
-    self.sortFrontView.layer.borderWidth = 1.0;
-    self.sortFrontView.layer.borderColor = [[UIColor colorWithWhite:.84 alpha:0.9] CGColor];
-    
-    self.selectMallFrontView.layer.cornerRadius = 7.0;
-    self.selectMallFrontView.layer.borderWidth = 1.0;
-    self.selectMallFrontView.layer.borderColor = [[UIColor colorWithWhite:.84 alpha:0.9] CGColor];
-    
-    self.assignRunnerFrontView.layer.cornerRadius = 7.0;
-    self.assignRunnerFrontView.layer.borderWidth = 1.0;
-    self.assignRunnerFrontView.layer.borderColor = [[UIColor colorWithWhite:.84 alpha:0.9] CGColor];
+    self.mallNameLabel.text = mallName;
 }
 
 #pragma mark - table view
@@ -68,14 +62,27 @@
 {
     if ( self.ordersForTableView.count )
     {
-        self.myTableView.hidden = NO;
+        self.noOrdersLabel.hidden = YES;
+        [self showTable];
         [self.loadingIndicator stopAnimating];
         return self.ordersForTableView.count;
-        //return 1;
     }
     else
     {
-        self.myTableView.hidden = YES;
+        [self hideTable];
+        
+        if ( self.myOrderManager.isLoadingOrders )
+            [self.loadingIndicator startAnimating];
+        else
+        {
+            self.noOrdersLabel.alpha = 0;
+            self.noOrdersLabel.hidden = NO;
+            [UIView animateWithDuration:.2 animations:^
+            {
+                self.noOrdersLabel.alpha = 1;
+            }];
+        }
+        
         return 0;
     }
 }
@@ -83,19 +90,6 @@
 - (NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     return 1;
-//    if ( self.ordersForTableView.count )
-//        return self.ordersForTableView.count;
-//    else
-//        return 50;
-}
-
-//The button will have to send in the indexpath of the row it was selected
--(void)assignRunner:(id)sender{
-    self.assignRunnerView.hidden = NO;
-}
-//just a temp method to close the view, as its not finished
-- (IBAction)closeAssignRunnerView:(id)sender {
-    self.assignRunnerView.hidden = YES;
 }
 
 - (UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -114,8 +108,6 @@
     [cell.dot setFrame:CGRectMake((self.myTableView.frame.size.width - 26) - textSize.width, cell.dot.frame.origin.y, cell.dot.frame.size.width, cell.dot.frame.size.height)];
     cell.dateLabel.text = [self.myDateFormatter stringFromDate:tmpOrder.placeTime];
     
-    [cell.assignRunnerButton addTarget:self action:@selector(assignRunner:) forControlEvents:UIControlEventTouchUpInside];
-    
     if ( tmpOrder.runnerName.length )
     {
         [cell.runnerNameLabel setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:14]];
@@ -133,7 +125,7 @@
     textSize = [cell.runnerNameLabel.text sizeWithAttributes:@{NSFontAttributeName:[cell.runnerNameLabel font]}];
     if ( textSize.width > cell.runnerNameLabel.frame.size.width )
         textSize.width = cell.runnerNameLabel.frame.size.width;
-    [cell.runnerImageView setFrame:CGRectMake((self.myTableView.frame.size.width - 26) - textSize.width, cell.runnerImageView.frame.origin.y, cell.runnerImageView.frame.size.width, cell.runnerImageView.frame.size.height)];
+    [cell.runnerImageView setFrame:CGRectMake((self.myTableView.frame.size.width - 24) - textSize.width, cell.runnerImageView.frame.origin.y, cell.runnerImageView.frame.size.width, cell.runnerImageView.frame.size.height)];
     cell.memberNameLabel.text = [NSString stringWithFormat:@"%@ %@", tmpOrder.buyerFirstName, tmpOrder.buyerLastName];
     cell.priceLabel.text = [NSString stringWithFormat:@"$%.2f", [tmpOrder.totalPrice floatValue]];
     cell.fulfillmentAddressLabel.text = [tmpOrder.pickupLocation capitalizedString];
@@ -153,6 +145,30 @@
         textSize.width = cell.fulfillmentAddressLabel.frame.size.width;
     [cell.fulfillmentImageView setFrame:CGRectMake((self.myTableView.frame.size.width - (29 + imageDiff)) - textSize.width, cell.fulfillmentImageView.frame.origin.y, cell.fulfillmentImageView.frame.size.width, cell.fulfillmentImageView.frame.size.height)];
     
+    //swipe/longPress menu
+    for ( UIGestureRecognizer * gesture in [[cell contentView] gestureRecognizers] )
+        [[cell contentView] removeGestureRecognizer:gesture];
+    
+    //only open orders should have override option
+    if ( [tmpOrder.displayStatus isEqualToString:@"Open"] )
+    {
+        UILongPressGestureRecognizer * longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPressGesture:)];
+        [cell.contentView addGestureRecognizer:longPressGesture];
+        
+        UISwipeGestureRecognizer * swipeLeftGesture = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeGesture:)];
+        swipeLeftGesture.direction = UISwipeGestureRecognizerDirectionLeft;
+        [cell.contentView addGestureRecognizer:swipeLeftGesture];
+        
+        UISwipeGestureRecognizer * swipeRightGesture = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeGesture:)];
+        swipeRightGesture.direction = UISwipeGestureRecognizerDirectionRight;
+        [cell.contentView addGestureRecognizer:swipeRightGesture];
+    }
+    
+    if ( [self.swipedOrderIds containsObject:tmpOrder.wcsOrderId] )
+        cell.swipeButton.frame = CGRectMake(cell.contentView.frame.size.width - cell.swipeButton.frame.size.width, cell.swipeButton.frame.origin.y, cell.swipeButton.frame.size.width, cell.swipeButton.frame.size.height);
+    else
+        cell.swipeButton.frame = CGRectMake(cell.contentView.frame.size.width, cell.swipeButton.frame.origin.y, cell.swipeButton.frame.size.width, cell.swipeButton.frame.size.height);
+    
     return cell;
 }
 
@@ -163,12 +179,51 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
-
-- (void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+- (void) handleLongPressGesture:(UILongPressGestureRecognizer *)gesture
 {
-    if ( [segue.identifier isEqualToString:@"goDetails"] ){
-        iPhone_OrderDetailViewController *detailVc = [segue destinationViewController];
-        detailVc.myOrder = self.myOrderToSend;
+    if ( gesture.state == UIGestureRecognizerStateBegan )
+    {
+        iPhone_OrderCell * cell;
+        if ( [[[UIDevice currentDevice] systemVersion] compare:@"8" options:NSNumericSearch] != NSOrderedAscending ) //iOS 8 and greater
+            cell = (iPhone_OrderCell *)[[gesture view] superview];
+        else
+            cell = (iPhone_OrderCell *)[[[gesture view] superview] superview];
+        
+        [self toggleSwipeMenuForCell:cell];
+    }
+}
+
+- (void) handleSwipeGesture:(UISwipeGestureRecognizer *)gesture
+{
+    [self.myTableView deselectRowAtIndexPath:[self.myTableView indexPathForSelectedRow] animated:YES];
+    iPhone_OrderCell * cell;
+    if ( [[[UIDevice currentDevice] systemVersion] compare:@"8" options:NSNumericSearch] != NSOrderedAscending ) //iOS 8 and greater
+        cell = (iPhone_OrderCell *)[[gesture view] superview];
+    else
+        cell = (iPhone_OrderCell *)[[[gesture view] superview] superview];
+    
+    [self toggleSwipeMenuForCell:cell];
+}
+
+- (void) toggleSwipeMenuForCell:(iPhone_OrderCell *)cell
+{
+    Order * tmpOrder = [self.ordersForTableView objectAtIndex:[[self.myTableView indexPathForCell:cell] section]];
+    
+    if ( [self.swipedOrderIds containsObject:tmpOrder.wcsOrderId] )
+    {
+        [UIView animateWithDuration:.5 animations:^
+         {
+             cell.swipeButton.frame = CGRectMake(cell.contentView.frame.size.width, cell.swipeButton.frame.origin.y, cell.swipeButton.frame.size.width, cell.swipeButton.frame.size.height);
+         }];
+        [self.swipedOrderIds removeObject:tmpOrder.wcsOrderId];
+    }
+    else
+    {
+        [UIView animateWithDuration:.5 animations:^
+         {
+             cell.swipeButton.frame = CGRectMake(cell.contentView.frame.size.width - cell.swipeButton.frame.size.width, cell.swipeButton.frame.origin.y, cell.swipeButton.frame.size.width, cell.swipeButton.frame.size.height);
+         }];
+        [self.swipedOrderIds addObject:tmpOrder.wcsOrderId];
     }
 }
 
@@ -249,7 +304,6 @@
         [self.myOrderManager startAutoRefreshOrdersWithStatus:self.selectedOrderStatus timeInterval:15];
     }];
     
-    self.ordersForTableView = [self.myOrderManager.cachedOrders objectForKey:[EnumTypes stringFromLoadOrderStatus:self.selectedOrderStatus]];
     [self refreshOrders];
 }
 
@@ -258,7 +312,8 @@
 {
     if ( ! self.ordersForTableView.count )
     {
-        self.myTableView.hidden = YES;
+        [self hideTable];
+        self.noOrdersLabel.hidden = YES;
         [self.loadingIndicator startAnimating];
     }
 }
@@ -266,82 +321,17 @@
 - (void) didFinishLoadingOrders:(NSArray *)orders status:(LoadOrderStatus)loadOrderStatus error:(NSString *)error
 {
     [self.loadingIndicator stopAnimating];
-    self.myTableView.hidden = NO;
+    [self showTable];
     [self refreshOrders];
 }
 
 #pragma mark - action sheet
 - (IBAction)sortByAction:(id)sender
 {
-    //show the sort view
-    self.sortByView.hidden = NO;
- 
-    //set the label of the current "selected" sort order to orange
-    if ([self.sortPreferenceArray count] > 0) {
-        UIColor *selectedColor = [UIColor orangeColor];
-        
-        self.sortByNameLabel.textColor = [UIColor blackColor];
-        self.sortByStatusLabel.textColor = [UIColor blackColor];
-        self.sortByOldestLabel.textColor = [UIColor blackColor];
-        self.sortByNewestLabel.textColor = [UIColor blackColor];
-        
-        if ([[self.sortPreferenceArray firstObject] isEqualToString:@"Buyer Name"]) {
-            self.sortByNameLabel.textColor = selectedColor;
-            
-        }else if ([[self.sortPreferenceArray firstObject] isEqualToString:@"Status"]) {
-            self.sortByStatusLabel.textColor = selectedColor;
-        }else if ([[self.sortPreferenceArray firstObject] isEqualToString:@"Order Date"]) {
-            
-            if ([[self.sortPreferenceArray objectAtIndex:1] boolValue]) {
-                self.sortByOldestLabel.textColor = selectedColor;
-
-            }else{
-                self.sortByNewestLabel.textColor = selectedColor;
-
-            }
-        }
-    }
-    /*
     UIActionSheet * testActionSheet = [[UIActionSheet alloc] initWithTitle:@"Sort Orders" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Newest", @"Oldest", @"Name", @"Status", nil];
     [testActionSheet showFromTabBar:self.myTabBar];
-     */
 }
 
-- (IBAction)sortByNameAction:(id)sender {
-    self.sortPreferenceArray = @[@"Buyer Name", @YES];
-    [self completeSort];
-}
-- (IBAction)sortByOldestAction:(id)sender {
-    self.sortPreferenceArray = @[@"Order Date", @YES];
-    [self completeSort];
-}
-- (IBAction)sortByNewestAction:(id)sender {
-    self.sortPreferenceArray = @[@"Order Date", @NO];
-    [self completeSort];
-}
-- (IBAction)sortByStatusAction:(id)sender {
-    self.sortPreferenceArray = @[@"Status", @YES];
-    [self completeSort];
-}
-
--(void)completeSort{
-    self.sortByView.hidden = YES;
-    
-    NSMutableArray * sortPreferences = [[AccountManager sharedInstance] orderSortPreferences];
-    for ( int i = 0; i < [sortPreferences count]; i++ )
-    {
-        if ( [[[sortPreferences objectAtIndex:i] firstObject] isEqualToString:[self.sortPreferenceArray firstObject]] )
-        {
-            [sortPreferences removeObjectAtIndex:i];
-            [sortPreferences insertObject:self.sortPreferenceArray atIndex:0];
-            break;
-        }
-    }
-    
-    [[AccountManager sharedInstance] setOrderSortPreferences:sortPreferences];
-    [[NSUserDefaults standardUserDefaults] setValue:sortPreferences forKey:@"orderSortPreferences"];
-    [self refreshOrders];
-}
 - (void) actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     NSArray * sortPreference;
@@ -371,6 +361,50 @@
 }
 
 #pragma mark - misc.
+- (void) showTable
+{
+    if ( self.myTableView.hidden == NO )
+        return;
+
+    [self.myTableView.layer removeAllAnimations]; //sometimes [hidetable] and [showtable] were called too close together, and they would mess each other up
+    self.myTableView.hidden = NO;
+    self.myTableView.alpha = 0;
+    self.myTableView.hidden = NO;
+    [UIView animateWithDuration:.2 animations:^
+    {
+        self.myTableView.alpha = 1;
+    }];
+}
+
+- (void) hideTable
+{
+    if ( self.myTableView.hidden == YES )
+        return;
+
+    [self.myTableView.layer removeAllAnimations]; //sometimes [hidetable] and [showtable] were called too close together, and they would mess each other up
+    [UIView animateWithDuration:.2 animations:^
+    {
+        self.myTableView.alpha = 0;
+    }
+    completion:^(BOOL finished)
+    {
+        self.myTableView.hidden = YES;
+        self.myTableView.alpha = 1;
+    }];
+}
+
+- (void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    [self.myOrderManager cancelLoadOrders:nil];
+    [self.myOrderManager stopAutoRefreshOrders:nil];
+    
+    if ( [segue.identifier isEqualToString:@"goDetails"] )
+    {
+        iPhone_OrderDetailViewController *detailVc = [segue destinationViewController];
+        detailVc.myOrder = self.myOrderToSend;
+    }
+}
+
 - (void) refreshOrders
 {
     self.ordersForTableView = [self.myOrderManager searchOrders:[OrderManager sortOrders:[self.myOrderManager.cachedOrders objectForKey:[EnumTypes stringFromLoadOrderStatus:self.selectedOrderStatus]]] withString:self.searchTextField.text];
@@ -389,8 +423,75 @@
 
 - (IBAction)changeMallAction:(id)sender
 {
-   // [SVProgressHUD showImage:nil status:@"change mall"];
-    self.selectMallView.hidden = NO;
+   [SVProgressHUD showImage:nil status:@"change mall"];
+}
+
+- (IBAction)overrideAction:(id)sender
+{
+    NSIndexPath * indexPathOfOrder;
+    if ([[[UIDevice currentDevice] systemVersion] compare:@"8" options:NSNumericSearch] != NSOrderedAscending) //iOS 8 and greater
+        indexPathOfOrder = [self.myTableView indexPathForCell:(iPhone_OrderCell *)[[sender superview] superview]];
+    else
+        indexPathOfOrder = [self.myTableView indexPathForCell:(iPhone_OrderCell *)[[[sender superview] superview] superview]];
+    
+    __block Order * overrideOrder = [self.ordersForTableView objectAtIndex:[indexPathOfOrder section]];
+    
+    [[[UIAlertView alloc] initWithTitle:@"Override Status"
+                                message:[NSString stringWithFormat:@"Override Order# %@\nStatus to Ready?", overrideOrder.wcsOrderId]
+                       cancelButtonItem:[RIButtonItem itemWithLabel:@"Yes" action:^
+                                         {
+                                             [SVProgressHUD show];
+                                             [self.myOrderManager overrideConfirmOrderAtStation:overrideOrder completion:^(NSString * error)
+                                              {
+                                                  if ( error )
+                                                  {
+                                                      [SVProgressHUD dismiss];
+                                                      [[[UIAlertView alloc] initWithTitle:@"Override Order Status"
+                                                                                  message:[NSString stringWithFormat:@"Issue changing status:\n%@", error]
+                                                                         cancelButtonItem:[RIButtonItem itemWithLabel:@"OK" action:^
+                                                                                           {
+                                                                                               //
+                                                                                           }]
+                                                                         otherButtonItems:nil] show];
+                                                  }
+                                                  else
+                                                  {
+                                                      for ( Order * tmpOrder in self.ordersForTableView )
+                                                      {
+                                                          if ( [tmpOrder.wcsOrderId isEqual:overrideOrder.wcsOrderId] )
+                                                          {
+                                                              overrideOrder = tmpOrder;
+                                                              break;
+                                                          }
+                                                      }
+                                                      
+                                                      if ( [self.ordersForTableView containsObject:overrideOrder] )
+                                                      {
+                                                          NSIndexPath * overrideIndex = [NSIndexPath indexPathForItem:0 inSection:[self.ordersForTableView indexOfObject:overrideOrder]];
+                                                          NSMutableArray * tmpOrders = [self.ordersForTableView mutableCopy];
+                                                          [tmpOrders removeObject:overrideOrder];
+                                                          self.ordersForTableView = tmpOrders;
+                                                          [self.myTableView deleteSections:[NSIndexSet indexSetWithIndex:[overrideIndex section]] withRowAnimation:UITableViewRowAnimationRight];
+                                                          
+                                                          for ( NSNumber * tmpOrderId in self.swipedOrderIds )
+                                                          {
+                                                              if ( [tmpOrderId isEqual:overrideOrder.wcsOrderId] )
+                                                              {
+                                                                  [self.swipedOrderIds removeObject:tmpOrderId];
+                                                                  break;
+                                                              }
+                                                          }
+                                                          [SVProgressHUD showSuccessWithStatus:@"Status Changed"];
+                                                      }
+                                                      else
+                                                          [SVProgressHUD showErrorWithStatus:@"Issue Locating Order"];
+                                                  }
+                                              }];
+                                         }]
+                       otherButtonItems:[RIButtonItem itemWithLabel:@"Cancel" action:^
+                                         {
+                                             //
+                                         }], nil] show];
 }
 
 - (IBAction)searchAction:(id)sender
@@ -401,21 +502,6 @@
 - (UIStatusBarStyle) preferredStatusBarStyle
 {
     return UIStatusBarStyleLightContent;
-}
-
-
-// A new mall is selected, Chuck, do something about it
-- (IBAction)selectMallWaterTowerAction:(id)sender {
-    self.selectMallView.hidden = YES;
-
-}
-- (IBAction)selectMallWoodfieldAction:(id)sender {
-    self.selectMallView.hidden = YES;
-
-}
-- (IBAction)selectMallOakbrookAction:(id)sender {
-    self.selectMallView.hidden = YES;
-
 }
 
 @end

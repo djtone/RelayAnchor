@@ -432,14 +432,22 @@ static OrderManager * sharedOrderManager = nil;
                 }
                 else
                 {
-                   order.status = kStatusDelivered;
-                   order.anchorStatus = kAnchorStatusDelivered;
-                   for ( int i = 0; i < [order.products count]; i++ )
-                   {
-                       Product * tmpProduct = (Product *)[order.products objectAtIndex:i];
-                       tmpProduct.anchorStatus = @"Delivered";
-                   }
-                   callBack(YES);
+                    order.status = kStatusDelivered;
+                    order.anchorStatus = kAnchorStatusDelivered;
+                    for ( int i = 0; i < [order.products count]; i++ )
+                    {
+                        Product * tmpProduct = (Product *)[order.products objectAtIndex:i];
+                        tmpProduct.anchorStatus = @"Delivered";
+                    }
+                    
+                    NSMutableArray * readyOrders  = [self.cachedOrders objectForKey:[EnumTypes stringFromLoadOrderStatus:kLoadOrderStatusReady]];
+                    NSMutableArray * deliveredOrders = [self.cachedOrders objectForKey:[EnumTypes stringFromLoadOrderStatus:kLoadOrderStatusDelivered]];
+                    if ( [readyOrders containsObject:order] )
+                    {
+                        [readyOrders removeObject:order];
+                        [deliveredOrders addObject:order];
+                    }
+                    callBack(YES);
                 }
             });
         }] resume];
@@ -475,11 +483,19 @@ static OrderManager * sharedOrderManager = nil;
                     
                     if ( callBack )
                     {
-                        if ( [[responseDictionary valueForKey:@"status"] class] == [NSString class] &&
+                        if ( [[responseDictionary valueForKey:@"status"] isKindOfClass:[NSString class]] &&
                            ( [[responseDictionary valueForKey:@"status"] isEqualToString:@"Delivery successfully called"] ||
                              [[responseDictionary valueForKey:@"status"] isEqualToString:@"SUCCESS"] ) )
                         {
-                                 callBack(nil);
+                            NSMutableArray * openOrders = [self.cachedOrders objectForKey:[EnumTypes stringFromLoadOrderStatus:kLoadOrderStatusOpen]];
+                            NSMutableArray * readyOrders = [self.cachedOrders objectForKey:[EnumTypes stringFromLoadOrderStatus:kLoadOrderStatusReady]];
+                            if ( [openOrders containsObject:order] )
+                            {
+                                [openOrders removeObject:order];
+                                [readyOrders addObject:order];
+                            }
+                            
+                            callBack(nil);
                         }
                         else
                         {

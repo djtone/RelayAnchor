@@ -136,6 +136,8 @@ static AccountManager * sharedAccountManager = nil;
                 NSString * camelCaseName = [responseDictionary valueForKey:@"sellerName"];
                 if ( [camelCaseName isEqualToString:@"OakBrookMall"] )
                     camelCaseName = @"OakbrookMall"; //backend should change their response. oakbrook is one word
+                else if ( [camelCaseName isEqualToString:@"WoodFieldMall"] )
+                    camelCaseName = @"WoodfieldMall"; //backend should change their response. woodfield is one word
                 NSMutableString * spacedName = [NSMutableString string];
                 
                 for ( int i = 0 ; i < camelCaseName.length; i++ )
@@ -343,7 +345,7 @@ static AccountManager * sharedAccountManager = nil;
         [NSThread sleepForTimeInterval:1];
         dispatch_async(dispatch_get_main_queue(), ^
         {
-            NSArray * tmpMalls = @[@"Oakbrook Mall", @"Water Tower Mall"];
+            NSArray * tmpMalls = @[@"Oakbrook Mall", @"Water Tower Mall", @"Woodfield Mall"];
             [[AccountManager sharedInstance] setNearbyMalls:tmpMalls];
             callBack(tmpMalls);
         });

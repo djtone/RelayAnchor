@@ -37,6 +37,7 @@
     UIViewController * mainController = self.window.rootViewController;
     UIViewController * sideMenu = [[UIStoryboard storyboardWithName:@"iPhone" bundle:nil] instantiateViewControllerWithIdentifier:@"sideMenu"];
     MFSideMenuContainerViewController * container = [MFSideMenuContainerViewController containerWithCenterViewController:mainController leftMenuViewController:sideMenu rightMenuViewController:nil];
+    container.panMode = MFSideMenuPanModeNone;
     
     self.window.rootViewController = container;
     [self.window makeKeyAndVisible];

@@ -10,5 +10,10 @@
 
 @implementation iPhone_OrderCell
 
+- (void) layoutSubviews
+{
+    self.swipeButton.titleLabel.numberOfLines = 2;
+    self.swipeButton.titleLabel.textAlignment = NSTextAlignmentCenter;
+}
 
 @end

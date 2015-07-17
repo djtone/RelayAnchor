@@ -32,7 +32,7 @@
         self.anchorId = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"anchorId"] withAlternative:[NSNumber numberWithInt:0]];
         self.buyerEmail = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"buyerEmail"] withAlternative:@""];
         
-        self.buyerPhoneNumber = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"buyerPhoneNumber"] withAlternative:[NSNumber numberWithDouble:0]];
+        self.buyerPhoneNumber = [DataMethods checkForNull:[dictionaryResponse valueForKey:@"buyerPhone"] withAlternative:[NSNumber numberWithDouble:0]];
         
         self.isKeynoteOrder = NO;
         if ( [[DataMethods checkForNull:[dictionaryResponse valueForKey:@"isKeynoteOrder"] withAlternative:nil] intValue] != 0 )

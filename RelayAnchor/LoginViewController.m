@@ -127,7 +127,12 @@
 
 - (BOOL) prefersStatusBarHidden
 {
-    return YES;
+    return YES; // this doesnt do anything at the moment
+}
+
+-(UIStatusBarStyle)preferredStatusBarStyle
+{
+    return UIStatusBarStyleLightContent;
 }
 
 - (void) viewWillDisappear:(BOOL)animated

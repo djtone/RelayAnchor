@@ -13,10 +13,13 @@
 
 @property OrderManager * myOrderManager;
 @property NSArray * ordersForTableView;
+@property NSMutableArray * swipedOrderIds;
 @property NSDateFormatter * myDateFormatter;
 @property LoadOrderStatus selectedOrderStatus;
 @property float lastContentOffset;
 @property Order * myOrderToSend;
+@property (weak, nonatomic) IBOutlet UILabel *mallNameLabel;
+@property (weak, nonatomic) IBOutlet UILabel *noOrdersLabel;
 
 @property (weak, nonatomic) IBOutlet UIImageView *mallImageView;
 @property (weak, nonatomic) IBOutlet UIView *mallImageOverlay;
@@ -29,5 +32,6 @@
 - (IBAction)sortByAction:(id)sender;
 - (IBAction)sideMenuAction:(id)sender;
 - (IBAction)changeMallAction:(id)sender;
+- (IBAction)overrideAction:(id)sender;
 
 @end

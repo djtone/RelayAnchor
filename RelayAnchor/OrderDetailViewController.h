@@ -12,8 +12,9 @@
 #import "OrderManager.h"
 #import "Order.h"
 #import "PrintManager.h"
+#import "AcceptPictureViewController.h"
 
-@interface OrderDetailViewController : UIViewController <UITableViewDelegate, UITableViewDataSource, TopViewDelegate, BottomViewDelegate, OrderManagerDelegate>
+@interface OrderDetailViewController : UIViewController <UITableViewDelegate, UITableViewDataSource, TopViewDelegate, BottomViewDelegate, OrderManagerDelegate, receiptCameraDelegate>
 
 @property Order * myOrder;
 @property OrderManager * myOrderManager;

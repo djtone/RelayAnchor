@@ -28,6 +28,7 @@
     [self setNeedsStatusBarAppearanceUpdate];
     
     //receipt views
+    /*
     self.purchaseReceiptView = [[[NSBundle mainBundle] loadNibNamed:@"ReceiptView" owner:self options:nil] firstObject];
     self.purchaseReceiptView.delegate = self;
     UITapGestureRecognizer * purchaseReceiptTapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(presentPurchaseReceiptView)];
@@ -41,6 +42,7 @@
     [self.returnReceiptImageView addGestureRecognizer:returnReceiptTapGesture];
     self.returnReceiptAlphaOverlay = [[UIView alloc] initWithFrame:CGRectMake(0, 70, 1024, 618)];
     [self.returnReceiptAlphaOverlay setBackgroundColor:[UIColor colorWithWhite:0.3 alpha:.5]];
+     */
     
     //email
     self.myEmailView = [[[NSBundle mainBundle] loadNibNamed:@"EmailView" owner:self options:nil] firstObject];
@@ -373,6 +375,7 @@
 }
 
 #pragma mark - receipt view delegate
+/*
 - (void) didPressImage:(ReceiptView *)receiptView
 {
     [self useCustomCamera];
@@ -429,7 +432,7 @@
     [self.view addSubview:self.returnReceiptAlphaOverlay];
     [self.view addSubview:self.returnReceiptView];
 }
-
+*/
 #pragma mark - misc.
 - (void) getOrderDetails
 {
@@ -444,7 +447,7 @@
     //images
     if ( self.myProduct.productImage != nil )
         self.imagePlaceholder.image = self.myProduct.productImage;
-    
+    /*
     if ( self.myProduct.purchaseReceiptImage != nil )
     {
         self.purchaseReceiptImageView.image = self.myProduct.purchaseReceiptImage;
@@ -456,7 +459,7 @@
         self.returnReceiptImageView.image = self.myProduct.returnReceiptImage;
         self.returnReceiptView.receiptImageView.image = self.myProduct.returnReceiptImage;
     }
-    
+    */
     //title
     if ( ! [self.itemNameLabel.text isEqualToString:self.myProduct.name] )
         self.itemNameLabel.text = [NSString stringWithFormat:@"%@", self.myProduct.name];
@@ -667,15 +670,31 @@
     //self.isPurchaseReceipt = NO;
     
     if ( self.myProduct.purchaseReceiptImage == nil )
-        [self useCustomCamera];
+        [self useCustomCamera]; 
     else
     {
         if ( [self.myOrderManager isLastProductToApprove:self.myProduct] )
         {
-            self.shouldSetStatusToAtStation = YES;
-            [SVProgressHUD showWithStatus:@"Uploading Receipt"];
-            UIImage * purchaseReceiptImage = [self.myOrderManager mergeReceiptImagesWithType:@"purchase" forOrder:self.myProduct.myOrder];
-            [self.myOrderManager uploadReceiptImage:purchaseReceiptImage withType:@"purchase" forOrder:self.myProduct.myOrder];
+            if ( self.myProduct.myOrder.purchaseReceiptImage == nil )
+            {
+                [[[UIAlertView alloc] initWithTitle:@"No Receipt Image"
+                                            message:[NSString stringWithFormat:@"Proceed without receipt?"]
+                                   cancelButtonItem:[RIButtonItem itemWithLabel:@"Take receipt picture" action:^
+                                                     {
+                                                         [self useCustomCamera];
+                                                     }]
+                                   otherButtonItems:[RIButtonItem itemWithLabel:@"Proceed" action:^
+                                                     {
+                                                         [self didFinishUploadingReceipt:nil];
+                                                     }], nil] show];
+            }
+            else
+            {
+                self.shouldSetStatusToAtStation = YES;
+                [SVProgressHUD showWithStatus:@"Uploading Receipt"];
+                UIImage * purchaseReceiptImage = [self.myOrderManager mergeReceiptImagesWithType:@"purchase" forOrder:self.myProduct.myOrder];
+                [self.myOrderManager uploadReceiptImage:purchaseReceiptImage withType:@"purchase" forOrder:self.myProduct.myOrder];
+            }
         }
         else
             [self setProductStatus:@"At Station"];
@@ -971,15 +990,18 @@
 {
     if ( self.isPurchaseReceipt )
     {
-        self.myProduct.myOrder.purchaseReceiptUrl = receiptUrl;
-        self.myProduct.myOrder.purchaseReceiptImage = self.purchaseReceiptView.receiptImageView.image;
-        for ( int i = 0; i < [self.myProduct.myOrder.products count]; i++ )
+        if ( receiptUrl != nil )
         {
-            [(Product *)[self.myProduct.myOrder.products objectAtIndex:i] setPurchaseReceiptImage:self.purchaseReceiptView.receiptImageView.image];
-            [(Product *)[self.myProduct.myOrder.products objectAtIndex:i] setPurchaseReceiptUrl:receiptUrl];
+            self.myProduct.myOrder.purchaseReceiptUrl = receiptUrl;
+            self.myProduct.myOrder.purchaseReceiptImage = self.purchaseReceiptView.receiptImageView.image;
+            for ( int i = 0; i < [self.myProduct.myOrder.products count]; i++ )
+            {
+                [(Product *)[self.myProduct.myOrder.products objectAtIndex:i] setPurchaseReceiptImage:self.purchaseReceiptView.receiptImageView.image];
+                [(Product *)[self.myProduct.myOrder.products objectAtIndex:i] setPurchaseReceiptUrl:receiptUrl];
+            }
+            [SVProgressHUD showSuccessWithStatus:@"Receipt Saved"];
         }
-        [SVProgressHUD showSuccessWithStatus:@"Receipt Saved"];
-        [self dismissReceiptView:self.purchaseReceiptView];
+        //[self dismissReceiptView:self.purchaseReceiptView];
         
         if ( self.shouldSetStatusToAtStation )
             [self setProductStatus:@"At Station"];
@@ -994,7 +1016,7 @@
             [(Product *)[self.myProduct.myOrder.products objectAtIndex:i] setReturnReceiptUrl:receiptUrl];
         }
         [SVProgressHUD showSuccessWithStatus:@"Receipt Saved"];
-        [self dismissReceiptView:self.returnReceiptView];
+        //[self dismissReceiptView:self.returnReceiptView];
     }
 }
 

@@ -16,6 +16,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    [[UIApplication sharedApplication] setStatusBarHidden:NO];
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
     
     self.signInButton.layer.borderColor = [[UIColor colorWithWhite:1 alpha:.5] CGColor];
     
@@ -109,17 +111,6 @@
     }
     
     return NO;
-}
-
-#pragma mark - misc.
-- (BOOL) prefersStatusBarHidden
-{
-    return NO; //not sure this does anyhting
-}
-
--(UIStatusBarStyle)preferredStatusBarStyle
-{
-    return UIStatusBarStyleLightContent;
 }
 
 @end

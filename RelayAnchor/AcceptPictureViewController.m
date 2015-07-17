@@ -11,15 +11,9 @@
 
 @implementation AcceptPictureViewController
 
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-}
-
 - (IBAction)retakeAction:(id)sender
 {
     [self dismissViewControllerAnimated:YES completion:nil];
-    //[self.navigationController popViewControllerAnimated:YES];
 }
 
 - (IBAction)usePhotoAction:(id)sender
@@ -28,21 +22,18 @@
     tmpReceiptImage = self.myImageView.image;
     
     self.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-    ItemDetailViewController * tmpItemDetailVC = (ItemDetailViewController *)[[self presentingViewController ] presentingViewController];
-    [tmpItemDetailVC dismissViewControllerAnimated:YES completion:^
+    
+    UIViewController <receiptCameraDelegate> * tmpVC = (UIViewController <receiptCameraDelegate> *)[[self presentingViewController] presentingViewController];
+    [tmpVC dismissViewControllerAnimated:YES completion:^
     {
-        [tmpItemDetailVC didFinishTakingPicture:tmpReceiptImage];
+        [tmpVC didFinishTakingReceiptPicture:tmpReceiptImage];
     }];
-    /*
-    iPhone_StoreFrontCategoryViewController * tmpVC = [self.navigationController.viewControllers objectAtIndex:self.navigationController.viewControllers.count-3];
-    [self.navigationController popToViewController:tmpVC animated:YES];
-    [tmpVC didFinishTakingPicture:tmpStoreFrontImage];
-     */
-}
-
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
+    
+//    ItemDetailViewController * tmpItemDetailVC = (ItemDetailViewController *)[[self presentingViewController ] presentingViewController];
+//    [tmpItemDetailVC dismissViewControllerAnimated:YES completion:^
+//    {
+//        [tmpItemDetailVC didFinishTakingPicture:tmpReceiptImage];
+//    }];
 }
 
 @end

@@ -70,12 +70,24 @@
     [headerTitleLabel setText:[NSString stringWithFormat:@"Order %@", self.myOrder.wcsOrderId]];
     [headerView addSubview:headerTitleLabel];
     
-    UILabel * orderPriceLabel = [[UILabel alloc] initWithFrame:CGRectMake(900, 0, 1000, 50)];
+    UILabel * orderPriceLabel = [[UILabel alloc] initWithFrame:CGRectMake(750, 0, 200, 50)];
     [orderPriceLabel setBackgroundColor:[UIColor whiteColor]];
     [orderPriceLabel setFont:[UIFont systemFontOfSize:20]];
+    [orderPriceLabel setTextAlignment:NSTextAlignmentRight];
     [orderPriceLabel setTextColor:[UIColor colorWithRed:(float)238/255 green:(float)118/255 blue:(float)36/255 alpha:1]];
     [orderPriceLabel setText:[NSString stringWithFormat:@"$%.2f", [self.myOrder.totalPrice floatValue]]];
     [headerView addSubview:orderPriceLabel];
+    
+    UIButton * receiptButton = [[UIButton alloc] initWithFrame:CGRectMake(950, 0, 50, 50)];
+    [[receiptButton imageView] setContentMode:UIViewContentModeCenter];
+    UIImage * receiptImage;
+    if ( self.myOrder.purchaseReceiptImage )
+        receiptImage = [UIImage imageWithCGImage:[self.myOrder.purchaseReceiptImage CGImage] scale:5.5 orientation:UIImageOrientationUp];
+    else
+        receiptImage = [UIImage imageWithCGImage:[[UIImage imageNamed:@"iPhone_OrderDetail_ReceiptButton.png"] CGImage] scale:1.5 orientation:UIImageOrientationUp];
+    [receiptButton setImage:receiptImage forState:UIControlStateNormal];
+    [receiptButton addTarget:self action:@selector(receiptButtonAction) forControlEvents:UIControlEventTouchUpInside];
+    [headerView addSubview:receiptButton];
     
     UIView * borderLine = [[UIView alloc] initWithFrame:CGRectMake(0, 48, 1000, 2)];
     [borderLine setBackgroundColor:[UIColor colorWithRed:.85 green:.85 blue:.85 alpha:1]];
@@ -387,15 +399,27 @@
     
     self.activeProduct = [self.productsForTableView objectAtIndex:[[self.OrderDetailTableView indexPathForCell:cell] row]];
     
-    if ( self.activeProduct.purchaseReceiptImage == nil )
-        [SVProgressHUD showErrorWithStatus:@"No Receipt Provided"];
-    else
-    {
         if ( [self.myOrderManager isLastProductToApprove:self.activeProduct] )
         {
-            [SVProgressHUD showWithStatus:@"Uploading Receipt"];
-            UIImage * purchaseReceiptImage = [self.myOrderManager mergeReceiptImagesWithType:@"purchase" forOrder:self.myOrder];
-            [self.myOrderManager uploadReceiptImage:purchaseReceiptImage withType:@"purchase" forOrder:self.myOrder];
+            if ( self.myOrder.purchaseReceiptImage == nil )
+            {
+                [[[UIAlertView alloc] initWithTitle:@"No Receipt Image"
+                                            message:[NSString stringWithFormat:@"Proceed without receipt?"]
+                                   cancelButtonItem:[RIButtonItem itemWithLabel:@"Take receipt picture" action:^
+                                                     {
+                                                         [self useCustomCamera];
+                                                     }]
+                                   otherButtonItems:[RIButtonItem itemWithLabel:@"Proceed" action:^
+                                                     {
+                                                         [self didFinishUploadingReceipt:nil];
+                                                     }], nil] show];
+            }
+            else
+            {
+                [SVProgressHUD showWithStatus:@"Uploading Receipt"];
+                UIImage * purchaseReceiptImage = [self.myOrderManager mergeReceiptImagesWithType:@"purchase" forOrder:self.myOrder];
+                [self.myOrderManager uploadReceiptImage:purchaseReceiptImage withType:@"purchase" forOrder:self.myOrder];
+            }
         }
         else
         {
@@ -412,7 +436,11 @@
                     [SVProgressHUD showErrorWithStatus:@"Error Saving Status"];
             }];
         }
-    }
+}
+
+- (void) finalizeAtStation
+{
+    
 }
 
 - (IBAction)deliveredAction:(id)sender
@@ -520,12 +548,16 @@
 
 - (void) didFinishUploadingReceipt:(NSURL *)receiptUrl
 {
-    self.myOrder.purchaseReceiptUrl = receiptUrl;
-    self.myOrder.purchaseReceiptImage =  self.activeProduct.purchaseReceiptImage;
-    for ( int i = 0; i < [self.myOrder.products count]; i++ )
+    if ( receiptUrl != nil )
     {
-        [(Product *)[self.myOrder.products objectAtIndex:i] setPurchaseReceiptImage:self.myOrder.purchaseReceiptImage];
-        [(Product *)[self.myOrder.products objectAtIndex:i] setPurchaseReceiptUrl:receiptUrl];
+        self.myOrder.purchaseReceiptUrl = receiptUrl;
+        self.myOrder.purchaseReceiptImage =  self.activeProduct.purchaseReceiptImage;
+        for ( int i = 0; i < [self.myOrder.products count]; i++ )
+        {
+            [(Product *)[self.myOrder.products objectAtIndex:i] setPurchaseReceiptImage:self.myOrder.purchaseReceiptImage];
+            [(Product *)[self.myOrder.products objectAtIndex:i] setPurchaseReceiptUrl:receiptUrl];
+        }
+        [self refreshDetails];
     }
     
     __weak typeof(self) weakSelf = self;
@@ -729,6 +761,24 @@
 }
 
 #pragma mark - misc.
+- (void) useCustomCamera
+{
+    UIStoryboard * myStoryboard = [UIStoryboard storyboardWithName:@"Storyboard" bundle:nil];
+    UIViewController * myCameraVC = [myStoryboard instantiateViewControllerWithIdentifier:@"myCameraViewController"];
+    myCameraVC.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+    [self presentViewController:myCameraVC animated:YES completion:nil];
+}
+
+- (void) receiptButtonAction
+{
+    [self useCustomCamera];
+}
+
+- (void) didFinishTakingReceiptPicture:(UIImage *)receiptImage
+{
+    self.myOrder.purchaseReceiptImage = receiptImage;
+}
+
 - (void) refreshDetails
 {
     [self.myOrderManager loadOrderDetailsForOrder:self.myOrder completion:nil];

@@ -22,4 +22,6 @@
 @property (weak, nonatomic) IBOutlet UILabel *fulfillmentAddressLabel;
 @property (weak, nonatomic) IBOutlet UIButton *assignRunnerButton;
 
+@property (weak, nonatomic) IBOutlet UIButton *swipeButton;
+
 @end

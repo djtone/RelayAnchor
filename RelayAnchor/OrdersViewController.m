@@ -171,7 +171,8 @@
 - (void) didChangeStatus:(BottomViewStatus)selectedStatus
 {
     self.statusesFirstLoad = YES;
-    self.ordersForTableView = @[];
+    //self.ordersForTableView = @[];
+    self.ordersForTableView = [self.myOrderManager.cachedOrders objectForKey:[EnumTypes stringFromLoadOrderStatus:[EnumTypes LoadOrderStatusFromBottomViewStatus:selectedStatus]]];
     [self.myOrderManager stopAutoRefreshOrders:^
     {
         [self.myOrderManager startAutoRefreshOrdersWithStatus:[EnumTypes LoadOrderStatusFromBottomViewStatus:selectedStatus] timeInterval:10];
